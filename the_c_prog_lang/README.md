@@ -2,7 +2,7 @@ Contains all the stuffs done for the book:
 The C Programming Language by K & R
 
 Use the following for compilation:
-gcc -Wall <source_file_name>.c
+gcc -Wall -Wextra -pedantic -Werror <source_file_name>.c
 
 NOTE
 1. In order to pass file as input to programs that use getchar() use: ./a.out < input.txt
