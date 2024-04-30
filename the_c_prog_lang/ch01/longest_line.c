@@ -6,11 +6,12 @@ long get_line(char *line) {
     int i = 0;
     int c = 0;
     while((c = getchar()) != EOF) {
-        ++i;
         if (c != '\n') {
             line[i] = c;
+            ++i;
         } else {
             line[i] = '\0';
+            ++i;
             break;
         }
     }
