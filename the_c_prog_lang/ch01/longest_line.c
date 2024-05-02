@@ -11,28 +11,28 @@ int main() {
     int max_line_length = 0;
     int line_length = 0;
     while ((line_length = get_line(line, MAX_LINE_LENGTH)) > 0) {
-        printf("Line = %s, length = %d\n", line, line_length);
+        printf("Line = %s", line);
+        printf("length = %d\n", line_length);
         if (line_length > max_line_length) {
             copy_from_to(line, max_line);
             max_line_length = line_length;
         }
     }
-    printf("Max line = %s, length = %d\n", max_line, max_line_length);
+    printf("Max line = %s", max_line);
+    printf("length = %d\n", max_line_length);
     return 0;
 }
 
 int get_line(char *line, int limit) {
     int i = 0;
     int c = 0;
-    while(((c = getchar()) != EOF) && i < limit) {
-        if (c != '\n') {
-            line[i] = c;
-            ++i;
-        } else {
-            line[i] = '\0';
-            ++i;
-            break;
-        }
+    while(((c = getchar()) != EOF) && (c != '\n') && (i < limit - 1)) {
+        line[i] = c;
+        ++i;
+    }
+    if (c == '\n') {
+        line[i] = c;
+        ++i;
     }
     line[i] = '\0';
     return i;
