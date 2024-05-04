@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+source "./venv/bin/activate"
+python .githooks/prepare-commit-msg.py "$@"
