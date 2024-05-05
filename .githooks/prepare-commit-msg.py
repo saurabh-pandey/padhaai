@@ -22,7 +22,7 @@ def is_disabled() -> bool:
         config = json.load(config_f)
         print(config)
         if "enablePrepareCommitMsg" in config:
-            return False
+            return config["enablePrepareCommitMsg"]
     return False
 
 
