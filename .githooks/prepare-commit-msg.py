@@ -20,6 +20,7 @@ def is_disabled() -> bool:
     config_file_path = (base_path / "../config.json").resolve()
     with open(config_file_path) as config_f:
         config = json.load(config_f)
+        print(config)
         if "enablePrepareCommitMsg" in config:
             return False
     return False
