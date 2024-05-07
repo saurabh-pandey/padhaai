@@ -27,10 +27,10 @@ def is_enabled() -> bool:
 
 def filter_code_files() -> List[str]:
     diff_output = check_output(["git",
-                                      "diff",
-                                      "--cached",
-                                      "--name-only",
-                                      "--diff-filter=ACDMR"]).decode()
+                                "diff",
+                                "--cached",
+                                "--name-only",
+                                "--diff-filter=ACDMR"]).decode()
     # print(changed_files_str)
     diff_output_list = diff_output.split("\n")
     changed_files = []
@@ -40,6 +40,19 @@ def filter_code_files() -> List[str]:
             changed_files.append(diff_line)
     return changed_files
 
+def construct_prefix(changed_files: List[str]) -> str:
+    for f in changed_files:
+        path_parts = f.split('/')
+        if len(path_parts) == 1:
+            return "PADHAAI"
+        elif len(path_parts) > 1:
+            config_file_path = (base_path / "../config.json").resolve()
+            with open(config_file_path) as config_f:
+                config = json.load(config_f)
+                if path_parts[0] in config["commitPrefix"]:
+                    return config["commitPrefix"][path_parts[0]] + "-" + path_parts[1].upper()
+    return ""
+
 def main():
     print(sys.argv)
     if not check_args():
@@ -48,6 +61,7 @@ def main():
         return 0
     changed_files : List[str] = filter_code_files()
     print(changed_files)
+    print(construct_prefix(changed_files))
     return 0
 
 main()
