@@ -3,12 +3,14 @@ import sys
 
 from pathlib import Path
 from subprocess import check_output
-from typing import Optional, List
+from typing import Optional, List, Any
 
 
+# Global varibles
 base_path = Path(__file__).parent
 
 
+# Helper functions
 def check_args() -> bool:
     if len(sys.argv) < 3:
         return False
@@ -16,12 +18,8 @@ def check_args() -> bool:
         return False
     return True
 
-def is_enabled() -> bool:
-    config_file_path = (base_path / "../config.json").resolve()
-    with open(config_file_path) as config_f:
-        config = json.load(config_f)
-        print(config)
-        if "enablePrepareCommitMsg" in config:
+def is_enabled(config: dict) -> bool:
+    if config and "enablePrepareCommitMsg" in config:
             return config["enablePrepareCommitMsg"]
     return False
 
@@ -40,28 +38,34 @@ def filter_code_files() -> List[str]:
             changed_files.append(diff_line)
     return changed_files
 
-def construct_prefix(changed_files: List[str]) -> str:
+def construct_prefix(changed_files: List[str], config: dict) -> str:
     for f in changed_files:
         path_parts = f.split('/')
         if len(path_parts) == 1:
             return "PADHAAI"
-        elif len(path_parts) > 1:
-            config_file_path = (base_path / "../config.json").resolve()
-            with open(config_file_path) as config_f:
-                config = json.load(config_f)
-                if path_parts[0] in config["commitPrefix"]:
-                    return config["commitPrefix"][path_parts[0]] + "-" + path_parts[1].upper()
+        elif len(path_parts) == 2:
+            if path_parts[0] in config["commitPrefix"]:
+                return config["commitPrefix"][path_parts[0]]
+        else:
+            if path_parts[0] in config["commitPrefix"]:
+                return config["commitPrefix"][path_parts[0]] + "-" + path_parts[1].upper()
     return ""
 
+# Main
 def main():
     print(sys.argv)
     if not check_args():
         return 0
-    if not is_enabled():
+    config_file_path = (base_path / "../config.json").resolve()
+    if config_file_path.is_file():
         return 0
-    changed_files : List[str] = filter_code_files()
-    print(changed_files)
-    print(construct_prefix(changed_files))
+    with open(config_file_path) as config_f:
+        config = json.load(config_f)
+        if not is_enabled(config.data()):
+            return 0
+        changed_files : List[str] = filter_code_files()
+        print(changed_files)
+        print(construct_prefix(changed_files))
     return 0
 
 main()
