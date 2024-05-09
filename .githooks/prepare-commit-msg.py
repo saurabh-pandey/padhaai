@@ -53,19 +53,19 @@ def construct_prefix(changed_files: List[str], config: dict) -> str:
 
 # Main
 def main():
-    print(sys.argv)
+    print("Args = ", sys.argv)
     if not check_args():
         return 0
     config_file_path = (base_path / "../config.json").resolve()
-    if config_file_path.is_file():
+    if not config_file_path.is_file():
         return 0
     with open(config_file_path) as config_f:
         config = json.load(config_f)
-        if not is_enabled(config.data()):
+        if not is_enabled(config):
             return 0
         changed_files : List[str] = filter_code_files()
-        print(changed_files)
-        print(construct_prefix(changed_files))
+        print("Changed files = ", changed_files)
+        print("Final prefix = ", construct_prefix(changed_files, config))
     return 0
 
 main()
