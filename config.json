@@ -1,5 +1,5 @@
 {
-    "enablePrepareCommitMsg": false,
+    "enablePrepareCommitMsg": true,
     "commitPrefix": {
         "the_c_prog_lang": "TCPL"
     }

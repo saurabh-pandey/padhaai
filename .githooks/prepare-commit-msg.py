@@ -38,22 +38,34 @@ def filter_code_files() -> List[str]:
             changed_files.append(diff_line)
     return changed_files
 
-def construct_prefix(changed_files: List[str], config: dict) -> str:
+def construct_prefix(changed_files: List[str], config: dict) -> tuple:
+    prefixes = ["", "", ""]
     for f in changed_files:
         path_parts = f.split('/')
         if len(path_parts) == 1:
-            return "PADHAAI"
+            prefixes[0] = "PADHAAI"
         elif len(path_parts) == 2:
             if path_parts[0] in config["commitPrefix"]:
-                return config["commitPrefix"][path_parts[0]]
+                prefixes[1] = config["commitPrefix"][path_parts[0]]
+            else:
+                prefixes[0] = "PADHAAI"
         else:
             if path_parts[0] in config["commitPrefix"]:
-                return config["commitPrefix"][path_parts[0]] + "-" + path_parts[1].upper()
-    return ""
+                prefixes[2] = config["commitPrefix"][path_parts[0]] + "-" + path_parts[1].upper()
+            else:
+                prefixes[0] = "PADHAAI"
+    return tuple(prefixes)
+
+def update_commit_message(commit_prefix):
+    commit_msg_filepath = sys.argv[1]
+    with open(commit_msg_filepath, 'r+') as f:
+        content = f.read()
+        f.seek(0, 0)
+        f.write(f"{commit_prefix}: {content}")
+
 
 # Main
 def main():
-    print("Args = ", sys.argv)
     if not check_args():
         return 0
     config_file_path = (base_path / "../config.json").resolve()
@@ -64,8 +76,11 @@ def main():
         if not is_enabled(config):
             return 0
         changed_files : List[str] = filter_code_files()
-        print("Changed files = ", changed_files)
-        print("Final prefix = ", construct_prefix(changed_files, config))
+        prefixes = construct_prefix(changed_files, config)
+        for prefix in prefixes:
+            if len(prefix) > 0:
+                update_commit_message(prefix)
+                break
     return 0
 
 main()
