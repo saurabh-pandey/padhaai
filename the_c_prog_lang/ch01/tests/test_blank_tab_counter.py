@@ -27,27 +27,54 @@ class TestBlankTabCounter(unittest.TestCase):
         cls.exe = "bin/" + pathlib.Path(__file__).stem[len("test_"):]
 
     def test_simple(self):
-        output = subprocess.run([self.exe], capture_output=True, text=True, input=repeat_inp).stdout
-        print("### = ", output.splitlines())
-        # self.assertEqual(output.splitlines(), ['Total number of Lines = 0'])
+        output = subprocess.run([self.exe], capture_output=True, text=True, input=single_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 2 and blank = 2'])
     
-    # def test_empty(self):
-    #     output = subprocess.run([self.exe], capture_output=True, text=True, input='').stdout
-    #     self.assertEqual(output.splitlines(), ['Total number of Lines = 0'])
+    def test_empty(self):
+        output = subprocess.run([self.exe], capture_output=True, text=True, input="").stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 0 and blank = 0'])
     
-    # def test_two_lines(self):
-    #     output = subprocess.run([self.exe],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=two_lines_inp).stdout
-    #     self.assertEqual(output.splitlines(), ['Total number of Lines = 2'])
+    def test_trail_lead_space(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=trail_lead_space_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 2 and blank = 4'])
     
-    # def test_single_line(self):
-    #     output = subprocess.run([self.exe],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=single_line_inp).stdout
-    #     self.assertEqual(output.splitlines(), ['Total number of Lines = 1'])
+    def test_trail_lead_tab(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=trail_lead_tab_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 4 and blank = 2'])
+    
+    def test_two_lines(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=two_lines_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 0 and blank = 4'])
+    
+    def test_blank_tab(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=blank_tab_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 4 and blank = 4'])
+    
+    def test_single_line(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=single_line_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 0 and blank = 0'])
+    
+    def test_repeat(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=repeat_inp).stdout
+        self.assertEqual(output.splitlines(), ['Number of tabs = 3 and blank = 3'])
 
 
 if __name__ == '__main__':
