@@ -15,7 +15,8 @@ single_line_inp = '''
 class TestLineCounter(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.exe = "bin/" + pathlib.Path(__file__).stem[len("test_"):]
+        p = pathlib.Path(__file__)
+        cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
 
     def test_simple(self):
         output = subprocess.run([self.exe], capture_output=True, text=True, input=single_inp).stdout
