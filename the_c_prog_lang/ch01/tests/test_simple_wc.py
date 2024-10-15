@@ -22,11 +22,7 @@ class TestLongestLine(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         p = pathlib.Path(__file__)
-        # exe = p.stem[len("test_"):]
-        # print("### exe = ", exe)
-        # print("### path = ", pathlib.Path(p.parents[1] / 'bin'))
         cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
-        print("### cls.exe = ", cls.exe)
 
     def test_simple(self):
         output = subprocess.run([self.exe], capture_output=True, text=True, input=single_inp).stdout
