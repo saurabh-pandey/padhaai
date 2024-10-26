@@ -4,13 +4,16 @@ CFLAGS=-Wall
 BIN=bin
 $(shell mkdir -p $(BIN))
 
+JUST_EXECS = simple_atoi simple_test
+EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
+
 $(BIN)/% : $(BIN)/%.o
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(BIN)/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-all: $(BIN)/simple_atoi $(BIN)/simple_test
+all: $(EXECS)
 
 $(BIN)/simple_test : simple_test.c my_add.c
 	$(CC) $(CFLAGS) -o $@ $^ -I.
@@ -20,8 +23,6 @@ $(BIN)/simple_test : simple_test.c my_add.c
 clean:
 	rm -r $(BIN)
 
-EXES = $(BIN)/simple_atoi $(BIN)/simple_test
-
 test:
 	@echo "Running tests\n"
-	@$(foreach var, $(EXES), ./$(var) && echo ;)
+	@$(foreach exec, $(EXECS), ./$(exec) && echo ;)

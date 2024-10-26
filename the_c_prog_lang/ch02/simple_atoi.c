@@ -34,7 +34,7 @@ int main() {
 
     const int result = simple_atoi("0013");
     printf("Result = %d\n", result);
-    if (result == 0) {
+    if (result == 13) {
         printf("Test 0 passed\n");
     } else {
         printf("Test 0 failed\n");
