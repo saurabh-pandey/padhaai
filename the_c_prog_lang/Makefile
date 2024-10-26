@@ -1,14 +1,14 @@
+CHAPTERS = ch01 ch02
+
 all:
-	echo "Spin all things from here"
-	pwd
-	cd ch01 && pwd && $(MAKE) all && pwd
-	pwd
+	@echo "Building everything"
+	$(foreach var, $(CHAPTERS), cd $(var) && $(MAKE) all && cd ..;)
 
 test:
-	echo "Spin tests from here"
-	pwd
-	cd ch01 && pwd && $(MAKE) test && pwd
-	pwd
+	@echo "Running all tests"
+	$(foreach var, $(CHAPTERS), cd $(var) && $(MAKE) test && cd ..;)
 
 clean:
-	cd ch01 && pwd && $(MAKE) clean && pwd
+	@echo "Cleaning"
+	$(foreach var, $(CHAPTERS), cd $(var) && $(MAKE) clean && cd ..;)
+
