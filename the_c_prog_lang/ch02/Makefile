@@ -15,7 +15,7 @@ $(BIN)/%.o : %.c
 
 all: $(EXECS)
 
-$(BIN)/simple_test : simple_test.c my_add.c
+$(BIN)/simple_test : simple_test.c my_add.c my_add.h
 	$(CC) $(CFLAGS) -o $@ $^ -I.
 
 
