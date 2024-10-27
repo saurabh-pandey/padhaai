@@ -1,12 +1,11 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
+
+// My original attempt
 // int simple_atoi(const char inp[]) {
 //     int i = 0;
-//     for (i = 0; inp[i] != '\0'; ++i) {
-//         printf("%c, %d\n", inp[i], inp[i]);
-//     }
-//     printf("Size = %d\n", i);
 //     unsigned int size = i;
 //     int n = 0;
 //     // unsigned pow = 1;
@@ -20,14 +19,12 @@ int simple_atoi(const char inp[]) {
     int i = 0;
     int n = 0;
     for (i = 0; inp[i] != '\0'; ++i) {
-        // printf("%c, %d\n", inp[i], inp[i]);
         if (inp[i] >= '0' && inp[i] <= '9') {
             n = 10 * n + (inp[i] - '0');
         } else {
             return -1;
         }
     }
-    printf("n = %d\n", n);
     return n;
 }
 
@@ -37,6 +34,8 @@ typedef struct test_data {
 } test_data;
 
 int main() {
+    bool debug = false;
+    
     printf("Running tests for simple_atoi\n");
 
     test_data arr [] = {
@@ -58,7 +57,12 @@ int main() {
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
         const int result = simple_atoi(arr[i].input);
-        printf("Input = %s, expected = %d and result = %d\n", arr[i].input, arr[i].value, result);
+        if (debug) {
+            printf("Input = %s, expected = %d and result = %d\n",
+                   arr[i].input,
+                   arr[i].value,
+                   result);
+        }
         if (result != arr[i].value) {
             printf("FAILED input = %s, expected = %d and result = %d\n",
                    arr[i].input,
