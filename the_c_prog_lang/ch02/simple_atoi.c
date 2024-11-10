@@ -4,18 +4,24 @@
 
 
 // My original attempt
-// int simple_atoi(const char inp[]) {
-//     int i = 0;
-//     unsigned int size = i;
-//     int n = 0;
-//     // unsigned pow = 1;
-//     for (i = 0; inp[i] != '\0'; ++i) {
-//         n += pow(10, (size - i - 1)) * (inp[i] - 48);
-//     }
-//     return n;
-// }
+int simple_atoi_v1(const char inp[]) {
+    int i = 0;
+    for (i = 0; inp[i] != '\0'; ++i) {
+        if (inp[i] < '0' || inp[i] > '9') {
+            return -1;
+        } 
+    }
+    unsigned int size = i;
+    int n = 0;
+    // unsigned pow = 1;
+    for (i = 0; inp[i] != '\0'; ++i) {
+        n += pow(10, (size - i - 1)) * (inp[i] - 48);
+    }
+    return n;
+}
 
-int simple_atoi(const char inp[]) {
+// Better book version
+int simple_atoi_v2(const char inp[]) {
     int i = 0;
     int n = 0;
     for (i = 0; inp[i] != '\0'; ++i) {
@@ -56,18 +62,30 @@ int main() {
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
-        const int result = simple_atoi(arr[i].input);
+        const int result1 = simple_atoi_v1(arr[i].input);
+        const int result2 = simple_atoi_v2(arr[i].input);
         if (debug) {
             printf("Input = %s, expected = %d and result = %d\n",
                    arr[i].input,
                    arr[i].value,
-                   result);
-        }
-        if (result != arr[i].value) {
-            printf("FAILED input = %s, expected = %d and result = %d\n",
+                   result1);
+            printf("Input = %s, expected = %d and result = %d\n",
                    arr[i].input,
                    arr[i].value,
-                   result);
+                   result2);
+        }
+        if (result1 != arr[i].value) {
+            printf("FAILED v1 input = %s, expected = %d and result1 = %d\n",
+                   arr[i].input,
+                   arr[i].value,
+                   result1);
+            ++num_failed;
+        }
+        if (result2 != arr[i].value) {
+            printf("FAILED v2 input = %s, expected = %d and result2 = %d\n",
+                   arr[i].input,
+                   arr[i].value,
+                   result2);
             ++num_failed;
         }
     }
