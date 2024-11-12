@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 
 BIN=bin
 $(shell mkdir -p $(BIN))
