@@ -4,6 +4,19 @@
 
 // Remove all occurrence of c in input string
 void squeeze(char input[], char c) {
+    // Pathological input
+    if (c == '\0') {
+        return;
+    }
+    
+    int j = 0;
+    for (int i = 0; input[i] != '\0'; ++i) {
+        if (input[i] != c) {
+            input[j] = input[i];
+            ++j;
+        }
+    }
+    input[j] = '\0';
 }
 
 typedef struct test_data
@@ -14,7 +27,7 @@ typedef struct test_data
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
     test_data arr[] = {
         {"abcde", 'c'},
@@ -23,10 +36,13 @@ int main() {
         {"c", 'c'},
         {"", 'c'},
         {"cccc", 'c'},
-        {"abdefc", 'c'}
+        {"abdefc", 'c'},
+        {"abcdef", '\0'}
     };
 
     int num_failed = 0;
+
+    printf("Running tests for squeeze\n");
 
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
         if (debug) {
@@ -36,11 +52,13 @@ int main() {
         if (debug) {
             printf("Result = %s\n", arr[i].input);
         }
-        for (int j = 0; arr[i].input[j] != '\0'; ++j) {
-            if (arr[i].input[j] == arr[i].c) {
-                printf("Failed for test # %d\n", i);
-                ++num_failed;
-                break;
+        if (arr[i].c != '\0') {
+            for (int j = 0; arr[i].input[j] != '\0'; ++j) {
+                if (arr[i].input[j] == arr[i].c) {
+                    printf("Failed for test # %d\n", i);
+                    ++num_failed;
+                    break;
+                }
             }
         }
     }
