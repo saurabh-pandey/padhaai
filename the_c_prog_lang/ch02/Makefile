@@ -4,7 +4,7 @@ CFLAGS=-Wall -g
 BIN=bin
 $(shell mkdir -p $(BIN))
 
-JUST_EXECS = simple_atoi simple_test simple_tolower simple_htoi
+JUST_EXECS = simple_atoi simple_test simple_tolower simple_htoi squeeze
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
