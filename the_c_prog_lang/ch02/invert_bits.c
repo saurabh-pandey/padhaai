@@ -37,9 +37,9 @@ typedef struct test_data {
 } test_data;
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
-    printf("Running tests for getbits\n");
+    printf("Running tests for invert_bits\n");
 
     // NOTE: All string are of size SIZE
     test_data arr [] = {
