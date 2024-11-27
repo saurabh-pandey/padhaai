@@ -6,7 +6,9 @@
 
 
 unsigned right_rotate(unsigned x, int n) {
+    // Store first n bits which will be right shifted
     const unsigned first_n_bits = x & ~(~0 << n);
+    // Right shift and to rotate copy the first n bits to the end
     return (x >> n) | (first_n_bits << (UNSIGNED_SIZE - n));
 }
 
@@ -58,25 +60,28 @@ int main() {
         {0, 0},
         {0, 10},
         {1, 1},
-        {2, 1}
+        {2, 1},
+        {3, 1},
+        {4, 1},
+        {4, 2},
+        {8, 1},
+        {8, 2},
+        {8, 3},
+        {23, 1},
+        {1001, 5},
+        {4999, 3}
     };
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
-        printf("x = %d\n", arr[i].x);
         unsigned rotated = right_rotate(arr[i].x, arr[i].n);
-
-        printf("rotated = %u\n", rotated); 
         
         char original_bits[UNSIGNED_SIZE + 1] = {'0'};
         fill_unsigned_to_bits(arr[i].x, original_bits);
-        printf("x bits = %s\n", original_bits);
         
         right_rotate_bits_array(original_bits, arr[i].n);
-        printf("rotated bits = %s\n", original_bits);
         
         unsigned rotated_bits_result = convert_bits_to_unsigned(original_bits);
-        printf("rotated bits result = %u\n", rotated_bits_result);
         
         if (debug) {
             printf("Input = %u, n = %d, expected = %u and result = %u\n",
