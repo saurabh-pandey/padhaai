@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "bits_helper.h"
+
 
 #define UNSIGNED_SIZE (sizeof(unsigned) * 8)
 
@@ -30,16 +32,6 @@ void right_rotate_bits_array(char bits[], int n) {
         }
         bits[0] = temp;
     }
-}
-
-
-unsigned convert_bits_to_unsigned(char bits[]) {
-    unsigned n = 0;
-    for (int i = 0; bits[i] != '\0'; ++i) {
-        unsigned value = (bits[i] == '1') ? 1 : 0;
-        n = value + (n << 1);
-    }
-    return n;
 }
 
 
