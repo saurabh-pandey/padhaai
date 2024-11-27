@@ -54,7 +54,6 @@ int main() {
     
     printf("Running tests for right_rotate_bits\n");
 
-    // NOTE: All string are of size SIZE
     test_data arr [] = {
         {0, 3},
         {0, 0},
