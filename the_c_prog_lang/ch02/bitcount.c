@@ -6,7 +6,7 @@
 
 #define SIZE 11
 
-int bitcount(unsigned x) {
+int bitcount_v1(unsigned x) {
     int count = 0;
     while (x > 0) {
         if (x & 1) {
@@ -15,7 +15,17 @@ int bitcount(unsigned x) {
         x >>= 1;
     }
     return count;
-} 
+}
+
+
+int bitcount_v2(unsigned x) {
+    int count = 0;
+    while (x > 0) {
+        ++count;
+        x &= (x - 1);
+    }
+    return count;
+}
 
 
 int count_on_bits(char bits[]) {
@@ -55,23 +65,26 @@ int main() {
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
         unsigned x = convert_bits_to_unsigned(arr[i].bits);
         
-        int result = bitcount(x);
+        int result1 = bitcount_v1(x);
+        int result2 = bitcount_v2(x);
         
         int expected = count_on_bits(arr[i].bits);
 
         if (debug) {
-            printf("Input = %s, x = %u, expected = %d and result = %d\n",
+            printf("Input = %s, x = %u, expected = %d, result1 = %d and result2 = %d\n",
                    arr[i].bits,
                    x,
                    expected,
-                   result);
+                   result1,
+                   result2);
         }
-        if (result != expected) {
-            printf("Input = %s, x = %u, expected = %d and result = %d\n",
+        if ((result1 != expected) || (result2 != expected)) {
+            printf("Input = %s, x = %u, expected = %d, result1 = %d and result2 = %d\n",
                    arr[i].bits,
                    x,
                    expected,
-                   result);
+                   result1,
+                   result2);
             ++num_failed;
         }
     }
