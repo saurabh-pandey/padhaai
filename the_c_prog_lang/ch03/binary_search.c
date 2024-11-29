@@ -2,7 +2,8 @@
 #include <stdbool.h>
 
 
-int binary_search(int x, int nums[], int size) {
+// 2 comparison binary search
+int binary_search_v1(int x, int nums[], int size) {
     int begin = 0;
     int end = size - 1;
     while(begin <= end) {
@@ -14,6 +15,31 @@ int binary_search(int x, int nums[], int size) {
         } else {
             return mid;
         }
+    }
+    return -1;
+}
+
+
+// Single comparison binary search
+int binary_search_v2(int x, int nums[], int size) {
+    if (size == 0) {
+        return -1;
+    }
+    
+    int begin = 0;
+    int end = size - 1;
+    while(begin < end - 1) {
+        int mid = (begin + end) / 2;
+        if (x < nums[mid]) {
+            end = mid - 1;
+        } else {
+            begin = mid;
+        }
+    }
+    if (nums[begin] == x) {
+        return begin;
+    } else if (nums[end] == x) {
+        return end;
     }
     return -1;
 }
@@ -46,24 +72,32 @@ int main() {
         {-1, {0}, 1, -1},
         {1, {0}, 1, -1},
         {1, {}, 0, -1},
-        {0, {}, 0, -1}
+        {0, {}, 0, -1},
+        {1, {0, 2, 4, 6}, 4, -1},
+        {3, {0, 2, 4, 6}, 4, -1},
+        {5, {0, 2, 4, 6}, 4, -1},
+        {1, {0, 2, 4}, 3, -1},
+        {3, {0, 2, 4}, 3, -1}
     };
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
-        const unsigned index = binary_search(arr[i].x, arr[i].nums, arr[i].size);
+        const unsigned index1 = binary_search_v1(arr[i].x, arr[i].nums, arr[i].size);
+        const unsigned index2 = binary_search_v2(arr[i].x, arr[i].nums, arr[i].size);
 
         if (debug) {
-            printf("x = %d, expected = %d, result = %d\n",
+            printf("x = %d, expected = %d, result1 = %d, , result2 = %d\n",
                    arr[i].x,
                    arr[i].expected,
-                   index);
+                   index1,
+                   index2);
         }
-        if (index != arr[i].expected) {
-            printf("x = %d, expected = %d, result = %d\n",
+        if ((index1 != arr[i].expected) || (index2 != arr[i].expected)) {
+            printf("x = %d, expected = %d, result1 = %d, , result2 = %d\n",
                    arr[i].x,
                    arr[i].expected,
-                   index);
+                   index1,
+                   index2);
             ++num_failed;
         }
     }
