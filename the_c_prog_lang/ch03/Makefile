@@ -5,7 +5,7 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = binary_search shell_sort
+JUST_EXECS = binary_search shell_sort reverse_string
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
