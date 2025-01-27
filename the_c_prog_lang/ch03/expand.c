@@ -1,22 +1,27 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define MAX_SIZE_EXPANSION 100
+#define MAX_SIZE_INPUT 20
+#define MAX_SIZE_OUTPUT 100
 
 
 void expand(char input[], char output[]) {
     // Basic idea is to have a list of "Series" that we support expanding
     // For eg, a-z is abcd ... xyz
-    // Now search for "-" and looks at the left and right chars
+    // Start looping through input
+    // If char is "-" and their are some chars to the left and right
     // Left char < right char
     // Left char and right char should be part of the same series
     // Now we can expand by looping the series
+    // Fill the ouput with the expansion
+    // If any of the above criteria is not met fill output with the original input char
+    // Move to the next char
 }
 
 
 typedef struct test_data {
-    char input[20];
-    char output[MAX_SIZE_EXPANSION];
+    char input[MAX_SIZE_INPUT];
+    char output[MAX_SIZE_OUTPUT];
 } test_data;
 
 
@@ -94,10 +99,7 @@ int main() {
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
-        char output[MAX_SIZE_EXPANSION] = {0};
-
-        // Empty the string
-        output[0] = '\0';
+        char output[MAX_SIZE_OUTPUT] = {0};
         
         if (debug) {
             printf("input = %s\n", arr[i].input);
