@@ -1,13 +1,22 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define MAX_SIZE_EXPANSION 100
 
-void expand(char input[], char output[]) {}
+
+void expand(char input[], char output[]) {
+    // Basic idea is to have a list of "Series" that we support expanding
+    // For eg, a-z is abcd ... xyz
+    // Now search for "-" and looks at the left and right chars
+    // Left char < right char
+    // Left char and right char should be part of the same series
+    // Now we can expand by looping the series
+}
 
 
 typedef struct test_data {
     char input[20];
-    char output[20];
+    char output[MAX_SIZE_EXPANSION];
 } test_data;
 
 
@@ -27,7 +36,7 @@ bool compare_string(char s1[], char s2[]) {
 
 
 int main() {
-    bool debug = false;
+    bool debug = true;
     
     printf("Running tests for expand\n");
 
@@ -85,19 +94,24 @@ int main() {
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
+        char output[MAX_SIZE_EXPANSION] = {0};
+
+        // Empty the string
+        output[0] = '\0';
+        
         if (debug) {
             printf("input = %s\n", arr[i].input);
         }
         
-        reverse_string(arr[i].input);
+        // expand(arr[i].input, output);
         
         if (debug) {
-            printf("output = %s, expected = %s\n", arr[i].input, arr[i].output);
+            printf("input = %s, output = %s, expected = %s\n", arr[i].input, output, arr[i].output);
         }
-        if (!compare_string(arr[i].input, arr[i].output)) {
-            printf("expected = %s, result = %s\n", arr[i].output, arr[i].input);
-            ++num_failed;
-        }
+        // if (!compare_string(output, arr[i].output)) {
+        //     printf("input = %s, output = %s, expected = %s\n", arr[i].input, output, arr[i].output);
+        //     ++num_failed;
+        // }
     }
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
