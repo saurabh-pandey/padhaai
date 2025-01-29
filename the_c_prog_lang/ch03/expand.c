@@ -5,6 +5,24 @@
 #define MAX_SIZE_OUTPUT 100
 
 
+typedef struct series {
+    char all_values[100];
+} series;
+
+
+series supported_series[] = {
+    "abcdefghijklmnopqrstuvwxyz",
+    "0123456789"
+};
+
+
+int find_series(char val) {
+    for (int i = 0; i < sizeof(supported_series)/sizeof(series); ++i) {
+        for (int j = 0; supported_series[i][j] != '\0'; ++j) {
+        }
+    }
+}
+
 void expand(char input[], char output[]) {
     // Basic idea is to have a list of "Series" that we support expanding
     // For eg, a-z is abcd ... xyz
@@ -16,6 +34,40 @@ void expand(char input[], char output[]) {
     // Fill the ouput with the expansion
     // If any of the above criteria is not met fill output with the original input char
     // Move to the next char
+    int i = 0;
+    int j = 0;
+    while (input[i] != '\0') {
+        if ((input[i] == '-')) {
+            if (i == 0) {
+                output[j] = input[i];
+                ++i;
+                ++j;
+            } else if (input[i + 1] == '\0') {
+                output[j] = input[i];
+                ++i;
+                ++j;
+            } else {
+                char left_char = input[i - 1];
+                char right_char = input[i + 1];
+                if ()
+                if (!try_expand(left_char, right_char)) {
+                    output[j] = input[i - 1];
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                }
+            }
+        } else if (input[i + 1] != '-') {
+            output[j] = input[i];
+            ++i;
+            ++j;
+        }
+    }
+    output[j] = '\0';
 }
 
 
