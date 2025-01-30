@@ -6,21 +6,35 @@
 
 
 typedef struct series {
-    char all_values[100];
+    char data[100];
 } series;
 
 
 series supported_series[] = {
-    "abcdefghijklmnopqrstuvwxyz",
-    "0123456789"
+    {"abcdefghijklmnopqrstuvwxyz"},
+    {"0123456789"}
 };
 
 
-int find_series(char val) {
+typedef struct search_result {
+    int series_index;
+    int data_index;
+} search_result;
+
+
+
+search_result search(char val) {
+    search_result result = {-1, -1};
     for (int i = 0; i < sizeof(supported_series)/sizeof(series); ++i) {
-        for (int j = 0; supported_series[i][j] != '\0'; ++j) {
+        for (int j = 0; supported_series[i].data[j] != '\0'; ++j) {
+            if (val == supported_series[i].data[j]) {
+                result.series_index = i;
+                result.data_index = j;
+                return result;
+            }
         }
     }
+    return result;
 }
 
 void expand(char input[], char output[]) {
@@ -37,7 +51,7 @@ void expand(char input[], char output[]) {
     int i = 0;
     int j = 0;
     while (input[i] != '\0') {
-        if ((input[i] == '-')) {
+        if (input[i] == '-') {
             if (i == 0) {
                 output[j] = input[i];
                 ++i;
@@ -48,9 +62,8 @@ void expand(char input[], char output[]) {
                 ++j;
             } else {
                 char left_char = input[i - 1];
-                char right_char = input[i + 1];
-                if ()
-                if (!try_expand(left_char, right_char)) {
+                search_result left_char_search_res = search(left_char);
+                if (left_char_search_res.series_index == -1) {
                     output[j] = input[i - 1];
                     ++j;
                     output[j] = input[i];
@@ -59,12 +72,77 @@ void expand(char input[], char output[]) {
                     output[j] = input[i];
                     ++i;
                     ++j;
+                    continue;
+                } else if (left_char_search_res.data_index == -1) {
+                    output[j] = input[i - 1];
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    continue;
+                }
+                char right_char = input[i + 1];
+                search_result right_char_search_res = search(right_char);
+                if (right_char_search_res.series_index == -1) {
+                    output[j] = input[i - 1];
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    continue;
+                } else if (right_char_search_res.data_index == -1) {
+                    output[j] = input[i - 1];
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    continue;
+                } else if (left_char_search_res.series_index != right_char_search_res.series_index) {
+                    output[j] = input[i - 1];
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    continue;
+                } else if (left_char_search_res.data_index >= right_char_search_res.data_index) {
+                    output[j] = input[i - 1];
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
+                    continue;
+                } else {
+                    const int series_index = left_char_search_res.series_index;
+                    const int data_start_index = left_char_search_res.data_index;
+                    const int data_end_index = right_char_search_res.data_index;
+                    for (int it = data_start_index; it <= data_end_index; ++it) {
+                        output[j] = supported_series[series_index].data[it];
+                        ++j;
+                    }
+                    i += 2;
                 }
             }
         } else if (input[i + 1] != '-') {
             output[j] = input[i];
             ++i;
             ++j;
+        } else {
+            ++i;
         }
     }
     output[j] = '\0';
@@ -157,16 +235,20 @@ int main() {
             printf("input = %s\n", arr[i].input);
         }
         
-        // expand(arr[i].input, output);
+        expand(arr[i].input, output);
         
         if (debug) {
             printf("input = %s, output = %s, expected = %s\n", arr[i].input, output, arr[i].output);
         }
-        // if (!compare_string(output, arr[i].output)) {
-        //     printf("input = %s, output = %s, expected = %s\n", arr[i].input, output, arr[i].output);
-        //     ++num_failed;
-        // }
+        if (!compare_string(output, arr[i].output)) {
+            printf("Failed input = %s, output = %s, expected = %s\n",
+                   arr[i].input,
+                   output,
+                   arr[i].output);
+            ++num_failed;
+        }
     }
+    
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
     } else {
