@@ -116,7 +116,7 @@ void expand(char input[], char output[]) {
                     ++i;
                     ++j;
                     continue;
-                } else if (left_char_search_res.data_index >= right_char_search_res.data_index) {
+                } else if (left_char_search_res.data_index > right_char_search_res.data_index) {
                     output[j] = input[i - 1];
                     ++j;
                     output[j] = input[i];
@@ -171,7 +171,7 @@ bool compare_string(char s1[], char s2[]) {
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
     printf("Running tests for expand\n");
 
