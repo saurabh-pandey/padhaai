@@ -64,8 +64,8 @@ void expand(char input[], char output[]) {
                 char left_char = input[i - 1];
                 search_result left_char_search_res = search(left_char);
                 if (left_char_search_res.series_index == -1) {
-                    output[j] = input[i - 1];
-                    ++j;
+                    // output[j] = input[i - 1];
+                    // ++j;
                     output[j] = input[i];
                     ++i;
                     ++j;
@@ -74,8 +74,8 @@ void expand(char input[], char output[]) {
                     ++j;
                     continue;
                 } else if (left_char_search_res.data_index == -1) {
-                    output[j] = input[i - 1];
-                    ++j;
+                    // output[j] = input[i - 1];
+                    // ++j;
                     output[j] = input[i];
                     ++i;
                     ++j;
@@ -87,8 +87,8 @@ void expand(char input[], char output[]) {
                 char right_char = input[i + 1];
                 search_result right_char_search_res = search(right_char);
                 if (right_char_search_res.series_index == -1) {
-                    output[j] = input[i - 1];
-                    ++j;
+                    // output[j] = input[i - 1];
+                    // ++j;
                     output[j] = input[i];
                     ++i;
                     ++j;
@@ -97,8 +97,8 @@ void expand(char input[], char output[]) {
                     ++j;
                     continue;
                 } else if (right_char_search_res.data_index == -1) {
-                    output[j] = input[i - 1];
-                    ++j;
+                    // output[j] = input[i - 1];
+                    // ++j;
                     output[j] = input[i];
                     ++i;
                     ++j;
@@ -107,8 +107,8 @@ void expand(char input[], char output[]) {
                     ++j;
                     continue;
                 } else if (left_char_search_res.series_index != right_char_search_res.series_index) {
-                    output[j] = input[i - 1];
-                    ++j;
+                    // output[j] = input[i - 1];
+                    // ++j;
                     output[j] = input[i];
                     ++i;
                     ++j;
@@ -117,8 +117,8 @@ void expand(char input[], char output[]) {
                     ++j;
                     continue;
                 } else if (left_char_search_res.data_index > right_char_search_res.data_index) {
-                    output[j] = input[i - 1];
-                    ++j;
+                    // output[j] = input[i - 1];
+                    // ++j;
                     output[j] = input[i];
                     ++i;
                     ++j;
@@ -130,19 +130,17 @@ void expand(char input[], char output[]) {
                     const int series_index = left_char_search_res.series_index;
                     const int data_start_index = left_char_search_res.data_index;
                     const int data_end_index = right_char_search_res.data_index;
-                    for (int it = data_start_index; it <= data_end_index; ++it) {
+                    for (int it = data_start_index + 1; it <= data_end_index; ++it) {
                         output[j] = supported_series[series_index].data[it];
                         ++j;
                     }
                     i += 2;
                 }
             }
-        } else if (input[i + 1] != '-') {
+        } else {
             output[j] = input[i];
             ++i;
             ++j;
-        } else {
-            ++i;
         }
     }
     output[j] = '\0';
@@ -204,7 +202,11 @@ int main() {
         {"*&-()", "*&-()"},
         {"!-!", "!-!"},
         {"a-a", "a"},
+        {"c-c", "c"},
+        {"z-z", "z"},
+        {"0-0", "0"},
         {"2-2", "2"},
+        {"9-9", "9"},
         {"a-b-c", "abc"},
         {"a-d-g", "abcdefg"},
         {"0-3-5", "012345"},
