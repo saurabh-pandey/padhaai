@@ -37,17 +37,32 @@ search_result search(char val) {
     return result;
 }
 
+
+bool is_char_found(search_result res) {
+    return (res.series_index != -1) && (res.data_index != -1);
+}
+
+
+bool can_expand(search_result left, search_result right) {
+    if (!is_char_found(left)) {
+        return false;
+    }
+    if (!is_char_found(right)) {
+        return false;
+    }
+    if (left.series_index != right.series_index) {
+        // Left and right chars around '-' are in different series
+        return false;
+    }
+    if (left.data_index > right.data_index) {
+        // the expansion is in reverse so don't expand
+        return false;
+    }
+    return true;
+}
+
+
 void expand(char input[], char output[]) {
-    // Basic idea is to have a list of "Series" that we support expanding
-    // For eg, a-z is abcd ... xyz
-    // Start looping through input
-    // If char is "-" and their are some chars to the left and right
-    // Left char < right char
-    // Left char and right char should be part of the same series
-    // Now we can expand by looping the series
-    // Fill the ouput with the expansion
-    // If any of the above criteria is not met fill output with the original input char
-    // Move to the next char
     int i = 0;
     int j = 0;
     while (input[i] != '\0') {
@@ -63,70 +78,11 @@ void expand(char input[], char output[]) {
             } else {
                 char left_char = input[i - 1];
                 search_result left_char_search_res = search(left_char);
-                if (left_char_search_res.series_index == -1) {
-                    // output[j] = input[i - 1];
-                    // ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    continue;
-                } else if (left_char_search_res.data_index == -1) {
-                    // output[j] = input[i - 1];
-                    // ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    continue;
-                }
                 char right_char = input[i + 1];
                 search_result right_char_search_res = search(right_char);
-                if (right_char_search_res.series_index == -1) {
-                    // output[j] = input[i - 1];
-                    // ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    continue;
-                } else if (right_char_search_res.data_index == -1) {
-                    // output[j] = input[i - 1];
-                    // ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    continue;
-                } else if (left_char_search_res.series_index != right_char_search_res.series_index) {
-                    // output[j] = input[i - 1];
-                    // ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    continue;
-                } else if (left_char_search_res.data_index > right_char_search_res.data_index) {
-                    // output[j] = input[i - 1];
-                    // ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                    continue;
-                } else {
+                
+                if (can_expand(left_char_search_res, right_char_search_res)) {
+                    // Expand the shorthand notation
                     const int series_index = left_char_search_res.series_index;
                     const int data_start_index = left_char_search_res.data_index;
                     const int data_end_index = right_char_search_res.data_index;
@@ -134,7 +90,14 @@ void expand(char input[], char output[]) {
                         output[j] = supported_series[series_index].data[it];
                         ++j;
                     }
+                    // We jump "-" and the right char of the expansions as they are already 
+                    // accounted in this expansion
                     i += 2;
+                } else {
+                    // Invalid expansion copy everything as it is
+                    output[j] = input[i];
+                    ++i;
+                    ++j;
                 }
             }
         } else {
