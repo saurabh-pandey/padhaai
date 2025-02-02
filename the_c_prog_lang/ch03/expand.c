@@ -43,7 +43,7 @@ bool is_char_found(search_result res) {
 }
 
 
-bool can_expand(search_result left, search_result right) {
+bool is_valid_shorthand(search_result left, search_result right) {
     if (!is_char_found(left)) {
         return false;
     }
@@ -62,44 +62,50 @@ bool can_expand(search_result left, search_result right) {
 }
 
 
+typedef struct expansion_result {
+    int series_index;
+    int data_start_index;
+    int data_end_index;
+} expansion_result;
+
+
+expansion_result can_expand(char input[], int index) {
+    expansion_result result = {-1, -1, -1};
+    if (input[index] != '-') {
+        return result;
+    }
+    if (index == 0) {
+        // Leading '-' char so can't expand
+        return result;
+    }
+    
+    char left_char = input[index - 1];
+    search_result left_char_search_res = search(left_char);
+    char right_char = input[index + 1];
+    search_result right_char_search_res = search(right_char);
+    if (is_valid_shorthand(left_char_search_res, right_char_search_res)) {
+        result.series_index = left_char_search_res.series_index;
+        result.data_start_index = left_char_search_res.data_index;
+        result.data_end_index = right_char_search_res.data_index;
+    }
+    
+    return result;
+}
+
+
 void expand(char input[], char output[]) {
     int i = 0;
     int j = 0;
     while (input[i] != '\0') {
-        if (input[i] == '-') {
-            if (i == 0) {
-                output[j] = input[i];
-                ++i;
+        expansion_result res = can_expand(input, i);
+        if (res.series_index != -1) {
+            for (int it = res.data_start_index + 1; it <= res.data_end_index; ++it) {
+                output[j] = supported_series[res.series_index].data[it];
                 ++j;
-            } else if (input[i + 1] == '\0') {
-                output[j] = input[i];
-                ++i;
-                ++j;
-            } else {
-                char left_char = input[i - 1];
-                search_result left_char_search_res = search(left_char);
-                char right_char = input[i + 1];
-                search_result right_char_search_res = search(right_char);
-                
-                if (can_expand(left_char_search_res, right_char_search_res)) {
-                    // Expand the shorthand notation
-                    const int series_index = left_char_search_res.series_index;
-                    const int data_start_index = left_char_search_res.data_index;
-                    const int data_end_index = right_char_search_res.data_index;
-                    for (int it = data_start_index + 1; it <= data_end_index; ++it) {
-                        output[j] = supported_series[series_index].data[it];
-                        ++j;
-                    }
-                    // We jump "-" and the right char of the expansions as they are already 
-                    // accounted in this expansion
-                    i += 2;
-                } else {
-                    // Invalid expansion copy everything as it is
-                    output[j] = input[i];
-                    ++i;
-                    ++j;
-                }
             }
+            // We jump "-" and the right char of the expansions as they are already 
+            // accounted in this expansion
+            i += 2;
         } else {
             output[j] = input[i];
             ++i;
