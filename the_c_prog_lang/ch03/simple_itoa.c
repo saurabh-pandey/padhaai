@@ -3,10 +3,6 @@
 
 
 void simple_itoa(int num, char output[]) {
-    // printf("%d %% %d = %d\n", 11, 10, 11 % 10);
-    // printf("%d %% %d = %d\n", 10, 10, 10 % 10);
-    // printf("%d %% %d = %d\n", -11, 10, -11 % 10);
-    // printf("%d %% %d = %d\n", -55, 10, -55 % 10);
     const int sign = num < 0 ? -1 : 1;
     int i = 0;
     do {
@@ -16,13 +12,13 @@ void simple_itoa(int num, char output[]) {
         num /= 10;
     } while (num != 0);
     
-    // Add sign
+    // Add sign char
     if (sign == -1) {
         output[i] = '-';
         ++i;
     }
     
-    // reverse here
+    // reverse here noting that i now points next to the last char
     for (int start = 0, end = i - 1; start < end; ++start, --end) {
         char temp = output[start];
         output[start] = output[end];
@@ -54,10 +50,7 @@ bool compare_strings(char str1[], char str2[]) {
 
 
 int main() {
-    bool debug = true;
-
-    // simple_itoa(0, "");
-    // return 0;
+    bool debug = false;
     
     printf("Running tests for simple_itoa\n");
 
@@ -83,13 +76,13 @@ int main() {
                    arr[i].expected,
                    result);
         }
-        // if (!compare_strings(result, arr[i].expected)) {
-        //     printf("FAILED for input = %d, expected = %s and result1 = %s\n",
-        //            arr[i].input,
-        //            arr[i].expected,
-        //            result);
-        //     ++num_failed;
-        // }
+        if (!compare_strings(result, arr[i].expected)) {
+            printf("FAILED for input = %d, expected = %s and result1 = %s\n",
+                   arr[i].input,
+                   arr[i].expected,
+                   result);
+            ++num_failed;
+        }
     }
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
