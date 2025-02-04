@@ -5,7 +5,7 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = binary_search shell_sort reverse_string expand simple_itoa
+JUST_EXECS = binary_search shell_sort reverse_string expand simple_itoa simple_itob
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
