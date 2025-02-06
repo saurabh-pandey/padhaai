@@ -54,26 +54,42 @@ int main() {
     
     printf("Running tests for simple_itob\n");
 
-    test_data arr [] = {
-        {0, 2, "0"},
-        {1, 2, "1"},
-        {-1, 2, "-1"},
-        {2, 2, "10"},
-        {-2, 2, "-10"},
-        {3, 2, "11"},
-        {-3, 2, "-11"}
-    };
+    // test_data arr [] = {
+    //     {0, 2, "0"},
+    //     {1, 2, "1"},
+    //     {-1, 2, "-1"},
+    //     {2, 2, "10"},
+    //     {-2, 2, "-10"},
+    //     {3, 2, "11"},
+    //     {-3, 2, "-11"}
+    // };
 
     unsigned int num_failed = 0;
-    for (int i = 0; i < sizeof(arr)/sizeof(test_data); ++i) {
+    for (int i = 1; i < 100; ++i) {
         char result[12] = {'\0'};
-        simple_itob(arr[i].input, arr[i].base, result);
+        simple_itob(i, 8, result);
+        char expected[12] = {'\0'};
+        snprintf(expected, 12, "%o", i);
         if (debug) {
-            printf("Input = %d, base = %d, expected = %s and result = %s\n",
-                   arr[i].input,
-                   arr[i].base,
-                   arr[i].expected,
-                   result);
+            printf("Input = %d, base = 8, expected = %s and result = %s\n", i, expected, result);
+        }
+
+        simple_itob(-i, 8, result);
+        snprintf(expected, 12, "%o", i);
+        if (debug) {
+            printf("Input = %d, base = 8, expected = -%s and result = %s\n", -i, expected, result);
+        }
+
+        simple_itob(i, 16, result);
+        snprintf(expected, 12, "%X", i);
+        if (debug) {
+            printf("Input = %d, base = 16, expected = %s and result = %s\n", i, expected, result);
+        }
+
+        simple_itob(-i, 16, result);
+        snprintf(expected, 12, "%X", i);
+        if (debug) {
+            printf("Input = %d, base = 16, expected = -%s and result = %s\n", -i, expected, result);
         }
         // if (!compare_strings(result, arr[i].expected)) {
         //     printf("FAILED for input = %d, base = %d, expected = %s and result1 = %s\n",
