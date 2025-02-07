@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define MAX_CHAR_DIGITS 12
 
 char digits[] = "0123456789ABCDEFGHIZKLMNOPQRSTUVWXYZ";
 
@@ -27,12 +28,6 @@ void simple_itob(int num, int base, char output[]) {
     output[j] = '\0';
 }
 
-typedef struct test_data {
-    int input;
-    int base;
-    char expected[12];
-} test_data;
-
 
 bool compare_strings(char str1[], char str2[]) {
     int i = 0;
@@ -50,55 +45,51 @@ bool compare_strings(char str1[], char str2[]) {
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
     printf("Running tests for simple_itob\n");
 
-    // test_data arr [] = {
-    //     {0, 2, "0"},
-    //     {1, 2, "1"},
-    //     {-1, 2, "-1"},
-    //     {2, 2, "10"},
-    //     {-2, 2, "-10"},
-    //     {3, 2, "11"},
-    //     {-3, 2, "-11"}
-    // };
-
     unsigned int num_failed = 0;
-    for (int i = 1; i < 100; ++i) {
-        char result[12] = {'\0'};
+    for (int i = -1000; i <= 1000; ++i) {
+        // TEST OCTAL
+        char result[MAX_CHAR_DIGITS] = {'\0'};
         simple_itob(i, 8, result);
-        char expected[12] = {'\0'};
-        snprintf(expected, 12, "%o", i);
+        char expected[MAX_CHAR_DIGITS] = {'\0'};
+        if (i < 0) {
+            snprintf(expected, MAX_CHAR_DIGITS, "-%o", -i);
+        } else {
+            snprintf(expected, MAX_CHAR_DIGITS, "%o", i);
+        }
+        
         if (debug) {
             printf("Input = %d, base = 8, expected = %s and result = %s\n", i, expected, result);
         }
 
-        simple_itob(-i, 8, result);
-        snprintf(expected, 12, "%o", i);
-        if (debug) {
-            printf("Input = %d, base = 8, expected = -%s and result = %s\n", -i, expected, result);
+        if (!compare_strings(result, expected)) {
+            printf("FAILED for input = %d, base = 8, expected = %s and result = %s\n",
+                   i,
+                   expected,
+                   result);
+            ++num_failed;
         }
 
+        // TEST HEX
         simple_itob(i, 16, result);
-        snprintf(expected, 12, "%X", i);
+        if (i < 0) {
+            snprintf(expected, MAX_CHAR_DIGITS, "-%X", -i);
+        } else {
+            snprintf(expected, MAX_CHAR_DIGITS, "%X", i);
+        }
         if (debug) {
             printf("Input = %d, base = 16, expected = %s and result = %s\n", i, expected, result);
         }
-
-        simple_itob(-i, 16, result);
-        snprintf(expected, 12, "%X", i);
-        if (debug) {
-            printf("Input = %d, base = 16, expected = -%s and result = %s\n", -i, expected, result);
+        if (!compare_strings(result, expected)) {
+            printf("FAILED for input = %d, base = 16, expected = %s and result = %s\n",
+                   i,
+                   expected,
+                   result);
+            ++num_failed;
         }
-        // if (!compare_strings(result, arr[i].expected)) {
-        //     printf("FAILED for input = %d, base = %d, expected = %s and result1 = %s\n",
-        //            arr[i].input,
-        //            arr[i].base,
-        //            arr[i].expected,
-        //            result);
-        //     ++num_failed;
-        // }
     }
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
