@@ -21,6 +21,7 @@ all: $(EXECS)
 clean:
 	rm -r $(BIN)
 
+# Run tests
 test:
-	@echo "Running tests\n"
-	@$(foreach exec, $(EXECS), ./$(exec) && echo ;)
+	python3 -m unittest -v
+

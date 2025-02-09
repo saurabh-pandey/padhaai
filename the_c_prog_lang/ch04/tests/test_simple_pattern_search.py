@@ -14,6 +14,7 @@ Welcome hello!
 End of line hello
 hello start of line
 Mid of line hello is this
+End of file hello
 '''
 
 empty_inp = '''
@@ -42,21 +43,19 @@ class TestSimplePatternSearch(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=single_inp).stdout
-        print(output.splitlines())
         self.assertEqual(output.splitlines(), ['hello',
                                                'Welcome hello!',
                                                'End of line hello',
                                                'hello start of line',
-                                               'Mid of line hello is this'])
+                                               'Mid of line hello is this',
+                                               'End of file hello'])
     
     def test_empty(self):
         output = subprocess.run([self.exe, "hello"], capture_output=True, text=True, input=empty_inp).stdout
-        print(output.splitlines())
         self.assertEqual(output.splitlines(), [])
     
     def test_usage(self):
         output = subprocess.run([self.exe], capture_output=True, text=True, input=empty_inp).stdout
-        print(output.splitlines())
         self.assertEqual(output.splitlines(),
                          ['','Usage:', '   ./bin/simple_pattern_search <pattern>', ''])
     
@@ -65,7 +64,7 @@ class TestSimplePatternSearch(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=space_in_pattern).stdout
-        print(output.splitlines())
+        self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
 
 
 if __name__ == '__main__':
