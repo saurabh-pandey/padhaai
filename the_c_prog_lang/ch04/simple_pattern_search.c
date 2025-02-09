@@ -7,19 +7,38 @@
 
 
 int get_line(char line[], int max_line_size) {
-    return -1;
+    int len = 0;
+    int c = 0;
+    while((c = getchar()) != EOF) {
+        if (c == '\n') {
+            line[len] = '\n';
+            ++len;
+            break;
+        }
+        if (len == (MAX_LINE_LIMIT - 2)) {
+            break;
+        }
+        line[len] = c;
+        ++len;
+    }
+    line[len] = '\0';
+    return len;
 }
 
 bool is_pattern_found(char line[], char pattern[]) {
+    int j = 0;
+    for (int i = 0; line[i] != '\0'; ++i) {
+        if (pattern[j] == line[i]) {
+            ++j;
+        }
+        if (pattern[j] == '\0') {
+            return true;
+        }
+    }
     return false;
 }
 
 int main(int argc, char * const argv[]) {
-    printf("argc = %d\n", argc);
-    for (int i = 0; i < argc; ++i) {
-        printf("%s\n", argv[i]);
-    }
-
     if (argc != 2) {
         printf("\nUsage:\n");
         printf("   ./bin/simple_pattern_search <pattern>\n\n");
@@ -27,13 +46,19 @@ int main(int argc, char * const argv[]) {
     }
 
     char pattern[MAX_PATTERN_LIMIT];
+    int i = 0;
+    while(argv[1][i] != '\0' && i < (MAX_PATTERN_LIMIT - 1)) {
+        pattern[i] = argv[1][i];
+        ++i;
+    }
+    pattern[i] = '\0';
     char line[MAX_LINE_LIMIT] = "";
-    
-    while (get_line(line, MAX_LINE_LIMIT) != -1) {
+
+    while (get_line(line, MAX_LINE_LIMIT) > 0) {
         if (is_pattern_found(line, pattern)) {
             printf("%s", line);
         }
-    } 
+    }
 
     return 0;
 }
