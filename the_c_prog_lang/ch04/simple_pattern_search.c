@@ -28,15 +28,14 @@ int get_line(char line[], int max_line_size) {
 bool is_pattern_found(char line[], char pattern[]) {
     int j = 0;
     for (int i = 0; line[i] != '\0'; ++i) {
-        // If pattern doesn't match reset
         if (pattern[j] != line[i]) {
+            // If pattern doesn't match reset
             j = 0;
-        }
-        // Continue if we match the pattern
-        if (pattern[j] == line[i]) {
+        } else {
+            // Continue if we match the pattern
             ++j;
         }
-        // If we reach the end we have found a match
+        // If reached the end it's a match
         if (pattern[j] == '\0') {
             return true;
         }
