@@ -32,6 +32,15 @@ hello
  hello
 '''
 
+part_word = '''hehello
+hehehellohe
+hellhellhellohell
+hhhhhello
+helhello
+hellhello
+hhello
+'''
+
 class TestSimplePatternSearch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -65,6 +74,14 @@ class TestSimplePatternSearch(unittest.TestCase):
                                 text=True,
                                 input=space_in_pattern).stdout
         self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
+    
+    def test_part_word(self):
+        output = subprocess.run([self.exe, "hello"],
+                                capture_output=True,
+                                text=True,
+                                input=part_word).stdout
+        print(output.splitlines())
+        # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
 
 
 if __name__ == '__main__':
