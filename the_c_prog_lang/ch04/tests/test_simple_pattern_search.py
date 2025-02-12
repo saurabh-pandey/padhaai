@@ -41,6 +41,8 @@ hellhello
 hhello
 '''
 
+another_one = '''babababbaabaabbbbb'''
+
 class TestSimplePatternSearch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -80,6 +82,14 @@ class TestSimplePatternSearch(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=part_word).stdout
+        print(output.splitlines())
+        # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
+    
+    def test_another_one(self):
+        output = subprocess.run([self.exe, "baabb"],
+                                capture_output=True,
+                                text=True,
+                                input=another_one).stdout
         print(output.splitlines())
         # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
 
