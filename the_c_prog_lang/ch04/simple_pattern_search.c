@@ -25,7 +25,8 @@ int get_line(char line[], int max_line_size) {
     return len;
 }
 
-bool is_pattern_found(char line[], char pattern[]) {
+// This has some bug
+bool is_pattern_found_buggy(char line[], char pattern[]) {
     int j = 0;
     for (int i = 0; line[i] != '\0'; ++i) {
         if (pattern[j] != line[i]) {
@@ -42,6 +43,43 @@ bool is_pattern_found(char line[], char pattern[]) {
     }
     return false;
 }
+
+
+int str_len(char s[]) {
+    int len = 0;
+    while(s[len] != '\0') {
+        ++len;
+    }
+    return len;
+}
+
+
+bool is_pattern_found(char line[], char pattern[]) {
+    int len_line = str_len(line);
+    if (len_line == 0) {
+        return false;
+    }
+
+    int len_pattern = str_len(pattern);
+    if (len_pattern == 0) {
+        return false;
+    }
+    
+    for (int i = 0; i < len_line; ++i) {
+        bool is_found = true;
+        for (int j = 0; (j < len_pattern) && ( (i + j) < len_line); ++j) {
+            if (line[i + j] != pattern[j]) {
+                is_found = false;
+                break;
+            }
+        }
+        if (is_found) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 int main(int argc, char * const argv[]) {
     if (argc != 2) {
