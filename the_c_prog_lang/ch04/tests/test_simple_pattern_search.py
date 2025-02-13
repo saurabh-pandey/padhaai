@@ -41,7 +41,9 @@ hellhello
 hhello
 '''
 
-another_one = '''babababbaabaabbbbb'''
+edge_case = '''babababbaabaabbbbb'''
+
+simpler_edge_case = '''aaab'''
 
 class TestSimplePatternSearch(unittest.TestCase):
     @classmethod
@@ -85,13 +87,21 @@ class TestSimplePatternSearch(unittest.TestCase):
         print(output.splitlines())
         # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
     
-    def test_another_one(self):
+    def test_edge_case(self):
         output = subprocess.run([self.exe, "baabb"],
                                 capture_output=True,
                                 text=True,
-                                input=another_one).stdout
+                                input=edge_case).stdout
         print(output.splitlines())
         # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
+    
+    def test_simpler_edge_case(self):
+        output = subprocess.run([self.exe, "aab"],
+                                capture_output=True,
+                                text=True,
+                                input=simpler_edge_case).stdout
+        print(output.splitlines())
+        # self.assertEqual(output.splitlines(),
 
 
 if __name__ == '__main__':

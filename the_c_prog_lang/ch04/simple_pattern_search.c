@@ -99,6 +99,7 @@ int main(int argc, char * const argv[]) {
 
     while (get_line(line, MAX_LINE_LIMIT) > 0) {
         if (is_pattern_found(line, pattern)) {
+        // if (is_pattern_found_buggy(line, pattern)) {
             printf("%s", line);
         }
     }
