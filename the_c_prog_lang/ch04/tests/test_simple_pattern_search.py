@@ -84,24 +84,27 @@ class TestSimplePatternSearch(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=part_word).stdout
-        print(output.splitlines())
-        # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
+        self.assertEqual(output.splitlines(),  ['hehello',
+                                                'hehehellohe',
+                                                'hellhellhellohell',
+                                                'hhhhhello',
+                                                'helhello',
+                                                'hellhello',
+                                                'hhello'])
     
     def test_edge_case(self):
         output = subprocess.run([self.exe, "baabb"],
                                 capture_output=True,
                                 text=True,
                                 input=edge_case).stdout
-        print(output.splitlines())
-        # self.assertEqual(output.splitlines(), ['hello', 'hello ', ' hello'])
+        self.assertEqual(output.splitlines(), ['babababbaabaabbbbb'])
     
     def test_simpler_edge_case(self):
         output = subprocess.run([self.exe, "aab"],
                                 capture_output=True,
                                 text=True,
                                 input=simpler_edge_case).stdout
-        print(output.splitlines())
-        # self.assertEqual(output.splitlines(),
+        self.assertEqual(output.splitlines(), ['aaab'])
 
 
 if __name__ == '__main__':

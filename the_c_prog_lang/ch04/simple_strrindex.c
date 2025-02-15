@@ -17,31 +17,24 @@ int str_len(char s[]) {
 int simple_strrindex_buggy(char s[], char t[]) {
     const int len_s = str_len(s);
     if (len_s == 0) {
-        // printf("here1");
         return -1;
     }
     const int len_t = str_len(t);
     if (len_t == 0) {
-        // printf("here2");
         return -1;
     }
-    // printf("len_s = %d, len_t = %d\n", len_s, len_t);
     int j = len_t - 1;
     for (int i = len_s - 1; i >=0; --i) {
-        // printf("Start i = %d, j = %d\n", i, j);
-        // printf("Start s[i] = %c, t[j] = %c\n", s[i], t[j]);
         if (s[i] != t[j]) {
+            // NOTE: It is this reset at the time of mismatch that is incorrect
             j = len_t - 1;
         } else {
-            // printf("MATCH i = %d, j = %d\n", i, j);
             --j;
         }
         if (j < 0) {
-            // printf("here3");
             return i;
         }
     }
-    // printf("here4");
     return -1;
 }
 
@@ -49,34 +42,25 @@ int simple_strrindex_buggy(char s[], char t[]) {
 int simple_strrindex(char s[], char t[]) {
     const int len_s = str_len(s);
     if (len_s == 0) {
-        // printf("here1");
         return -1;
     }
     const int len_t = str_len(t);
     if (len_t == 0) {
-        // printf("here2");
         return -1;
     }
-    // printf("len_s = %d, len_t = %d\n", len_s, len_t);
-    for (int i = len_s - 1; i >=0; --i) {
+    
+    for (int i = len_s - len_t; i >=0; --i) {
         bool is_found = true;
-        // printf("Start i = %d, j = %d\n", i, j);
-        // printf("Start s[i] = %c, t[j] = %c\n", s[i], t[j]);
-        for (int j = len_t - 1; j >= 0; --j) {
-            if ((i - j) < 0) {
-                is_found = false;
-                break;
-            }
-            if (s[i - j] != t[j]) {
+        for (int j = 0; j < len_t; ++j) {
+            if (s[i + j] != t[j]) {
                 is_found = false;
                 break;
             }
         }
         if (is_found) {
-            return i - len_t - 1;
+            return i;
         }
     }
-    // printf("here4");
     return -1;
 }
 
@@ -100,7 +84,11 @@ int main() {
         {"abc", "bc", 1},
         {"abcd", "cd", 2},
         {"abcd", "ab", 0},
-        {"abad", "ab", 2},
+        {"abab", "ab", 2},
+        {"ababcdcd", "ab", 2},
+        {"hhello", "hello", 1},
+        {"aaab", "aab", 1},
+        {"babababbaabaabbbbb", "baabb", 10}
     };
 
     unsigned int num_failed = 0;

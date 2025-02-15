@@ -25,12 +25,14 @@ int get_line(char line[], int max_line_size) {
     return len;
 }
 
-// This has some bug
+// This is incorrect
 bool is_pattern_found_buggy(char line[], char pattern[]) {
     int j = 0;
     for (int i = 0; line[i] != '\0'; ++i) {
         if (pattern[j] != line[i]) {
             // If pattern doesn't match reset
+            // NOTE: It is this reset that is incorrect. In some cases full reset is incorrect.
+            //       Example: "aaab", "aab"
             j = 0;
         } else {
             // Continue if we match the pattern
