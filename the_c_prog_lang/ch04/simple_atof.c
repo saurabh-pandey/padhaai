@@ -67,10 +67,31 @@ double simple_atof_v2(char s[]) {
     // Step 4: Fractional part
     double fractional_part = 0.0;
     double fract_div = 1.0;
-    while (s[i] != '\0') {
+    while ((s[i] != '\0') && (s[i] != 'e') && (s[i] != 'E')) {
         const int digit = s[i] - '0';
         fract_div *= 10.0;
         fractional_part = 10 * fractional_part + digit;
+        ++i;
+    }
+
+    // Step 5: Check if e or E exponent
+    if ((s[i] == 'e') || (s[i] == 'E')) {
+        ++i;
+    }
+
+    // Step 6: Check sign of exponent
+    int exp_sign = (s[i] == '-') ? -1 : 1;
+    
+    // Step 1: Parse sign
+    if ((s[i] == '-') || (s[i] == '+')) {
+        ++i;
+    }
+    
+    // Step 7: Exponential part
+    int exp = 0;
+    while (s[i] != '\0') {
+        const int digit = s[i] - '0';
+        exp = 10 * exp + digit;
         ++i;
     }
     
