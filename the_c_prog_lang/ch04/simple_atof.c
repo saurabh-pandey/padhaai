@@ -10,7 +10,11 @@
 // My initial version
 double simple_atof_v1(char s[]) {
     int sign = (s[0] == '-') ? -1 : 1;
-    int i = (sign == -1) ? 1 : 0;
+    int i = 0;
+
+    if ((s[0] == '-') || (s[0] == '+')) {
+        ++i;
+    }
 
     bool is_fractional_part = false;
     double integral_part = 0.0;
@@ -93,7 +97,9 @@ int main() {
         {"200.0", 200.0},
         {"-200.0", -200.0},
         {"42.12", 42.12},
-        {"-42.12", -42.12}
+        {"-42.12", -42.12},
+        {"+12.345", 12.345},
+        {"-12.345", -12.345}
     };
 
     unsigned int num_failed = 0;
