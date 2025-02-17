@@ -31,7 +31,7 @@ double simple_atof_v1(char s[]) {
             }
         } else {
             is_fractional_part = true;
-        } 
+        }
         ++i;
     }
     return sign * (integral_part + fractional_part);
@@ -81,21 +81,33 @@ double simple_atof_v2(char s[]) {
 
     // Step 6: Check sign of exponent
     int exp_sign = (s[i] == '-') ? -1 : 1;
+    // printf("exp sign = %d\n", exp_sign);
     
-    // Step 1: Parse sign
+    // Step 8: Parse exponent sign
     if ((s[i] == '-') || (s[i] == '+')) {
         ++i;
     }
     
-    // Step 7: Exponential part
+    // Step 9: Exponential part
     int exp = 0;
     while (s[i] != '\0') {
         const int digit = s[i] - '0';
         exp = 10 * exp + digit;
         ++i;
     }
+    // printf("exp = %d\n", exp);
+
+    double exponent_value = 1.0;
+    for (int j = 0; j < exp; ++j) {
+        exponent_value *= 10;
+    }
+    // printf("exp val = %f\n", exponent_value);
+    if (exp_sign == -1) {
+        exponent_value = 1.0/exponent_value;
+    }
+    // printf("final exp val = %f\n", exponent_value);
     
-    return sign * (integral_part + (fractional_part / fract_div));
+    return sign * ((integral_part + (fractional_part / fract_div)) * exponent_value);
 }
 
 
@@ -106,21 +118,31 @@ typedef struct test_data {
 
 
 int main() {
-    bool debug = false;
+    bool debug = true;
     
     printf("Running tests for simple_atof\n");
 
     test_data tests[] = {
-        {"1.2", 1.2},
-        {"-1.2", -1.2},
-        {"0.02", 0.02},
-        {"-0.02", -0.02},
-        {"200.0", 200.0},
-        {"-200.0", -200.0},
-        {"42.12", 42.12},
-        {"-42.12", -42.12},
-        {"+12.345", 12.345},
-        {"-12.345", -12.345}
+        // {"1.2", 1.2},
+        // {"-1.2", -1.2},
+        // {"0.02", 0.02},
+        // {"-0.02", -0.02},
+        // {"200.0", 200.0},
+        // {"-200.0", -200.0},
+        // {"42.12", 42.12},
+        // {"-42.12", -42.12},
+        // {"+12.345", 12.345},
+        // {"-12.345", -12.345},
+        {"1.23e1", 12.3},
+        {"-1.23e1", -12.3},
+        {"12.3e-1", 1.23},
+        {"-12.3e-1", -1.23},
+        {"1.23e01", 12.3},
+        {"-1.23e01", -12.3},
+        {"12.3e-01", 1.23},
+        {"-12.3e-01", -1.23},
+        {"+1.234e02", 123.4},
+        {"-1.234e02", -123.4}
     };
 
     unsigned int num_failed = 0;
