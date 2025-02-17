@@ -114,55 +114,69 @@ double simple_atof_v2(char s[]) {
 typedef struct test_data {
     char s[MAX_STR_LEN];
     double expected;
+    bool test_v1;
 } test_data;
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
     printf("Running tests for simple_atof\n");
 
     test_data tests[] = {
-        // {"1.2", 1.2},
-        // {"-1.2", -1.2},
-        // {"0.02", 0.02},
-        // {"-0.02", -0.02},
-        // {"200.0", 200.0},
-        // {"-200.0", -200.0},
-        // {"42.12", 42.12},
-        // {"-42.12", -42.12},
-        // {"+12.345", 12.345},
-        // {"-12.345", -12.345},
-        {"1.23e1", 12.3},
-        {"-1.23e1", -12.3},
-        {"12.3e-1", 1.23},
-        {"-12.3e-1", -1.23},
-        {"1.23e01", 12.3},
-        {"-1.23e01", -12.3},
-        {"12.3e-01", 1.23},
-        {"-12.3e-01", -1.23},
-        {"+1.234e02", 123.4},
-        {"-1.234e02", -123.4}
+        {"1.2", 1.2, true},
+        {"-1.2", -1.2, true},
+        {"0.02", 0.02, true},
+        {"-0.02", -0.02, true},
+        {"200.0", 200.0, true},
+        {"-200.0", -200.0, true},
+        {"42.12", 42.12, true},
+        {"-42.12", -42.12, true},
+        {"+12.345", 12.345, true},
+        {"-12.345", -12.345, true},
+        {"1.23e1", 12.3, false},
+        {"-1.23e1", -12.3, false},
+        {"12.3e-1", 1.23, false},
+        {"-12.3e-1", -1.23, false},
+        {"1.23e01", 12.3, false},
+        {"-1.23e01", -12.3, false},
+        {"12.3e-01", 1.23, false},
+        {"-12.3e-01", -1.23, false},
+        {"+1.234e02", 123.4, false},
+        {"-1.234e02", -123.4, false}
     };
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
-        const double result1 = simple_atof_v1(tests[i].s);
+        if (tests[i].test_v1) {
+            const double result1 = simple_atof_v1(tests[i].s);
+            if (debug) {
+                printf("s = %s, expected = %f, result1 = %f\n",
+                       tests[i].s,
+                       tests[i].expected,
+                       result1);
+            }
+            if (fabs(result1 - tests[i].expected) > TOLERANCE) {
+                printf("s = %s, expected = %f, result1 = %f\n",
+                       tests[i].s,
+                       tests[i].expected,
+                       result1);
+                ++num_failed;
+            }
+        }
+        
         const double result2 = simple_atof_v2(tests[i].s);
 
         if (debug) {
-            printf("s = %s, expected = %f, result1 = %f, result2 = %f\n",
+            printf("s = %s, expected = %f, result2 = %f\n",
                    tests[i].s,
                    tests[i].expected,
-                   result1,
                    result2);
         }
-        if ((fabs(result1 - tests[i].expected) > TOLERANCE)
-        ||  (fabs(result2 - tests[i].expected) > TOLERANCE)) {
-            printf("s = %s, expected = %f, result1 = %f, result2 = %f\n",
+        if (fabs(result2 - tests[i].expected) > TOLERANCE) {
+            printf("s = %s, expected = %f, result2 = %f\n",
                    tests[i].s,
                    tests[i].expected,
-                   result1,
                    result2);
             ++num_failed;
         }
