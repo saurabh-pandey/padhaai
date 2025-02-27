@@ -14,8 +14,10 @@ $(BIN)/% : $(BIN)/%.o
 $(BIN)/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-all: $(EXECS)
+all: $(EXECS) rpn
 
+rpn:
+	cd reverse_polish_book && $(MAKE) all && cd ..;
 
 .PHONY: clean
 clean:

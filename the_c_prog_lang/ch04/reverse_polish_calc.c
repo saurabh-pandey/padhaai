@@ -39,7 +39,7 @@ int main(int argc, char * const argv[]) {
         return 0;
     }
 
-    // Skip the command itself so start from 1
+    // Skip the command itself so start from 1 index
     for (int i = 1; i < argc; ++i) {
         // Check if the first char is digit or -digit
         if (isdigit(argv[i][0]) || (argv[i][0] == '-' && isdigit(argv[i][1]))) {
