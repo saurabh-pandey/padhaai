@@ -17,6 +17,7 @@ typedef enum {
 
 char buffer[MAX_BUFFER];
 int buffPt = 0;
+// TODO: Might implement this in a new file that manages buffer or cache
 
 
 Token getop(char parsed_inp[]) {
@@ -73,8 +74,11 @@ int main() {
         switch (ret_val)
         {
             case NUMBER:
+                // TODO: Check if it is indeed a number and push to stack
             case OP:
+                // TODO: Check if it is a valid option and eval
             case NEW_LINE:
+                // TODO: Is this where we print the outcome?
                 printf("<=> %s\n", parsed_inp);
                 break;
             case INVALID:
