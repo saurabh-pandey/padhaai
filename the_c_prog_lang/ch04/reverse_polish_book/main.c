@@ -20,12 +20,9 @@ int buffPt = 0;
 
 
 Token getop(char parsed_inp[]) {
-    // printf("Buffer data = %c, pt = %d\n", buffer[0], buffPt);
     int c = buffPt > 0 ? buffer[--buffPt] : getchar();
-    // printf("c = %c, val = %d, pt = %d\n", c, c, buffPt);
     // Skip all whitespace char
     while(1) {
-        // printf("1- %c\n", c);
         if (c == ' ' || c == '\t') {
             c = getchar();
             continue;
@@ -34,8 +31,7 @@ Token getop(char parsed_inp[]) {
         }
     }
 
-    // printf("2- %c\n", c);
-
+    // If we reached EOF we are done
     if (c == EOF) {
         return END_OF_FILE;
     }
@@ -43,7 +39,6 @@ Token getop(char parsed_inp[]) {
     // Parse for op
     parsed_inp[1] = '\0';
     if (c != '.' && !isdigit(c)) {
-        // printf("3- %c\n", c);
         parsed_inp[0] = c;
         return OP;
     }
@@ -51,28 +46,23 @@ Token getop(char parsed_inp[]) {
     // Parse for number
     int i = 0;
     parsed_inp[i] = c;
-    // printf("4- %c\n", c);
     ++i;
-    // while ((c = getchar()) != EOF) {
     while (1) {
         c = getchar();
-        // printf("5- %c\n", c);
         if (isdigit(c)) {
             parsed_inp[i] = c;
         } else if (c == '.') {
             parsed_inp[i] = c;
         } else {
+            // Not a number anymore store whatever accumulated so far and return
             parsed_inp[i] = '\0';
             buffer[buffPt++] = c;
-            // printf("6- %c\n", c);
             return NUMBER; 
         }
         ++i;
     }
-
-    // printf("7- %c\n", c);
     
-    return 0;
+    return INVALID;
 }
 
 int main() {
@@ -87,6 +77,9 @@ int main() {
             case NEW_LINE:
                 printf("<=> %s\n", parsed_inp);
                 break;
+            case INVALID:
+                printf("ERROR: Invalid input\n");
+                return -1;
             default:
                 printf("<=> DONE %s\n", parsed_inp);
                 return 0;
