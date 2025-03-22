@@ -11,9 +11,15 @@
 
 
 int main() {
+    int prompt = 1;
     int ret_val = 0;
     char parsed_inp[MAX_INP] = "\0";
     while(1) {
+        if (prompt == 1) {
+            printf("expr> ");
+            prompt = 0;
+        }
+        
         ret_val = getop(parsed_inp);
         switch (ret_val)
         {
@@ -61,12 +67,12 @@ int main() {
                     }
                     case '\n':
                     {
-                        printf("<=> %s\n", parsed_inp);
                         if (size() != 1) {
                             printf("WARNING: Expected the stack to contain only one element here\n");
                         } else {
                             printf("Result = %f\n", pop());
                         }
+                        prompt = 1;
                         break;
                     }
                     default:
@@ -84,7 +90,7 @@ int main() {
             }
             default:
             {
-                printf("<=> DONE %s\n", parsed_inp);
+                printf("DONE %s\n", parsed_inp);
                 return 0;
             }
         }
