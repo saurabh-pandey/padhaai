@@ -68,7 +68,8 @@ int main() {
                     case '\n':
                     {
                         if (size() != 1) {
-                            printf("WARNING: Expected the stack to contain only one element here\n");
+                            printf("WARNING: Expected the stack to contain only one element here. Stack status:\n");
+                            print();
                         } else {
                             printf("Result = %f\n", pop());
                         }
@@ -77,7 +78,7 @@ int main() {
                     }
                     default:
                     {
-                        // printf("ERROR: Unknown operator %s\n", parsed_inp);
+                        printf("ERROR: Unknown operator %s\n", parsed_inp);
                         break;
                     }
                 }

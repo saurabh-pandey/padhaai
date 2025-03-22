@@ -29,3 +29,15 @@ double pop() {
 int size() {
     return stack_ptr;
 }
+
+void print() {
+    printf("Stack size = %d\n", stack_ptr);
+    printf("Stack content = [");
+    for (int i = 0; i < stack_ptr; ++i) {
+        printf("%f", data[i]);
+        if (i < (stack_ptr - 1)) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}

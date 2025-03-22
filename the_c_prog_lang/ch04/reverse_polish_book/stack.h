@@ -4,5 +4,6 @@
 void push(double num);
 double pop();
 int size();
+void print();
 
 #endif /* _RPN_STACK_H */
