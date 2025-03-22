@@ -70,6 +70,8 @@ int main() {
                         if (size() != 1) {
                             printf("WARNING: Expected the stack to contain only one element here. Stack status:\n");
                             print();
+                            printf("Clearing the stack\n");
+                            clear();
                         } else {
                             printf("Result = %f\n", pop());
                         }

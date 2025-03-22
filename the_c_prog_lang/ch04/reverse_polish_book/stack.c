@@ -26,6 +26,10 @@ double pop() {
     return data[--stack_ptr];
 }
 
+void clear() {
+    stack_ptr = 0;
+}
+
 int size() {
     return stack_ptr;
 }
