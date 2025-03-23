@@ -12,3 +12,7 @@ clean:
 	rm -r $(BIN)
 
 all: $(BIN)/rpn
+
+# Run tests
+test:
+	python3 -m unittest -v
