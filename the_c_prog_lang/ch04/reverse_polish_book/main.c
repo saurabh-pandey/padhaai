@@ -10,6 +10,18 @@
 #define EPSILON 1.0e-06
 
 
+int check_stack(int min_expected_size) {
+    if (size() < min_expected_size) {
+        printf("WARNING: Min stack size = %d. Stack status:\n", min_expected_size);
+        print();
+        printf("Clearing the stack\n");
+        clear();
+        return 0;
+    }
+    return 1;
+}
+
+
 int main() {
     int prompt = 1;
     int ret_val = 0;
@@ -35,34 +47,42 @@ int main() {
                 {
                     case '+':
                     {
-                        const double num2 = pop();
-                        const double num1 = pop();
-                        push(num1 + num2);
+                        if (check_stack(2) != 0) {
+                            const double num2 = pop();
+                            const double num1 = pop();
+                            push(num1 + num2);
+                        }
                         break;
                     }
                     case '-':
                     {
-                        const double num2 = pop();
-                        const double num1 = pop();
-                        push(num1 - num2);
+                        if (check_stack(2) != 0) {
+                            const double num2 = pop();
+                            const double num1 = pop();
+                            push(num1 - num2);
+                        }
                         break;
                     }
                     case '*':
                     {
-                        const double num2 = pop();
-                        const double num1 = pop();
-                        push(num1 * num2);
+                        if (check_stack(2) != 0) {
+                            const double num2 = pop();
+                            const double num1 = pop();
+                            push(num1 * num2);
+                        }
                         break;
                     }
                     case '/':
                     {
-                        const double num2 = pop();
-                        if (fabs(num2) < EPSILON) {
-                            printf("ERROR: Division by zero is not allowed\n");
-                            break;
+                        if (check_stack(2) != 0) {
+                            const double num2 = pop();
+                            if (fabs(num2) < EPSILON) {
+                                printf("ERROR: Division by zero is not allowed\n");
+                                break;
+                            }
+                            const double num1 = pop();
+                            push(num1 / num2);
                         }
-                        const double num1 = pop();
-                        push(num1 / num2);
                         break;
                     }
                     case '\n':
