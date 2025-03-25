@@ -18,6 +18,30 @@ floating_input = '''2.1 3.1 +
 bigger_input = '''1 2 - 4 5 + *
 '''
 
+incorrect_input = '''1 2 - 4
+'''
+
+fault_tolerance_inp = '''2 3 *
+2 + 3
+2 3 +
+'''
+
+new_lines_inp = '''
+
+
+2 3 +
+'''
+
+empty_inp = '''
+'''
+
+div_zero_inp = '''3 4 *
+2 3 +
+5 0 /
+5 2 -
+'''
+
+
 class TestRpnCalc(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -55,6 +79,69 @@ class TestRpnCalc(unittest.TestCase):
                                 input=bigger_input).stdout
         # print(output.splitlines())
         self.assertEqual(output.splitlines(), ['expr> Result = -9.000000', 'expr> DONE ', ''])
+    
+    def test_incorrect(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=incorrect_input).stdout
+        # print(output.splitlines())
+        self.assertEqual(output.splitlines(),
+                         ['expr> WARNING: Expected the stack to contain only one element here. Stack status:',
+                          'Stack size = 2',
+                          'Stack content = [-1.000000, 4.000000]',
+                          'Clearing the stack',
+                          'expr> DONE ', ''])
+    
+    def test_fault_tolerance(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=fault_tolerance_inp).stdout
+        # print(output.splitlines())
+        self.assertEqual(output.splitlines(),
+                         ['expr> Result = 6.000000', 'expr> WARNING: Min stack size = 2. Stack status:',
+                         'Stack size = 1',
+                         'Stack content = [2.000000]',
+                         'Clearing the stack',
+                         'Result = 3.000000',
+                         'expr> Result = 5.000000',
+                         'expr> DONE ', ''])
+    
+    def test_new_lines(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=new_lines_inp).stdout
+        # print(output.splitlines())
+        self.assertEqual(output.splitlines(),
+                         ['expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> Result = 5.000000', 'expr> DONE ', ''])
+    
+    def test_empty(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=empty_inp).stdout
+        # print(output.splitlines())
+        self.assertEqual(output.splitlines(),
+                         ['expr> WARNING: Expected the stack to contain only one element here. Stack status:',
+                          'Stack size = 0',
+                          'Stack content = []',
+                          'Clearing the stack',
+                          'expr> DONE ', ''])
+    
+    def test_div_zero(self):
+        output = subprocess.run([self.exe],
+                                capture_output=True,
+                                text=True,
+                                input=div_zero_inp).stdout
+        # print(output.splitlines())
+        self.assertEqual(output.splitlines(),
+                         ['expr> Result = 12.000000',
+                          'expr> Result = 5.000000',
+                          'expr> ERROR: Division by zero is not allowed', 'Result = 5.000000',
+                          'expr> Result = 3.000000',
+                          'expr> DONE ', ''])
 
 if __name__ == '__main__':
     unittest.main()
