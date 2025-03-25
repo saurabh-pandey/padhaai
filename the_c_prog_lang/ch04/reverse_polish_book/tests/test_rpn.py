@@ -53,7 +53,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=simple_input).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(), ['expr> Result = 5.000000',
                                                'expr> Result = -1.000000',
                                                'expr> Result = 6.000000',
@@ -65,7 +64,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=floating_input).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(), ['expr> Result = 5.200000',
                                                'expr> Result = 2.100000',
                                                'expr> Result = 5.610000',
@@ -77,7 +75,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=bigger_input).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(), ['expr> Result = -9.000000', 'expr> DONE ', ''])
     
     def test_incorrect(self):
@@ -85,7 +82,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=incorrect_input).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(),
                          ['expr> WARNING: Expected the stack to contain only one element here. Stack status:',
                           'Stack size = 2',
@@ -98,7 +94,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=fault_tolerance_inp).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(),
                          ['expr> Result = 6.000000', 'expr> WARNING: Min stack size = 2. Stack status:',
                          'Stack size = 1',
@@ -113,7 +108,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=new_lines_inp).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(),
                          ['expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> Result = 5.000000', 'expr> DONE ', ''])
     
@@ -122,7 +116,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=empty_inp).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(),
                          ['expr> WARNING: Expected the stack to contain only one element here. Stack status:',
                           'Stack size = 0',
@@ -135,7 +128,6 @@ class TestRpnCalc(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=div_zero_inp).stdout
-        # print(output.splitlines())
         self.assertEqual(output.splitlines(),
                          ['expr> Result = 12.000000',
                           'expr> Result = 5.000000',
