@@ -109,7 +109,21 @@ class TestRpnCalc(unittest.TestCase):
                                 text=True,
                                 input=new_lines_inp).stdout
         self.assertEqual(output.splitlines(),
-                         ['expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> WARNING: Expected the stack to contain only one element here. Stack status:', 'Stack size = 0', 'Stack content = []', 'Clearing the stack', 'expr> Result = 5.000000', 'expr> DONE ', ''])
+                         ['expr> WARNING: Expected the stack to contain only one element here. Stack status:',
+                          'Stack size = 0',
+                          'Stack content = []',
+                          'Clearing the stack',
+                          'expr> WARNING: Expected the stack to contain only one element here. Stack status:',
+                          'Stack size = 0',
+                          'Stack content = []',
+                          'Clearing the stack',
+                          'expr> WARNING: Expected the stack to contain only one element here. Stack status:',
+                          'Stack size = 0',
+                          'Stack content = []',
+                          'Clearing the stack',
+                          'expr> Result = 5.000000',
+                          'expr> DONE ',
+                          ''])
     
     def test_empty(self):
         output = subprocess.run([self.exe],

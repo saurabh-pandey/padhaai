@@ -23,8 +23,9 @@ int check_stack(int min_expected_size) {
 
 
 int main() {
+    // Controls when to show the prompt
     int prompt = 1;
-    int ret_val = 0;
+    Token token = INVALID;
     char parsed_inp[MAX_INP] = "\0";
     while(1) {
         if (prompt == 1) {
@@ -32,8 +33,8 @@ int main() {
             prompt = 0;
         }
         
-        ret_val = getop(parsed_inp);
-        switch (ret_val)
+        token = getop(parsed_inp);
+        switch (token)
         {
             case NUMBER:
             {
