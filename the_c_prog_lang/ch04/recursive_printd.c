@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include <stdbool.h>
 
 
 #define MAX_STR_LEN 20
 
 
-int recursive_printd(int n) {
+void recursive_printd(int n) {
     if (n < 0) {
         printf("-");
         n = -n;
@@ -19,8 +18,6 @@ int recursive_printd(int n) {
 
 
 int main() {
-    bool debug = false;
-    
     printf("Running tests for recursive_printd\n");
 
     for (int i = -100; i < 101; ++i) {
