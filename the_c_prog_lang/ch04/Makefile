@@ -5,7 +5,8 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = simple_pattern_search simple_strrindex simple_atof reverse_polish_calc rpn
+JUST_EXECS = simple_pattern_search simple_strrindex simple_atof reverse_polish_calc \
+recursive_printd
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
@@ -22,6 +23,7 @@ rpn:
 .PHONY: clean
 clean:
 	rm -r $(BIN)
+	cd reverse_polish_book && $(MAKE) clean && cd ..;
 
 # Run tests
 test:
