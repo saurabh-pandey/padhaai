@@ -7,13 +7,21 @@
 #define MAX_BUFFER 20
 
 
-char buffer[MAX_BUFFER];
-int buffPt = 0;
-// TODO: Might implement this in a new file that manages buffer or cache
+// Use a buffer array of chars. Later this is replaced by using a static char buffer.
+// char buffer[MAX_BUFFER];
+// int buffPt = 0;
 
 
 Token getop(char parsed_inp[]) {
-    int c = buffPt > 0 ? buffer[--buffPt] : getchar();
+    // Using static variable
+    static char buffer = 0;
+    int c = buffer > 0 ? buffer : getchar();
+    // Reset the buffer
+    buffer = 0;
+    
+    // Not needed as static var suits better here
+    // int c = buffPt > 0 ? buffer[--buffPt] : getchar();
+    
     // Skip all whitespace char
     while(1) {
         if (c == ' ' || c == '\t') {
@@ -49,7 +57,12 @@ Token getop(char parsed_inp[]) {
         } else {
             // Not a number anymore store whatever accumulated so far and return
             parsed_inp[i] = '\0';
-            buffer[buffPt++] = c;
+            
+            // buffer[buffPt++] = c;
+            
+            // Fill the static buffer instead
+            buffer = c;
+            
             return NUMBER; 
         }
         ++i;
