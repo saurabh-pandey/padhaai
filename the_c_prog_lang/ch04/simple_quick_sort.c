@@ -4,8 +4,8 @@
 #include <time.h>
 
 
-#define MAX_ARR_SZ 3
-#define NUM_ITERATIONS 3
+#define MAX_ARR_SZ 20
+#define NUM_ITERATIONS 5
 #define MIN_ARR_VAL -500
 #define MAX_ARR_VAL 500
 
@@ -28,7 +28,7 @@ void swap(int input_arr[], int left, int right) {
 // NOTE: left and right args are assumed to be inclusive
 void qsort_v1(int input_array[], int left, int right) {
     // Input array of size 1 or less is already sorted
-    if ((right - left + 1) < 2) {
+    if (left >= right) {
         return;
     }
 
@@ -39,22 +39,15 @@ void qsort_v1(int input_array[], int left, int right) {
     swap(input_array, left, pivot);
 
     // Partition around pivot
-    int partition_index = right;
-    int index = left + 1;
-    while (index <= right) {
-        if (input_array[index] < input_array[left]) {
+    int partition_index = left;
+    for (int i = left + 1; i <= right; ++i) {
+        if (input_array[i] < input_array[left]) {
             // This element should be moved to the left of partition_index
-            ++index;
-        } else {
-            // This element should be moved to the right of partition_index
-            swap(input_array, index, partition_index);
-            --partition_index;
+            ++partition_index;
+            swap(input_array, i, partition_index);
         }
     }
-    // Here pivot should be at its rightful sorted position
-    for (int i = left; i < partition_index; ++i) {
-        swap(input_array, i, i + 1);
-    }
+    swap(input_array, left, partition_index);
     
     // Recurse on the left and right of pivot subarrays
     qsort_v1(input_array, left, pivot - 1);
@@ -101,6 +94,7 @@ int main() {
             }
 
             if (!is_not_descending(input_array, size)) {
+                print_array("Failed", input_array, size);
                 ++num_failed;
             }
         }
