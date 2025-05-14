@@ -4,8 +4,8 @@
 #include <time.h>
 
 
-#define MAX_ARR_SZ 20
-#define NUM_ITERATIONS 5
+#define MAX_ARR_SZ 500
+#define NUM_ITERATIONS 10
 #define MIN_ARR_VAL -500
 #define MAX_ARR_VAL 500
 
@@ -19,10 +19,10 @@ void fill_array(int input_arr[], int size, int iteration) {
     }
 }
 
-void swap(int input_arr[], int left, int right) {
-    const int temp = input_arr[left];
-    input_arr[left] = input_arr[right];
-    input_arr[right] = temp;
+void swap(int input_arr[], int i, int j) {
+    const int temp = input_arr[i];
+    input_arr[i] = input_arr[j];
+    input_arr[j] = temp;
 }
 
 // NOTE: left and right args are assumed to be inclusive
@@ -49,9 +49,9 @@ void qsort_v1(int input_array[], int left, int right) {
     }
     swap(input_array, left, partition_index);
     
-    // Recurse on the left and right of pivot subarrays
-    qsort_v1(input_array, left, pivot - 1);
-    qsort_v1(input_array, pivot + 1, right);
+    // Recurse on the left and right of partitioned subarrays
+    qsort_v1(input_array, left, partition_index - 1);
+    qsort_v1(input_array, partition_index + 1, right);
 }
 
 
@@ -77,16 +77,18 @@ int main() {
     printf("Running tests for simple_quick_sort\n");
 
     int input_array[MAX_ARR_SZ] = {0};
-    bool debug = true;
+    bool debug = false;
 
     unsigned int num_failed = 0;
     for (int size = 2; size < (MAX_ARR_SZ + 1); ++size) {
         for (int iteration = 0; iteration < NUM_ITERATIONS; ++iteration) {
             fill_array(input_array, size, iteration);
+            
             if (debug) {
                 printf("\nRunning size = %d and iteration = %d\n", size, iteration);
                 print_array("Before", input_array, size);
             }
+
             qsort_v1(input_array, 0, size - 1);
 
             if (debug) {
