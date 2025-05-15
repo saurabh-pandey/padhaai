@@ -4,10 +4,12 @@
 #include <time.h>
 
 
-#define MAX_ARR_SZ 500
-#define NUM_ITERATIONS 10
-#define MIN_ARR_VAL -500
-#define MAX_ARR_VAL 500
+#define MAX_ARR_SZ 1000
+
+const int NUM_ITERATIONS = 10;
+const int MIN_ARR_VAL = -5 * MAX_ARR_SZ;
+const int MAX_ARR_VAL = 5 * MAX_ARR_SZ;
+
 
 void fill_array(int input_arr[], int size, int iteration) {
     srand(time(NULL) + (NUM_ITERATIONS + 1) * size + iteration);
@@ -19,11 +21,13 @@ void fill_array(int input_arr[], int size, int iteration) {
     }
 }
 
+
 void swap(int input_arr[], int i, int j) {
     const int temp = input_arr[i];
     input_arr[i] = input_arr[j];
     input_arr[j] = temp;
 }
+
 
 // NOTE: left and right args are assumed to be inclusive
 void qsort_v1(int input_array[], int left, int right) {
@@ -72,6 +76,7 @@ void print_array(char prefix[], int input_array[], int size) {
     }
     printf("]\n");
 }
+
 
 int main() {
     printf("Running tests for simple_quick_sort\n");
