@@ -30,7 +30,6 @@ void recursive_itoa(int num, char result[]) {
     }
     const int len = recursive_itoa_impl(num, result, depth);
     result[len] = '\0';
-    printf("=> %d len = %d\n", num, len);
 }
 
 
@@ -56,7 +55,7 @@ bool compare_strings(char s1[], char s2[]) {
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     printf("Running tests for recursive_itoa\n");
 
     test_data arr [] = {
