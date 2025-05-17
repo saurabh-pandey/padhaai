@@ -7,8 +7,24 @@
 #define MAX_CHAR_SIZE 11
 
 
-int recursive_reverse(char input[]) {
-    return -1;
+int recursive_reverse_impl(char input[], int depth) {
+    int len = 0;
+    if (input[depth] != '\0') {
+        len = recursive_reverse_impl(input, depth + 1);
+        const int i = len - 1 -depth;
+        if (i < depth) {
+            char temp = input[i];
+            input[i] = input[depth];
+            input[depth] = temp;
+        }
+    } else {
+        return depth;
+    }
+    return len;
+}
+
+void recursive_reverse(char input[]) {
+    recursive_reverse_impl(input, 0);
 }
 
 
@@ -34,7 +50,7 @@ bool compare_strings(char s1[], char s2[]) {
 
 
 int main() {
-    bool debug = false;
+    bool debug = true;
     printf("Running tests for recursive_reverse\n");
 
     test_data arr [] = {
@@ -46,6 +62,9 @@ int main() {
         {"~!@#", "#@!~"},
         {"aa", "aa"},
         {"ccc", "ccc"},
+        {"aba", "aba"},
+        {"abcba", "abcba"},
+        {"abcdcba", "abcdcba"},
     };
 
     unsigned int num_failed = 0;
