@@ -4,12 +4,6 @@
 #include <time.h>
 
 
-#define MAX_ARR_SZ 1000
-
-const int NUM_ITERATIONS = 10;
-const int MIN_ARR_VAL = -5 * MAX_ARR_SZ;
-const int MAX_ARR_VAL = 5 * MAX_ARR_SZ;
-
 
 int recursive_itoa_impl(int num, char result[], int depth) {
     const int new_num = num / 10;
