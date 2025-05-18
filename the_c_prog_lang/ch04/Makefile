@@ -6,7 +6,7 @@ $(shell mkdir -p $(BIN))
 
 
 JUST_EXECS = simple_pattern_search simple_strrindex simple_atof reverse_polish_calc \
-recursive_printd simple_quick_sort recursive_itoa recursive_reverse
+recursive_printd simple_quick_sort recursive_itoa recursive_reverse swap_macro
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
