@@ -1,19 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-static int buffer = 0;
-
-int getch() {
-    int c = 0;
-    if (buffer == 0) {
-        c = getchar();
-    } else {
-        c = buffer;
-        buffer = 0;
-    }
-    return c;
-}
-
 
 int getint(int *pn) {
     static int buffer = 0;
@@ -22,40 +9,48 @@ int getint(int *pn) {
     buffer = 0;
 
     // Ignore all white spaces
-    while (isspace(c = getch())) {}
+    while (isspace(c)) {
+        c = getchar();
+    }
 
     // Check all the characters we handle later
     if (!isdigit(c) && c != '+' && c != '-' && c != EOF) {
         return 0;
     }
 
+    // Now c is either digit, sign or EOF
     sign = c == '-' ? -1 : 1;
 
-    if (c == EOF) {
-        return c;
-    }
-
+    // If it is sign then we read the next number
     if (c == '+' || c == '-') {
         c = getchar();
     }
 
-    if (isdigit(c)) {
+    // Now we parse all the digits
+    for (*pn = 0; isdigit(c); c = getchar()) {
         *pn = (*pn) * 10 + (c - '0');
     }
 
+    buffer = c;
+
+    // If the next character is not EOF we buffer it for next round
     if (c != EOF) {
-        buffer = c;
+        buffer = 0;
     }
 
     *pn *= sign;
+
+    return c;
 }
 
 
 int main() {
-    int c = 0;
+    int array[10] = {0};
     
-    while ((c = getchar()) != EOF) {
-        printf("c = %c\n", c);
+    for (int i = 0; i < 10 && getint(&array[i]) != EOF; ++i) {}
+
+    for (int i = 0; i < 10; ++i) {
+        printf("arr[%d] = %d\n", i, array[i]);
     }
     
     return 0;
