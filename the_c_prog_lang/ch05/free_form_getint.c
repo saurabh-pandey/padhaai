@@ -33,7 +33,6 @@ int getint(int *pn) {
 
     buffer = c;
 
-    // If the next character is not EOF we buffer it for next round
     if (c != EOF) {
         buffer = 0;
     }
