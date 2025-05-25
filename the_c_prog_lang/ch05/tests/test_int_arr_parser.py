@@ -23,7 +23,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]'])
     
     def test_comma(self):
@@ -32,7 +31,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [1, 2, 3, 4, 5, 0, 0, 0, 0, 0]'])
     
     def test_negative(self):
@@ -41,7 +39,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [-1, -2, -3, -4, -5, 0, 0, 0, 0, 0]'])
     
     def test_mixed_sign(self):
@@ -50,7 +47,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [-1, 2, -3, 4, -5, 0, 0, 0, 0, 0]'])
     
     def test_no_num(self):
@@ -59,7 +55,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]'])
     
     def test_mixed_sep(self):
@@ -68,7 +63,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [1, 2, -3, -4, 5, -6, 0, 0, 0, 0]'])
     
     def test_big_nums(self):
@@ -77,7 +71,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [12, -345, 6789, 0, 0, 0, 0, 0, 0, 0]'])
     
     def test_spaced_sign(self):
@@ -86,7 +79,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [1, 2, -3, -4, -5, 6, 7, 0, 0, 0]'])
     
     def test_zero_prefix(self):
@@ -95,7 +87,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['arr = [-1, 2, -3, -14, 105, 0, 7, 0, 0, 0]'])
     
     def test_max_size(self):
@@ -104,7 +95,6 @@ class TestIntArrParser(unittest.TestCase):
                                 capture_output=True,
                                 text=True,
                                 input=arr_inp).stdout
-        # print(output)
         self.assertEqual(output.splitlines(), ['Array has reached max size = 10',
                                                'Exiting.',
                                                'arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]'])
