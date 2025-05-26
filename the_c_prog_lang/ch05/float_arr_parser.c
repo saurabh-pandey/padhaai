@@ -11,9 +11,9 @@ int get_float(float *pf) {
     buffer = 0;
 
     // Keep looping until we are sure we have arrived at something that is a floating point number. 
-    // This means we  ignore everything other than digits, sign and EOF. If a sign is not 
-    // immediately followed by a digit then it is ignored. For eg. "-2" is -2 but "- 2" is just 2 
-    // and "- a" is not a number
+    // This means we ignore everything other than digits, sign, dot and EOF. If a sign is not 
+    // immediately followed by a digit or dot then it is ignored. Also a dot has to be followed by 
+    // a digit. For eg. "-.2" is -0.2 but "- .2" is just 0.2 and "-. a" is not a number
     while (1) {
         // If it is a digit we are done. We parse this and potentially subsequent digits later
         if (isdigit(c)) {
@@ -24,11 +24,16 @@ int get_float(float *pf) {
             return EOF;
         }
 
+        // If we found a digit just after the dot then we would have broken in the first check of 
+        // this while loop. Since we are here that means even if the dot was found previously it 
+        // has no significance now for the floating point number.
         found_dot = 0;
 
         // Reset the sign value here. This handles the case where sign is followed by anything 
-        // other than a digit. If sign was followed by a digit it would already be captured above
-        // with the correct sign value. So if we are here that means we are looking a fresh
+        // other than a digit or a dot. If sign was followed by a digit it would already be 
+        // captured above with the correct sign value. So if we are here that means we might be 
+        // looking at the case where the next character is dot. If it is not a dot then we reset. 
+        // If it is a dot we mark for a dot found.
         if (c != '.') {
             sign = 0;
         } else {
@@ -53,7 +58,9 @@ int get_float(float *pf) {
     // sign was never provided in the input. This in turn means that sign is 1.
     sign = sign == 0 ? 1 : sign;
 
-    // Now we parse all the digits
+    // Parse Integral Part
+    // Now we parse all the digits if dot was not found. If dot was found then we only have to 
+    // parse the fractional part only.
     if (!found_dot) {
         for (*pf = 0.0; isdigit(c); c = getchar()) {
             // printf("0 i c = %c pf = %.2f\n", c, *pf);
@@ -62,7 +69,12 @@ int get_float(float *pf) {
         }
     }
 
+    // Parse Fractional Part
+    // It can happen in two cases:
+    // 1. If it is a continuation after the integral part followed by the decimal sign
+    // 2. It is purely fractional floating number and the dot was parsed even before any number
     if ((c == '.') || (found_dot == 1)) {
+        // If we parsed a dot we need to fetch the next character for the digits
         if (c == '.') {
             c = getchar();
         }
@@ -76,8 +88,8 @@ int get_float(float *pf) {
         }
     }
 
-    // Here we have read a character extra that is certainly not a digit. But if it is a sign or 
-    // EOF then we will need to consider this char in the next call. Thus we buffer it for now.
+    // Here we have read a character extra that is certainly not a digit. But if it is a sign, dot 
+    // or EOF then we will need to consider this char in the next call. Thus we buffer it for now.
     buffer = c;
 
     // Fix the sign
