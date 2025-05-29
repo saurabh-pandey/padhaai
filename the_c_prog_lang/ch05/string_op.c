@@ -30,7 +30,7 @@ typedef struct test_data {
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
     printf("Running tests for string_op\n");
 
