@@ -5,7 +5,7 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = int_arr_parser float_arr_parser char_ptr_string string_op
+JUST_EXECS = int_arr_parser float_arr_parser char_ptr_string string_op simple_strcat
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
