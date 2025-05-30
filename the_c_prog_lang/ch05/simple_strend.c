@@ -51,7 +51,7 @@ typedef struct test_data {
 
 
 int main() {
-    bool debug = true;
+    bool debug = false;
     
     printf("Running tests for simple_strend\n");
 
