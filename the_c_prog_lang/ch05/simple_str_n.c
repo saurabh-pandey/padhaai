@@ -5,23 +5,26 @@
 #define SMALL_STR_LEN 10
 
 
-void my_strncpy(char *s, char *t, int n) {
-    while ((*s = *t) != '\0') {
-        ++s;
-        ++t;
-    }
-}
-
-int my_strncmp(char *s, char *t) {
-    while (*s == *t) {
+int my_strncmp(char *s, char *t, int n) {
+    while (n > 0 && (*s == *t)) {
         if (*s == '\0') {
             return 0;
         }
         ++s;
         ++t;
+        --n;
     }
 
     return (*s - *t);
+}
+
+
+void my_strncpy(char *s, char *t, int n) {
+    while (n > 0 && (*s = *t) != '\0') {
+        ++s;
+        ++t;
+        --n;
+    }
 }
 
 typedef struct strncpy_test_data {
@@ -60,7 +63,7 @@ void run_strncpy_tests() {
                    t,
                    strncpy_tests[i].expected);
         }
-        const int cmp_res = my_strncmp(t, strncpy_tests[i].expected);
+        const int cmp_res = my_strncmp(t, strncpy_tests[i].expected, strncpy_tests[i].n);
         if (cmp_res != 0) {
             ++num_failed;
         }
@@ -79,10 +82,11 @@ void my_strncat(char *s, char *t, int n) {
         ++s;
     }
 
-    while (*t != '\0') {
+    while (n > 0 && *t != '\0') {
         *s = *t;
         ++s;
         ++t;
+        --n;
     }
     *s = '\0';
 }
@@ -108,6 +112,17 @@ void run_strncat_tests() {
         {"abc", "ba", -1, "abc"},
         {"abc", "ba", 3, "abcba"},
         {"abc", "ba", 4, "abcba"},
+        {"", "1234", 0, ""},
+        {"", "1234", 1, "1"},
+        {"", "1234", 2, "12"},
+        {"", "1234", 3, "123"},
+        {"", "1234", 4, "1234"},
+        {"", "1234", 5, "1234"},
+        {"", "1234", 6, "1234"},
+        {"", "1234", -1, ""},
+        {"", "", 0, ""},
+        {"", "", 1, ""},
+        {"", "", -1, ""},
     };
 
     unsigned int num_failed = 0;
@@ -121,7 +136,9 @@ void run_strncat_tests() {
                    strncat_tests[i].t,
                    strncat_tests[i].expected);
         }
-        const int cmp_res = my_strncmp(strncat_tests[i].s, strncat_tests[i].expected);
+        const int cmp_res = my_strncmp(strncat_tests[i].s,
+                                       strncat_tests[i].expected,
+                                       strncat_tests[i].n);
         if (cmp_res != 0) {
             ++num_failed;
         }
