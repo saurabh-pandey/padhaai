@@ -11,7 +11,7 @@ int get_line(char * line, int max_len) {
     while((c = getchar()) != EOF) {
         if (c == '\n') {
             line[n_chars] = '\0';
-            return n_chars;
+            return ++n_chars;
         } else {
             line[n_chars] = c;
             ++n_chars;
