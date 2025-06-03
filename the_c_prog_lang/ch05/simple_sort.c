@@ -1,27 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_LINES 100
-#define MAX_LEN 100
 
-
-int get_line(char * line, int max_len) {
-    char c;
-    int n_chars = 0;
-    while((c = getchar()) != EOF) {
-        if (c == '\n') {
-            line[n_chars] = '\0';
-            return ++n_chars;
-        } else {
-            line[n_chars] = c;
-            ++n_chars;
-        }
-    }
-    return EOF;
-}
-
-
+// -----------------------------------------------------
 // A stack like growing and shrinking memory pool
+// -----------------------------------------------------
+
 #define MAX_POOL_SIZE 10000
 
 static char mem_pool[MAX_POOL_SIZE] = "";
@@ -40,6 +24,30 @@ char * my_alloc(int len) {
 
 void my_dealloc(int len) {
     // Free this data
+}
+
+
+// -----------------------------------------------------
+// Read and sort the lines
+// -----------------------------------------------------
+
+#define MAX_LINES 100
+#define MAX_LEN 100
+
+
+int get_line(char * line, int max_len) {
+    char c;
+    int n_chars = 0;
+    while((c = getchar()) != EOF) {
+        if (c == '\n') {
+            line[n_chars] = '\0';
+            return ++n_chars;
+        } else {
+            line[n_chars] = c;
+            ++n_chars;
+        }
+    }
+    return EOF;
 }
 
 
