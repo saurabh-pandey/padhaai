@@ -73,7 +73,42 @@ void write_lines(char *lines[], int n_lines) {
     }
 }
 
-void qsort(char *lines[], int left, int right) {}
+
+void swap(char *lines[], int i, int j) {
+    char *temp = lines[i];
+    lines[i] = lines[j];
+    lines[j] = temp;
+}
+
+
+// NOTE: left and right args are assumed to be inclusive
+void qsort(char *lines[], int left, int right) {
+    // Input array of size 1 or less is already sorted
+    if (left >= right) {
+        return;
+    }
+
+    // Input array is of size > 1
+    const int pivot = (left + right) / 2;
+
+    // Move pivot to the start of the array
+    swap(lines, left, pivot);
+
+    // Partition around pivot
+    int partition_index = left;
+    for (int i = left + 1; i <= right; ++i) {
+        if (strcmp(lines[i], lines[left]) < 0) {
+            // This element should be moved to the left of partition_index
+            ++partition_index;
+            swap(lines, i, partition_index);
+        }
+    }
+    swap(lines, left, partition_index);
+    
+    // Recurse on the left and right of partitioned subarrays
+    qsort(lines, left, partition_index - 1);
+    qsort(lines, partition_index + 1, right);
+}
 
 int main(int argc, char *argv[]) {
     // if (argc < 2) {
@@ -87,7 +122,7 @@ int main(int argc, char *argv[]) {
     char *lines[MAX_LINES] = {};
 
     if ((n_lines = read_lines(lines, MAX_LINES)) > 0) {
-        // qsort(lines, 0, n_lines - 1);
+        qsort(lines, 0, n_lines - 1);
         write_lines(lines, n_lines);
         return 0;
     } else {
