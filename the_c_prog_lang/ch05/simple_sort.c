@@ -67,7 +67,7 @@ int read_lines(char *lines[], int max_lines) {
 void write_lines(char *lines[], int n_lines) {
     printf("Sorted output:\n");
     for (int i = 0; i < n_lines; ++i) {
-        printf("%s\n", i, lines[i]);
+        printf("%s\n", lines[i]);
     }
 }
 
