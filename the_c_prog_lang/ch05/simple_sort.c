@@ -56,11 +56,8 @@ int read_lines(char *lines[], int max_lines) {
     char a_line[MAX_LEN] = "";
     int len_line = 0;
     while ((len_line = get_line(a_line, MAX_LEN)) != EOF) {
-        printf("a line = %s\n", a_line);
         lines[n_lines] = my_alloc(len_line);
-        printf("Line %d ptr = %p\n", n_lines, lines[n_lines]);
         strcpy(lines[n_lines], a_line);
-        printf("Line %d ptr = %s\n", n_lines, lines[n_lines]);
         ++n_lines;
     }
 
@@ -68,8 +65,9 @@ int read_lines(char *lines[], int max_lines) {
 }
 
 void write_lines(char *lines[], int n_lines) {
+    printf("Sorted output:\n");
     for (int i = 0; i < n_lines; ++i) {
-        printf("Line no %d: %s\n", i, lines[i]);
+        printf("%s\n", i, lines[i]);
     }
 }
 
@@ -111,12 +109,7 @@ void qsort(char *lines[], int left, int right) {
 }
 
 int main(int argc, char *argv[]) {
-    // if (argc < 2) {
-    //     printf("\nUsage:\n");
-    //     printf("   ./bin/simple_sort\n");
-    //     printf("\n");
-    //     return 0;
-    // }
+    printf("Input some lines below to sort:\n");
 
     int n_lines = 0;
     char *lines[MAX_LINES] = {};
