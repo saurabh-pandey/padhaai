@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 
 static char daytable[2][13] = {
@@ -50,6 +51,16 @@ void month_day(int year, int yearday, int *pmonth, int *pday) {
     }
     *pmonth = month;
     *pday = yearday;
+}
+
+char *month_name(int month) {
+    static char * month_name[] = {
+        "Illegal month",
+        "January", "February", "March", "April", "May", "June", "July", "August", "September",
+        "October", "November", "December"
+    };
+
+    return (month < 1 || month > 12) ? month_name[0] : month_name[month];
 }
 
 typedef struct test_data {
@@ -121,6 +132,95 @@ int main() {
                    tests[i].year, day_year, month, day);
         }
     }
+
+    for (int i = 0; i < 14; ++i) {
+        const char * name = month_name(i);
+        if (debug) {
+            printf("%d -> %s\n", i, name);
+        }
+        switch (i)
+        {
+            case 1: {
+                if (strcmp(name, "January")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 2: {
+                if (strcmp(name, "February")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 3: {
+                if (strcmp(name, "March")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 4: {
+                if (strcmp(name, "April")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 5: {
+                if (strcmp(name, "May")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 6: {
+                if (strcmp(name, "June")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 7: {
+                if (strcmp(name, "July")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 8: {
+                if (strcmp(name, "August")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 9: {
+                if (strcmp(name, "September")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 10: {
+                if (strcmp(name, "October")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 11: {
+                if (strcmp(name, "November")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            case 12: {
+                if (strcmp(name, "December")) {
+                    ++num_failed;
+                }
+                break;
+            }
+            default: {
+                if (strcmp(name, "Illegal month")) {
+                    ++num_failed;
+                }
+                break;
+            }
+        }
+    }
+    
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
     } else {
