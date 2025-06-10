@@ -26,9 +26,28 @@ int get_line(char * line, int max_len) {
 }
 
 int main(int argc, char *argv[]) {
+    int except = 0;
+    int line_num = 0;
+    
     for (int i = 0; i < argc; ++i) {
         printf("Arg %d => %s\n", i, argv[i]);
+        if (argv[i][0] == '-') {
+            int j = 1;
+            while (argv[i][j] != '\0') {
+                if (argv[i][j] == 'x') {
+                    except = 1;
+                }
+                else if (argv[i][j] == 'n') {
+                    line_num = 1;
+                } else {
+                    printf("simple_find: illegal option %c\n", argv[i][j]);
+                }
+                ++j;
+            }
+        }
     }
+
+    printf("except = %d, line_num = %d\n", except, line_num);
 
     return 0;
 }
