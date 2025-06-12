@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     char *pattern = NULL;
     
     for (int i = 1; i < argc; ++i) {
-        printf("Arg %d => %s\n", i, argv[i]);
+        // printf("Arg %d => %s\n", i, argv[i]);
         if (argv[i][0] == '-') {
             int j = 1;
             while (argv[i][j] != '\0') {
@@ -48,17 +48,23 @@ int main(int argc, char *argv[]) {
             }
         } else {
             pattern = argv[i];
-            // printf("Pattern => %s\n", pattern);
         }
     }
 
-    printf("except = %d, line_num = %d, pattern = %s\n", except, number, pattern);
+    // printf("except = %d, line_num = %d, pattern = %s\n", except, number, pattern);
 
     int line_num = 0;
     char line[MAX_LEN] = "";
     while(get_line(line, MAX_LEN) != EOF) {
         ++line_num;
-        printf("%d: %s\n", line_num, line);
+        // printf("%d: %s\n", line_num, line);
+        const char * found = strstr(line, pattern);
+        if ((except == 0 && found != NULL) || (except == 1 && found == NULL)) {
+            if (number == 1) {
+                printf("%d: ", line_num);
+            }
+            printf("%s\n", line);
+        }
     }
 
     return 0;
