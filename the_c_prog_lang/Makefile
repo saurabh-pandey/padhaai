@@ -1,4 +1,4 @@
-CHAPTERS = ch01 ch02 ch03 ch04 ch05
+CHAPTERS = ch01 ch02 ch03 ch04 ch05 ch06
 
 all:
 	@echo "Building everything"
