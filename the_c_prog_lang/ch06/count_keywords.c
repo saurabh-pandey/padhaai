@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 
 #define MAX_WORD_LEN 100
 
@@ -29,7 +30,18 @@ struct keyword {
 
 
 int getword(char *word) {
-    return 0;
+    char c = 0;
+    int i = 0;
+    while ((c = getchar()) != EOF) {
+        if (isspace(c)) {
+            word[i] = '\0';
+            return i;
+        } else {
+            word[i] = c;
+            ++i;
+        }
+    }
+    return EOF;
 }
 
 struct keyword * binsearch(struct keyword *left, struct keyword *right, char *word) {
@@ -39,19 +51,20 @@ struct keyword * binsearch(struct keyword *left, struct keyword *right, char *wo
 
 int main(int argc, char *argv[]) {
     printf("Count all keyword occurrences\n");
-    char word[MAX_WORD_LEN] = "";
-
     const int keywords_size = sizeof(keywords) / sizeof(keywords[0]);
-    while (getword(word) != EOF) {
-        struct keyword *word_found = NULL;
-        if ((word_found = binsearch(&keywords[0], &keywords[keywords_size - 1], word)) != NULL) {
-            (word_found->count)++;
-        }
+    char word[MAX_WORD_LEN] = "";
+    int word_len = 0;
+    while ((word_len = getword(word)) != EOF) {
+        printf("Word = %s, len = %d\n", word, word_len);
+        // struct keyword *word_found = NULL;
+        // if ((word_found = binsearch(&keywords[0], &keywords[keywords_size - 1], word)) != NULL) {
+        //     (word_found->count)++;
+        // }
     }
     
-    for (int i = 0; i < keywords_size; ++i) {
-        printf("%s -> %d\n", keywords[i].word, keywords[i].count);
-    }
+    // for (int i = 0; i < keywords_size; ++i) {
+    //     printf("%s -> %d\n", keywords[i].word, keywords[i].count);
+    // }
 
     return 0;
 }
