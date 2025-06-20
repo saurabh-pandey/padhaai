@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 
 #define MAX_WORD_LEN 100
@@ -24,8 +25,7 @@ struct keyword {
     {"struct", 0},
     {"unsigned", 0},
     {"void", 0},
-    {"volatile", 0},
-    {"void", 0},
+    {"volatile", 0}
 };
 
 
@@ -45,6 +45,23 @@ int getword(char *word) {
 }
 
 struct keyword * binsearch(struct keyword *left, struct keyword *right, char *word) {
+    
+    if (left > right) {
+        return NULL;
+    }
+
+    struct keyword *mid = left + (right - left) / 2;
+
+    const int comp = strcmp(word, mid->word);
+
+    if (comp == 0) {
+        return mid;
+    } else if (comp < 0) {
+        return binsearch(left, mid - 1, word);
+    } else {
+        return binsearch(mid + 1, right, word);
+    }
+
     return NULL;
 }
 
@@ -56,10 +73,11 @@ int main(int argc, char *argv[]) {
     int word_len = 0;
     while ((word_len = getword(word)) != EOF) {
         printf("Word = %s, len = %d\n", word, word_len);
-        // struct keyword *word_found = NULL;
-        // if ((word_found = binsearch(&keywords[0], &keywords[keywords_size - 1], word)) != NULL) {
-        //     (word_found->count)++;
-        // }
+        struct keyword *word_found = NULL;
+        if ((word_found = binsearch(&keywords[0], &keywords[keywords_size - 1], word)) != NULL) {
+            printf("  Found word = %s\n", word);
+            (word_found->count)++;
+        }
     }
     
     // for (int i = 0; i < keywords_size; ++i) {
