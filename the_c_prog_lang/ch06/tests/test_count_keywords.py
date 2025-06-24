@@ -10,13 +10,23 @@ class TestCountKeywords(unittest.TestCase):
         p = pathlib.Path(__file__)
         cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
     
+    def check_keywords_count(self, expected, output):
+        for line in output.splitlines():
+            words = line.split()
+            print(words)
+            if (words[0] in expected):
+                print("Found keyword", words[0])
+            else:
+                pass
+                
+    
     def test_simple(self):
         arr_inp = textwrap.dedent('''\
             Hello World
             auto
         ''')
         output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
-        print(output.splitlines())
+        self.check_keywords_count({'auto': 1}, output)
         # self.assertEqual(output.splitlines(), ['This is a cat.', 'This also has cat.'])
     
     # def test_simple_except(self):
