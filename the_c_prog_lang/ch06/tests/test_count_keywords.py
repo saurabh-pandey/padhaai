@@ -11,13 +11,18 @@ class TestCountKeywords(unittest.TestCase):
         cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
     
     def check_keywords_count(self, expected, output):
-        for line in output.splitlines():
+        lines = output.splitlines()
+        self.assertEqual(lines[0], 'Count all keyword occurrences')
+        self.assertEqual(lines[1], 'Word       Count')
+        for line in lines[2:]:
             words = line.split()
             print(words)
             if (words[0] in expected):
-                print("Found keyword", words[0])
-            else:
-                pass
+                # print("Found keyword", words[0])
+                if expected[words[0]] != int(words[1]):
+                    print("Found mismatch 1")
+            elif len(words) == 2 and int(words[1]) != 0:
+                print("Found mismatch 0")
                 
     
     def test_simple(self):
