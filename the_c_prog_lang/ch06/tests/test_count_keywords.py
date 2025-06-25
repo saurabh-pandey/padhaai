@@ -14,16 +14,18 @@ class TestCountKeywords(unittest.TestCase):
         lines = output.splitlines()
         self.assertEqual(lines[0], 'Count all keyword occurrences')
         self.assertEqual(lines[1], 'Word       Count')
+        keyword_mismatch = {}
         for line in lines[2:]:
             words = line.split()
-            print(words)
+            # print(words)
+            actual = int(words[1])
             if (words[0] in expected):
                 # print("Found keyword", words[0])
-                if expected[words[0]] != int(words[1]):
-                    print("Found mismatch 1")
-            elif len(words) == 2 and int(words[1]) != 0:
-                print("Found mismatch 0")
-                
+                if expected[words[0]] != actual:
+                    keyword_mismatch[words[0]] = (expected[words[0]], actual)
+            elif actual != 0:
+                keyword_mismatch[words[0]] = (0, actual)
+        self.assertEqual(len(keyword_mismatch), 0, keyword_mismatch)
     
     def test_simple(self):
         arr_inp = textwrap.dedent('''\
