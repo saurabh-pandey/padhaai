@@ -12,6 +12,7 @@ class TestCountKeywords(unittest.TestCase):
     
     def check_keywords_count(self, expected, output):
         lines = output.splitlines()
+        # print(lines)
         self.assertEqual(lines[0], 'Count all keyword occurrences')
         self.assertEqual(lines[1], 'Word       Count')
         keyword_mismatch = {}
@@ -25,6 +26,7 @@ class TestCountKeywords(unittest.TestCase):
                     keyword_mismatch[words[0]] = (expected[words[0]], actual)
             elif actual != 0:
                 keyword_mismatch[words[0]] = (0, actual)
+        # print(keyword_mismatch)
         self.assertEqual(len(keyword_mismatch), 0, keyword_mismatch)
     
     def test_simple(self):
@@ -34,86 +36,21 @@ class TestCountKeywords(unittest.TestCase):
         ''')
         output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
         self.check_keywords_count({'auto': 1}, output)
-        # self.assertEqual(output.splitlines(), ['This is a cat.', 'This also has cat.'])
     
-    # def test_simple_except(self):
-    #     arr_inp = textwrap.dedent('''\
-    #         Hi!
-    #         This is a cat.
-    #         What about this line?
-    #         Cat is here but.
-    #         This also has cat.
-    #         CAT is an exam.
-    #         Not in this line.
-    #     ''')
-    #     output = subprocess.run([self.exe, "-x", "cat"],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=arr_inp).stdout
-    #     self.assertEqual(output.splitlines(),
-    #                      ['Hi!', 'What about this line?', 'Cat is here but.', 'CAT is an exam.', 
-    #                       'Not in this line.'])
-    
-    # def test_simple_line_num(self):
-    #     arr_inp = textwrap.dedent('''\
-    #         Hi!
-    #         This is a cat.
-    #         What about this line?
-    #         Cat is here but.
-    #         This also has cat.
-    #         CAT is an exam.
-    #         Not in this line.
-    #     ''')
-    #     output = subprocess.run([self.exe, "-n", "cat"],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=arr_inp).stdout
-    #     self.assertEqual(output.splitlines(), ['2: This is a cat.', '5: This also has cat.'])
-    
-    # def test_simple_except_line_num(self):
-    #     arr_inp = textwrap.dedent('''\
-    #         Hi!
-    #         This is a cat.
-    #         What about this line?
-    #         Cat is here but.
-    #         This also has cat.
-    #         CAT is an exam.
-    #         Not in this line.
-    #     ''')
-    #     output = subprocess.run([self.exe, "-nx", "cat"],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=arr_inp).stdout
-    #     self.assertEqual(output.splitlines(),
-    #                      ['1: Hi!', '3: What about this line?', '4: Cat is here but.',
-    #                       '6: CAT is an exam.', '7: Not in this line.'])
-    
-    # def test_simple_separate_except_line_num(self):
-    #     arr_inp = textwrap.dedent('''\
-    #         Hi!
-    #         This is a cat.
-    #         What about this line?
-    #         Cat is here but.
-    #         This also has cat.
-    #         CAT is an exam.
-    #         Not in this line.
-    #     ''')
-    #     output = subprocess.run([self.exe, "-n", "-x", "cat"],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=arr_inp).stdout
-    #     self.assertEqual(output.splitlines(),
-    #                      ['1: Hi!', '3: What about this line?', '4: Cat is here but.',
-    #                       '6: CAT is an exam.', '7: Not in this line.'])
-    
-    # def test_simple_separate_except_line_num(self):
-    #     arr_inp = textwrap.dedent('''
-    #     ''')
-    #     output = subprocess.run([self.exe, "cat"],
-    #                             capture_output=True,
-    #                             text=True,
-    #                             input=arr_inp).stdout
-    #     self.assertEqual(output.splitlines(), [])
+    def test_all(self):
+        arr_inp = textwrap.dedent('''\
+            This a simple sentence
+            It has auto and break in it
+            It has case char const and we continue
+            By default we can never double the float to an int
+            There is long return to struct
+            Finally unsigned void is also volatile
+        ''')
+        output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
+        self.check_keywords_count({'auto' : 1, 'break' : 1, 'case' : 1, 'char' : 1, 'const' : 1,
+                                   'continue' : 1, 'default' : 1, 'double' : 1, 'float' : 1,
+                                   'int' : 1, 'long' : 1, 'return' : 1, 'struct' : 1,
+                                   'unsigned' : 1, 'void' : 1, 'volatile' : 1}, output)
 
 
 if __name__ == '__main__':
