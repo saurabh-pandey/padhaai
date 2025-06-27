@@ -60,6 +60,21 @@ class TestCountKeywords(unittest.TestCase):
         ''')
         output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
         self.check_keywords_count({'int' : 1}, output)
+    
+    def test_punctuation(self):
+        arr_inp = textwrap.dedent('''\
+            This a simple sentence.
+            It has auto, break in it.
+            It has case, char:const and we continue?
+            By default'we can never double)float to an,int`
+            There is long>return to <struct.
+            Finally unsigned,void is also volatile?
+        ''')
+        output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
+        self.check_keywords_count({'auto' : 1, 'break' : 1, 'case' : 1, 'char' : 1, 'const' : 1,
+                                   'continue' : 1, 'default' : 1, 'double' : 1, 'float' : 1,
+                                   'int' : 1, 'long' : 1, 'return' : 1, 'struct' : 1,
+                                   'unsigned' : 1, 'void' : 1, 'volatile' : 1}, output)
 
 
 if __name__ == '__main__':

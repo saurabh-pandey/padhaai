@@ -33,12 +33,12 @@ int getword(char *word) {
     char c = 0;
     int i = 0;
     while ((c = getchar()) != EOF) {
-        if (isspace(c)) {
-            word[i] = '\0';
-            return i;
-        } else {
+        if (isalpha(c)) {
             word[i] = c;
             ++i;
+        } else {
+            word[i] = '\0';
+            return i;
         }
     }
     return EOF;
