@@ -12,21 +12,17 @@ class TestCountKeywords(unittest.TestCase):
     
     def check_keywords_count(self, expected, output):
         lines = output.splitlines()
-        # print(lines)
         self.assertEqual(lines[0], 'Count all keyword occurrences')
         self.assertEqual(lines[1], 'Word       Count')
         keyword_mismatch = {}
         for line in lines[2:]:
             words = line.split()
-            # print(words)
             actual = int(words[1])
             if (words[0] in expected):
-                # print("Found keyword", words[0])
                 if expected[words[0]] != actual:
                     keyword_mismatch[words[0]] = (expected[words[0]], actual)
             elif actual != 0:
                 keyword_mismatch[words[0]] = (0, actual)
-        # print(keyword_mismatch)
         self.assertEqual(len(keyword_mismatch), 0, keyword_mismatch)
     
     def test_simple(self):
@@ -51,6 +47,19 @@ class TestCountKeywords(unittest.TestCase):
                                    'continue' : 1, 'default' : 1, 'double' : 1, 'float' : 1,
                                    'int' : 1, 'long' : 1, 'return' : 1, 'struct' : 1,
                                    'unsigned' : 1, 'void' : 1, 'volatile' : 1}, output)
+    
+    def test_empty(self):
+        arr_inp = textwrap.dedent('''\
+        ''')
+        output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
+        self.check_keywords_count({}, output)
+    
+    def test_case_sensitive(self):
+        arr_inp = textwrap.dedent('''\
+            INT iNT InT inT INt iNt Int int
+        ''')
+        output = subprocess.run([self.exe], capture_output=True, text=True, input=arr_inp).stdout
+        self.check_keywords_count({'int' : 1}, output)
 
 
 if __name__ == '__main__':

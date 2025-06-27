@@ -69,17 +69,11 @@ struct keyword * binsearch(struct keyword *left, struct keyword *right, char *wo
 int main(int argc, char *argv[]) {
     printf("Count all keyword occurrences\n");
     const int keywords_size = sizeof(keywords) / sizeof(keywords[0]);
-    // for (int i = 0; i < keywords_size; ++i) {
-    //     printf("\'%s\' : %d, ", keywords[i].word, keywords[i].count);
-    // }
-    // printf("\n");
     char word[MAX_WORD_LEN] = "";
     int word_len = 0;
     while ((word_len = getword(word)) != EOF) {
-        // printf("Word = %s, len = %d\n", word, word_len);
         struct keyword *word_found = NULL;
         if ((word_found = binsearch(&keywords[0], &keywords[keywords_size - 1], word)) != NULL) {
-            // printf("  Found word = %s\n", word);
             (word_found->count)++;
         }
     }
