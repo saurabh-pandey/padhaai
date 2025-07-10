@@ -45,13 +45,13 @@ struct node * add_node(char *word, struct node *root) {
         if (res == 0) {
             ++(root->count);
         } else if (res < 0) {
-            return add_node(word, root->left);
+            root->left = add_node(word, root->left);
         } else {
-            return add_node(word, root->left);
+            root->right = add_node(word, root->left);
         }
     }
     
-    return NULL;
+    return root;
 }
 
 
