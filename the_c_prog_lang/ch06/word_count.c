@@ -41,7 +41,7 @@ struct node * add_node(char *word, struct node *root) {
     if (root == NULL) {
         return create_node(word);
     } else {
-        const int res = strcmp(root->word, word);
+        const int res = strcmp(word, root->word);
         if (res == 0) {
             ++(root->count);
         } else if (res < 0) {
@@ -55,7 +55,14 @@ struct node * add_node(char *word, struct node *root) {
 }
 
 
-void tree_print(struct node *root) {}
+void tree_print(struct node *root) {
+    if (root == NULL) {
+        return;
+    }
+    tree_print(root->left);
+    printf("%s => %d\n", root->word, root->count);
+    tree_print(root->right);
+}
 
 
 int main(int argc, char *argv[]) {
