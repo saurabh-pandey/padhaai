@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #define MAX_WORD_LEN 100
 
@@ -28,8 +29,28 @@ struct node {
     struct node *right;
 };
 
+
+struct node * node_alloc() {
+    return (struct node *) malloc(sizeof(struct node));
+}
+
+
+
 struct node * create_node(char *word) {
-    return NULL;
+    const size_t word_len = strlen(word);
+    if (word_len == 0) {
+        printf("WARNING: Found word with 0 length\n");
+    }
+    struct node * new_node = node_alloc();
+    new_node->count = 1;
+    new_node->left = NULL;
+    new_node->right = NULL;
+    
+    char * new_word = (char *)malloc(sizeof(char) * (word_len + 1));
+    new_node->word = new_word;
+    strcpy(new_node->word, word);
+    
+    return new_node;
 }
 
 struct node * add_node(char *word, struct node *root) {
@@ -47,7 +68,7 @@ struct node * add_node(char *word, struct node *root) {
         } else if (res < 0) {
             root->left = add_node(word, root->left);
         } else {
-            root->right = add_node(word, root->left);
+            root->right = add_node(word, root->right);
         }
     }
     
@@ -60,7 +81,8 @@ void tree_print(struct node *root) {
         return;
     }
     tree_print(root->left);
-    printf("%s => %d\n", root->word, root->count);
+    const size_t word_len = strlen(root->word);
+    printf("%s => count = %d, len = %zu\n", root->word, root->count, word_len);
     tree_print(root->right);
 }
 
