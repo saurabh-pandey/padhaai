@@ -39,8 +39,9 @@ struct node * node_alloc() {
 struct node * create_node(char *word) {
     const size_t word_len = strlen(word);
     if (word_len == 0) {
-        printf("WARNING: Found word with 0 length\n");
+        return NULL;
     }
+    
     struct node * new_node = node_alloc();
     new_node->count = 1;
     new_node->left = NULL;
