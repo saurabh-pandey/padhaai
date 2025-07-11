@@ -43,11 +43,20 @@ struct node * create_node(char *word) {
     }
     
     struct node * new_node = node_alloc();
+    if (new_node == NULL) {
+        printf("ERROR: New node allocation failed\n");
+        exit(1);
+    }
+    
     new_node->count = 1;
     new_node->left = NULL;
     new_node->right = NULL;
     
     char * new_word = (char *)malloc(sizeof(char) * (word_len + 1));
+    if (new_word == NULL) {
+        printf("ERROR: New word allocation failed\n");
+        exit(1);
+    }
     new_node->word = new_word;
     strcpy(new_node->word, word);
     
@@ -82,8 +91,8 @@ void tree_print(struct node *root) {
         return;
     }
     tree_print(root->left);
-    const size_t word_len = strlen(root->word);
-    printf("%s => count = %d, len = %zu\n", root->word, root->count, word_len);
+    // printf("%s => count = %d, len = %zu\n", root->word, root->count, strlen(root->word));
+    printf("%s => %d\n", root->word, root->count);
     tree_print(root->right);
 }
 
@@ -95,7 +104,7 @@ int main(int argc, char *argv[]) {
     struct node *root = NULL;
     while ((word_len = getword(word)) != EOF) {
         root = add_node(word, root);
-        printf("%s\n", word);
+        // printf("%s\n", word);
     }
 
     tree_print(root);
