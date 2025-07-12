@@ -96,6 +96,19 @@ void tree_print(Node *root) {
 }
 
 
+void free_tree(Node * root) {
+    if (root == NULL) {
+        return;
+    }
+
+    free_tree(root->left);
+    free_tree(root->right);
+    free(root->word);
+    free(root);
+    root = NULL;
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Count all words\n");
     char word[MAX_WORD_LEN] = "";
@@ -107,6 +120,8 @@ int main(int argc, char *argv[]) {
     }
 
     tree_print(root);
+
+    free_tree(root);
 
     return 0;
 }
