@@ -22,27 +22,26 @@ int getword(char *word) {
 }
 
 
-struct node {
+typedef struct node {
     char *word;
     int count;
     struct node *left;
     struct node *right;
-};
+} Node;
 
 
-struct node * node_alloc() {
-    return (struct node *) malloc(sizeof(struct node));
+Node * node_alloc() {
+    return (Node *) malloc(sizeof(Node));
 }
 
 
-
-struct node * create_node(char *word) {
+Node * create_node(char *word) {
     const size_t word_len = strlen(word);
     if (word_len == 0) {
         return NULL;
     }
     
-    struct node * new_node = node_alloc();
+    Node * new_node = node_alloc();
     if (new_node == NULL) {
         printf("ERROR: New node allocation failed\n");
         exit(1);
@@ -63,7 +62,7 @@ struct node * create_node(char *word) {
     return new_node;
 }
 
-struct node * add_node(char *word, struct node *root) {
+Node * add_node(char *word, Node *root) {
     if (word == NULL) {
         // TODO: Should be a warning?
         return NULL;
@@ -86,7 +85,7 @@ struct node * add_node(char *word, struct node *root) {
 }
 
 
-void tree_print(struct node *root) {
+void tree_print(Node *root) {
     if (root == NULL) {
         return;
     }
@@ -101,7 +100,7 @@ int main(int argc, char *argv[]) {
     printf("Count all words\n");
     char word[MAX_WORD_LEN] = "";
     int word_len = 0;
-    struct node *root = NULL;
+    Node * root = NULL;
     while ((word_len = getword(word)) != EOF) {
         root = add_node(word, root);
         // printf("%s\n", word);
