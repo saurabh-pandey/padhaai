@@ -32,6 +32,12 @@ typedef struct node {
 } Node;
 
 
+typedef struct list_node {
+    Node * tree_node;
+    struct list_node * next;
+} ListNode;
+
+
 Node * node_alloc() {
     return (Node *) malloc(sizeof(Node));
 }
@@ -124,6 +130,66 @@ void tree_count_min_max(Node * root, int * min_count, int * max_count) {
 }
 
 
+void fill_count_ordered_nodes(Node * root, ListNode ** count_ordered_nodes) {
+    if (root == NULL) {
+        return;
+    }
+
+    ListNode * list_node = NULL;
+    if (count_ordered_nodes[root->count - 1] == NULL) {
+        list_node = (ListNode *)malloc(sizeof(ListNode));
+        if (list_node == NULL) {
+            printf("ERROR: Unable to allocate ListNode\n");
+            return;
+        }
+        list_node->tree_node = root;
+        list_node->next = NULL;
+        count_ordered_nodes[root->count - 1] = list_node;
+    } else {
+        list_node = count_ordered_nodes[root->count - 1];
+        while (list_node->next != NULL) {
+            list_node = list_node->next;
+        }
+        list_node->next = (ListNode *)malloc(sizeof(ListNode));
+        if (list_node->next == NULL) {
+            printf("ERROR: Unable to allocate ListNode\n");
+            return;
+        }
+        list_node->next->tree_node = root;
+        list_node->next->next = NULL;
+    }
+
+    fill_count_ordered_nodes(root->left, count_ordered_nodes);
+    fill_count_ordered_nodes(root->right, count_ordered_nodes);
+}
+
+void print_count_ordered_nodes(ListNode ** count_ordered_nodes, int size) {
+    if (count_ordered_nodes == NULL) {
+        return;
+    }
+
+    for (int i = 0; i < size; ++i) {
+        ListNode * list_node = count_ordered_nodes[i];
+        if (list_node != NULL) {
+            printf("Count = %d, ", i + 1);
+            printf("Nodes = [");
+            while (list_node != NULL) {
+                printf("%s", list_node->tree_node->word);
+                if (list_node->next != NULL) {
+                    printf(", ");
+                }
+                list_node = list_node->next;
+            }
+            printf("]\n");            
+        }
+    }
+}
+
+void free_list_nodes(ListNode ** list_node) {
+    
+}
+
+
 void tree_print_by_count_decreasing(Node * root) {
     if (root == NULL) {
         return;
@@ -134,6 +200,40 @@ void tree_print_by_count_decreasing(Node * root) {
 
     tree_count_min_max(root, &min_count, &max_count);
     printf("min_count = %d, max_count = %d\n", min_count, max_count);
+
+    if (min_count > max_count) {
+        printf("ERROR: min word count (%d) is bigger than max word count (%d)\n",
+               min_count,
+               max_count);
+        return;
+    }
+
+    const int arr_sz = max_count - min_count + 1;
+
+    ListNode ** count_ordered_nodes = (ListNode **)malloc(sizeof(ListNode *) * arr_sz);
+    if (count_ordered_nodes == NULL) {
+        printf("ERROR: Allocation of count ordered nodes failed\n");
+        return;
+    }
+
+    // Initialize
+    for (int i = 0; i < arr_sz; ++i) {
+        count_ordered_nodes[i] = NULL;
+    }
+
+    fill_count_ordered_nodes(root, count_ordered_nodes);
+
+    print_count_ordered_nodes(count_ordered_nodes, arr_sz);
+
+    // Free all nodes
+    for (int i = 0; i < arr_sz; ++i) {
+        if (count_ordered_nodes[i] != NULL) {
+            free(count_ordered_nodes[i]);
+        }
+    }
+    if (count_ordered_nodes != NULL) {
+        free(count_ordered_nodes);
+    }
 }
 
 
