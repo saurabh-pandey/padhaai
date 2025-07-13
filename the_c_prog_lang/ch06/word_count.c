@@ -2,6 +2,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <limits.h>
+
 
 #define MAX_WORD_LEN 100
 
@@ -109,17 +111,48 @@ void free_tree(Node * root) {
 }
 
 
+void tree_count_min_max(Node * root, int * min_count, int * max_count) {
+    if (root == NULL) {
+        return;
+    }
+
+    *min_count = root->count < *min_count ? root->count : *min_count;
+    *max_count = root->count > *max_count ? root->count : *max_count;
+
+    tree_count_min_max(root->left, min_count, max_count);
+    tree_count_min_max(root->right, min_count, max_count);
+}
+
+
+void tree_print_by_count_decreasing(Node * root) {
+    if (root == NULL) {
+        return;
+    }
+    
+    int min_count = INT_MAX;
+    int max_count = INT_MIN;
+
+    tree_count_min_max(root, &min_count, &max_count);
+    printf("min_count = %d, max_count = %d\n", min_count, max_count);
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Count all words\n");
+    
     char word[MAX_WORD_LEN] = "";
     int word_len = 0;
     Node * root = NULL;
+
     while ((word_len = getword(word)) != EOF) {
         root = add_node(word, root);
         // printf("%s\n", word);
+        
     }
 
     tree_print(root);
+
+    tree_print_by_count_decreasing(root);
 
     free_tree(root);
 
