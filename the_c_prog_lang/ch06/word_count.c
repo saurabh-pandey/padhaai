@@ -186,7 +186,17 @@ void print_count_ordered_nodes(ListNode ** count_ordered_nodes, int size) {
 }
 
 void free_list_nodes(ListNode ** list_node) {
-    
+    if (list_node == NULL) {
+        return;
+    }
+
+    if (*list_node == NULL) {
+        return;
+    }
+
+    free_list_nodes(&((*list_node)->next));
+    free(*list_node);
+    *list_node = NULL;
 }
 
 
@@ -228,7 +238,8 @@ void tree_print_by_count_decreasing(Node * root) {
     // Free all nodes
     for (int i = 0; i < arr_sz; ++i) {
         if (count_ordered_nodes[i] != NULL) {
-            free(count_ordered_nodes[i]);
+            free_list_nodes(&(count_ordered_nodes[i]));
+            printf("%d => %p\n", i, count_ordered_nodes[i]);
         }
     }
     if (count_ordered_nodes != NULL) {
