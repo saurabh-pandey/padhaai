@@ -12,16 +12,14 @@ class TestWordCount(unittest.TestCase):
         cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
     
     def check_word_count(self, input, output):
-        # print(input.split())
         expected_word_count = collections.Counter(input.split())
-        # print(expected_word_count)
         lines = output.splitlines()
-        # print(lines)
         self.assertEqual(lines[0], 'Count all words')
         word_count_mismatch = {}
         for line in lines[1:]:
+            if line == "Done":
+                break
             word_count_pair = line.split(" => ")
-            # print(word_count_pair)
             actual_count = int(word_count_pair[1])
             if (word_count_pair[0] in expected_word_count):
                 expected_count = expected_word_count[word_count_pair[0]]

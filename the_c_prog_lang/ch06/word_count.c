@@ -264,6 +264,8 @@ int main(int argc, char *argv[]) {
 
     tree_print(root);
 
+    printf("Done\n");
+
     tree_print_by_count_decreasing(root);
 
     free_tree(root);
