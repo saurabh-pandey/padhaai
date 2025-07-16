@@ -259,7 +259,6 @@ int main(int argc, char *argv[]) {
     while ((word_len = getword(word)) != EOF) {
         root = add_node(word, root);
         // printf("%s\n", word);
-        
     }
 
     int print_count_based = 0;

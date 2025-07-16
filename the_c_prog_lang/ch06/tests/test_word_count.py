@@ -15,8 +15,9 @@ class TestWordCount(unittest.TestCase):
         expected_word_count = collections.Counter(input.split())
         lines = output.splitlines()
         self.assertEqual(lines[0], 'Count all words')
+        self.assertEqual(lines[1], 'Tree based view')
         word_count_mismatch = {}
-        for line in lines[1:]:
+        for line in lines[2:]:
             if line == "Done":
                 break
             word_count_pair = line.split(" => ")
