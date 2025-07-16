@@ -4,6 +4,7 @@ import subprocess
 import textwrap
 import unittest
 
+from . import valgrind
 
 class TestWordCount(unittest.TestCase):
     @classmethod
@@ -64,6 +65,30 @@ class TestWordCount(unittest.TestCase):
         ''')
         output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
         self.check_word_count(input, output)
+    
+    def test_mem_leak_tree_view(self):
+        input = textwrap.dedent('''\
+            this is a multiple line example and this is the first line
+            another sentence that makes it two line
+            this is the third line now what next
+            now i have added a fourth line to see if it works
+            finally a fifth line to finish things
+        ''')
+        stdout, stderr, retcode = valgrind.run(self.exe, input)
+        print("🧪 Valgrind Output:\n", stdout)
+        print("🧪 Valgrind Error:\n", stderr)
+    
+    def test_mem_leak_count_view(self):
+        input = textwrap.dedent('''\
+            this is a multiple line example and this is the first line
+            another sentence that makes it two line
+            this is the third line now what next
+            now i have added a fourth line to see if it works
+            finally a fifth line to finish things
+        ''')
+        stdout, stderr, retcode = valgrind.run(self.exe, input, ["--count"])
+        print("🧪 Valgrind Output:\n", stdout)
+        print("🧪 Valgrind Error:\n", stderr)
 
 
 if __name__ == '__main__':

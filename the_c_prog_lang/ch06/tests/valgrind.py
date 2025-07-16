@@ -2,7 +2,7 @@ import shutil
 import subprocess
 import sys
 import re
-import textwrap
+# import textwrap
 
 def check_valgrind_installed():
     if shutil.which("valgrind") is None:
@@ -10,28 +10,29 @@ def check_valgrind_installed():
         sys.exit(1)
     print("✅ Valgrind found.")
 
-def run_valgrind(exe_path, args=None):
+def run(exe_path, input, args=[]):
     cmd = [
         "valgrind",
         "--leak-check=full",
         # "--error-exitcode=1",  # Fail if any errors are found
         # "--log-fd=1",          # Output directly to stdout
         # "--track-origins=yes",
-        exe_path
+        exe_path,
+        *args
     ]
-    if args:
-        cmd += args
+    # if args:
+    #     cmd += args
 
     try:
-        cmd = ["valgrind", "--leak-check=full", "/home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch06/bin/word_count"]
-        print("Valgrind command = ", cmd)
-        input = textwrap.dedent('''\
-            this is a multiple line example and this is the first line
-            another sentence that makes it two line
-            this is the third line now what next
-            now i have added a fourth line to see if it works
-            finally a fifth line to finish things
-        ''')
+        # cmd = ["valgrind", "--leak-check=full", "/home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch06/bin/word_count"]
+        # print("Valgrind command = ", cmd)
+        # input = textwrap.dedent('''\
+        #     this is a multiple line example and this is the first line
+        #     another sentence that makes it two line
+        #     this is the third line now what next
+        #     now i have added a fourth line to see if it works
+        #     finally a fifth line to finish things
+        # ''')
         result = subprocess.run(
             cmd,
             capture_output=True,
@@ -61,7 +62,7 @@ def main():
     exe_path = "/home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch06/bin/word_count < ~/inp.txt"  # Replace with actual path
 
     check_valgrind_installed()
-    stdout, stderr, retcode = run_valgrind(exe_path)
+    stdout, stderr, retcode = run(exe_path, "abc def")
 
     print("🧪 Valgrind Output:\n", stdout)
     print("🧪 Valgrind Error:\n", stderr)
