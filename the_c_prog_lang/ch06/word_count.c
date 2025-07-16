@@ -262,11 +262,20 @@ int main(int argc, char *argv[]) {
         
     }
 
-    tree_print(root);
+    int print_count_based = 0;
+    if (argc > 1 && strcmp(argv[1], "--count") == 0) {
+        print_count_based = 1;
+    }
+
+    if (print_count_based == 0) {
+        printf("Tree based view\n");
+        tree_print(root);
+    } else {
+        printf("Count based view\n");
+        tree_print_by_count_decreasing(root);
+    }
 
     printf("Done\n");
-
-    tree_print_by_count_decreasing(root);
 
     free_tree(root);
 
