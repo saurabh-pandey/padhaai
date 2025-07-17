@@ -12,7 +12,66 @@ class TestWordCount(unittest.TestCase):
         p = pathlib.Path(__file__)
         cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
     
-    def check_word_count(self, input, output):
+    def test_simple(self):
+        input = textwrap.dedent('''\
+            now is the time for all good men to come to the aid of their party
+        ''')
+        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
+        # self._check_word_count(input, output)
+        self._run_and_test(input)
+    
+    def test_multiple_line(self):
+        input = textwrap.dedent('''\
+            this is a multiple line example and this is the first line
+            another sentence that makes it two line
+            this is the third line now what next
+            now i have added a fourth line to see if it works
+            finally a fifth line to finish things
+        ''')
+        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
+        # self._check_word_count(input, output)
+        self._run_and_test(input)
+    
+    def test_empty(self):
+        input = textwrap.dedent('''\
+        ''')
+        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
+        # self._check_word_count(input, output)
+        self._run_and_test(input)
+    
+    def test_char_case(self):
+        input = textwrap.dedent('''\
+            Now we will try to test an example with lower and upper case
+            Best is to mix the cases and see if they match
+            How about this This THIS tHis tHIS thiS
+            Since we have tested above line we test now what
+            Let us try another line that will test best as well
+        ''')
+        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
+        # self._check_word_count(input, output)
+        self._run_and_test(input)
+    
+    def test_mem_leak_count_view(self):
+        input = textwrap.dedent('''\
+            this is a multiple line example and this is the first line
+            another sentence that makes it two line
+            this is the third line now what next
+            now i have added a fourth line to see if it works
+            finally a fifth line to finish things
+        ''')
+        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
+        stdout, stderr, retcode = valgrind.run(self.exe, input, ["--count"])
+        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        # print("🧪 Valgrind Output:\n", stdout)
+        # print("🧪 Valgrind Error:\n", stderr)
+    
+    def _run_and_test(self, input):
+        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
+        stdout, stderr, retcode = valgrind.run(self.exe, input)
+        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        self._check_word_count(input, stdout)
+    
+    def _check_word_count(self, input, output):
         expected_word_count = collections.Counter(input.split())
         lines = output.splitlines()
         self.assertEqual(lines[0], 'Count all words')
@@ -30,69 +89,6 @@ class TestWordCount(unittest.TestCase):
             else:
                 word_count_mismatch[word_count_pair[0]] = (0, actual_count)
         self.assertEqual(len(word_count_mismatch), 0, word_count_mismatch)
-    
-    def test_simple(self):
-        input = textwrap.dedent('''\
-            now is the time for all good men to come to the aid of their party
-        ''')
-        output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        self.check_word_count(input, output)
-    
-    def test_multiple_line(self):
-        input = textwrap.dedent('''\
-            this is a multiple line example and this is the first line
-            another sentence that makes it two line
-            this is the third line now what next
-            now i have added a fourth line to see if it works
-            finally a fifth line to finish things
-        ''')
-        output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        self.check_word_count(input, output)
-    
-    def test_empty(self):
-        input = textwrap.dedent('''\
-        ''')
-        output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        self.check_word_count(input, output)
-    
-    def test_char_case(self):
-        input = textwrap.dedent('''\
-            Now we will try to test an example with lower and upper case
-            Best is to mix the cases and see if they match
-            How about this This THIS tHis tHIS thiS
-            Since we have tested above line we test now what
-            Let us try another line that will test best as well
-        ''')
-        output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        self.check_word_count(input, output)
-    
-    def test_mem_leak_tree_view(self):
-        input = textwrap.dedent('''\
-            this is a multiple line example and this is the first line
-            another sentence that makes it two line
-            this is the third line now what next
-            now i have added a fourth line to see if it works
-            finally a fifth line to finish things
-        ''')
-        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
-        stdout, stderr, retcode = valgrind.run(self.exe, input)
-        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
-        # print("🧪 Valgrind Output:\n", stdout)
-        # print("🧪 Valgrind Error:\n", stderr)
-    
-    def test_mem_leak_count_view(self):
-        input = textwrap.dedent('''\
-            this is a multiple line example and this is the first line
-            another sentence that makes it two line
-            this is the third line now what next
-            now i have added a fourth line to see if it works
-            finally a fifth line to finish things
-        ''')
-        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
-        stdout, stderr, retcode = valgrind.run(self.exe, input, ["--count"])
-        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
-        # print("🧪 Valgrind Output:\n", stdout)
-        # print("🧪 Valgrind Error:\n", stderr)
 
 
 if __name__ == '__main__':
