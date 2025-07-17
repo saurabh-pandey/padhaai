@@ -74,9 +74,11 @@ class TestWordCount(unittest.TestCase):
             now i have added a fourth line to see if it works
             finally a fifth line to finish things
         ''')
+        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
         stdout, stderr, retcode = valgrind.run(self.exe, input)
-        print("🧪 Valgrind Output:\n", stdout)
-        print("🧪 Valgrind Error:\n", stderr)
+        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        # print("🧪 Valgrind Output:\n", stdout)
+        # print("🧪 Valgrind Error:\n", stderr)
     
     def test_mem_leak_count_view(self):
         input = textwrap.dedent('''\
@@ -86,9 +88,11 @@ class TestWordCount(unittest.TestCase):
             now i have added a fourth line to see if it works
             finally a fifth line to finish things
         ''')
+        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
         stdout, stderr, retcode = valgrind.run(self.exe, input, ["--count"])
-        print("🧪 Valgrind Output:\n", stdout)
-        print("🧪 Valgrind Error:\n", stderr)
+        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        # print("🧪 Valgrind Output:\n", stdout)
+        # print("🧪 Valgrind Error:\n", stderr)
 
 
 if __name__ == '__main__':
