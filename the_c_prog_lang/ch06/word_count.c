@@ -135,29 +135,14 @@ void fill_count_ordered_nodes(Node * root, ListNode ** count_ordered_nodes) {
         return;
     }
 
-    ListNode * list_node = NULL;
-    if (count_ordered_nodes[root->count - 1] == NULL) {
-        list_node = (ListNode *)malloc(sizeof(ListNode));
-        if (list_node == NULL) {
-            printf("ERROR: Unable to allocate ListNode\n");
-            return;
-        }
-        list_node->tree_node = root;
-        list_node->next = NULL;
-        count_ordered_nodes[root->count - 1] = list_node;
-    } else {
-        list_node = count_ordered_nodes[root->count - 1];
-        while (list_node->next != NULL) {
-            list_node = list_node->next;
-        }
-        list_node->next = (ListNode *)malloc(sizeof(ListNode));
-        if (list_node->next == NULL) {
-            printf("ERROR: Unable to allocate ListNode\n");
-            return;
-        }
-        list_node->next->tree_node = root;
-        list_node->next->next = NULL;
+    ListNode * list_node = (ListNode *)malloc(sizeof(ListNode));
+    if (list_node == NULL) {
+        printf("ERROR: Unable to allocate ListNode\n");
+        return;
     }
+    list_node->tree_node = root;
+    list_node->next = count_ordered_nodes[root->count - 1];
+    count_ordered_nodes[root->count - 1] = list_node;
 
     fill_count_ordered_nodes(root->left, count_ordered_nodes);
     fill_count_ordered_nodes(root->right, count_ordered_nodes);
