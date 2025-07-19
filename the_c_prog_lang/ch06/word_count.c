@@ -224,7 +224,6 @@ void tree_print_by_count_decreasing(Node * root) {
     for (int i = 0; i < arr_sz; ++i) {
         if (count_ordered_nodes[i] != NULL) {
             free_list_nodes(&(count_ordered_nodes[i]));
-            printf("%d => %p\n", i, count_ordered_nodes[i]);
         }
     }
     if (count_ordered_nodes != NULL) {

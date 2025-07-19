@@ -94,9 +94,9 @@ class TestWordCount(unittest.TestCase):
 
     def _check_count_view(self, input, output):
         expected_word_count = collections.Counter(input.split())
-        print(expected_word_count)
+        # print(expected_word_count)
         min_count, max_count = min(expected_word_count.values()), max(expected_word_count.values())
-        print(f"min = {min_count}, max = {max_count}")
+        # print(f"min = {min_count}, max = {max_count}")
         count_ordered_words = {}
         for count in range(max_count, min_count - 1, -1):
             count_ordered_words[count] = []
@@ -104,16 +104,33 @@ class TestWordCount(unittest.TestCase):
         for key, value in expected_word_count.items():
             count_ordered_words[value].append(key)
         
-        print(count_ordered_words)
+        # print(count_ordered_words)
 
         lines = output.splitlines()
         self.assertEqual(lines[0], 'Count all words')
         self.assertEqual(lines[1], 'Count based view')
+        self.assertEqual(lines[2], f'min_count = {min_count}, max_count = {max_count}')
         # word_count_mismatch = {}
-        for line in lines[2:]:
+        for line in lines[3:]:
             if line == "Done":
                 break
-            print(line)
+            comma_split_line = [part.strip() for part in line.split(',')]
+            # print(comma_split_line)
+            count_line_split = [part.strip() for part in comma_split_line[0].split('=')]
+            self.assertEqual(count_line_split[0], 'Count')
+            count_num = int(count_line_split[1])
+            nodes_line_split = [part.strip() for part in comma_split_line[1].split('=')]
+            self.assertEqual(nodes_line_split[0], 'Nodes')
+            
+            all_words = [nodes_line_split[1][1:]]
+            all_words.extend(comma_split_line[2:])
+            all_words[-1] = all_words[-1][:-1]
+            # print(f"Count: {count_num}, words = {all_words}")
+            if (set(count_ordered_words[count_num]) != set(all_words)):
+                print("## Mismatch")
+            # for comma_part in comma_split_line:
+            #     print(comma_part.split('='))
+
             # word_count_pair = line.split(" => ")
             # actual_count = int(word_count_pair[1])
             # if (word_count_pair[0] in expected_word_count):
