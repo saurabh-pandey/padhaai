@@ -27,26 +27,60 @@ typedef struct {
 typedef union {
     OnlyKeyOp o_key_op;
     KeyValOp key_value_op;
+} query;
+
+
+typedef enum {
+    ONLY_KEY,
+    KEY_VAL
+} query_type;
+
+
+typedef struct {
+    query_type q_type;
+    query q;
 } test_data;
 
  // TODO: How to check results of various operations in the tests?
 
 
 int main() {
-    bool debug = false;
+    bool debug = true;
     
     printf("Running tests for hash_table\n");
 
     test_data tests[] = {
-        {FIND, "a"},
-        {INSERT, "a", "A"},
-        {FIND, "a"},
-        {ERASE, "a"},
-        {FIND, "a"},
+        {.q_type = ONLY_KEY, .q.o_key_op = {FIND, "a"}},
+        {.q_type = KEY_VAL, .q.key_value_op = {INSERT, "a", "A"}},
+        {.q_type = ONLY_KEY, .q.o_key_op = {ERASE, "a"}},
     };
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
+        if (debug) {
+            switch (tests[i].q_type)
+            {
+                case ONLY_KEY:
+                {
+                    printf("%d, %s\n", tests[i].q.o_key_op.op, tests[i].q.o_key_op.key);
+                    break;
+                }
+                case KEY_VAL:
+                {
+                    printf("%d, %s, %s\n",
+                           tests[i].q.key_value_op.op,
+                           tests[i].q.key_value_op.key,
+                           tests[i].q.key_value_op.value);
+                    break;
+                }
+            
+                default:
+                {
+                    printf("ERROR: Unsupported operation %d\n", tests[i].q_type);
+                    break;
+                }
+            }
+        }
     }
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
