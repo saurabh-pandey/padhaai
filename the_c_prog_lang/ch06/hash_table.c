@@ -4,14 +4,29 @@
 #define MAX_SIZE 100
 
 
+// typedef enum {
+//     INSERT,
+//     ERASE,
+//     FIND
+// } Op;
+
+// static const char * Op_Str[] = {"INSERT", "ERASE", "FIND"};
+
+#define FOREACH_OP(OP) \
+    OP(INSERT) \
+    OP(ERASE) \
+    OP(FIND)
+
+#define GENERATE_ENUM(ENUM) ENUM,
+#define GENERATE_STRING(STRING) #STRING,
+
 typedef enum {
-    INSERT,
-    ERASE,
-    FIND
+    FOREACH_OP(GENERATE_ENUM)
 } Op;
 
-static const char * Op_Str[] = {"INSERT", "ERASE", "FIND"};
-
+static const char * Op_Str[] = {
+    FOREACH_OP(GENERATE_STRING)
+};
 
 typedef struct {
     Op op;
