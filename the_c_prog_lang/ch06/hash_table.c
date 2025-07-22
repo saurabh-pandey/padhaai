@@ -10,6 +10,8 @@ typedef enum {
     FIND
 } Op;
 
+static const char * Op_Str[] = {"INSERT", "ERASE", "FIND"};
+
 
 typedef struct {
     Op op;
@@ -35,6 +37,8 @@ typedef enum {
     KEY_VAL
 } query_type;
 
+static const char * query_type_str[] = {"ONLY_KEY", "KEY_VAL"};
+
 
 typedef struct {
     query_type q_type;
@@ -43,6 +47,9 @@ typedef struct {
 
  // TODO: How to check results of various operations in the tests?
 
+ #define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q.o_key_op = {op, key}}
+ #define KEY_VAL(key, val) {.q_type = KEY_VAL, .q.key_value_op = {INSERT, key, val}}
+
 
 int main() {
     bool debug = true;
@@ -50,9 +57,12 @@ int main() {
     printf("Running tests for hash_table\n");
 
     test_data tests[] = {
-        {.q_type = ONLY_KEY, .q.o_key_op = {FIND, "a"}},
-        {.q_type = KEY_VAL, .q.key_value_op = {INSERT, "a", "A"}},
-        {.q_type = ONLY_KEY, .q.o_key_op = {ERASE, "a"}},
+        // {.q_type = ONLY_KEY, .q.o_key_op = {FIND, "a"}},
+        ONLY_KEY(FIND, "a"),
+        // {.q_type = KEY_VAL, .q.key_value_op = {INSERT, "a", "A"}},
+        KEY_VAL("a", "A"),
+        // {.q_type = ONLY_KEY, .q.o_key_op = {ERASE, "a"}},
+        ONLY_KEY(ERASE, "a"),
     };
 
     unsigned int num_failed = 0;
@@ -62,13 +72,17 @@ int main() {
             {
                 case ONLY_KEY:
                 {
-                    printf("%d, %s\n", tests[i].q.o_key_op.op, tests[i].q.o_key_op.key);
+                    printf("q_type = %s, op = %s, key = %s\n",
+                           query_type_str[tests[i].q_type],
+                           Op_Str[tests[i].q.o_key_op.op],
+                           tests[i].q.o_key_op.key);
                     break;
                 }
                 case KEY_VAL:
                 {
-                    printf("%d, %s, %s\n",
-                           tests[i].q.key_value_op.op,
+                    printf("q_type = %s, op = %s, key = %s, val = %s\n",
+                           query_type_str[tests[i].q_type],
+                           Op_Str[tests[i].q.key_value_op.op],
                            tests[i].q.key_value_op.key,
                            tests[i].q.key_value_op.value);
                     break;
