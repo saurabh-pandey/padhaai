@@ -1,7 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 #define MAX_SIZE 100
+
+//------------------------------------------
+// Test related data structures and Macros
+//------------------------------------------
 
 // Macro to define enum with a string map for better logging of the enums
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -80,6 +87,93 @@ typedef struct {
 // Helper macro to construct the query data structure
 #define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q.o_key_op = {op, key}}
 #define KEY_VAL(key, val) {.q_type = KEY_VAL, .q.key_value_op = {INSERT, key, val}}
+
+
+//--------------------------------------
+// Hash Table
+//--------------------------------------
+
+// An entry in the buckets
+typedef struct hash_node {
+    char key[MAX_SIZE];
+    char value[MAX_SIZE];
+    struct hash_node * next;
+} HashNode;
+
+#define MAX_BUCKET_SIZE 101
+
+static HashNode * buckets[MAX_BUCKET_SIZE];
+
+unsigned int hash(char *key) {
+    unsigned int hash_value = 0;
+    for (; key != NULL && *key != '\0'; ++key) {
+        hash_value += *key + 31 * hash_value;
+    }
+    return hash_value % MAX_BUCKET_SIZE;
+}
+
+
+HashNode * find(char *key) {
+    // TODO: Might also check size
+    if (key == NULL) {
+        return NULL;
+    }
+    HashNode * bucket_nodes = buckets[hash(key)];
+    HashNode * current = bucket_nodes;
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            // Found
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+
+HashNode * erase(char *key) {
+    // TODO: Might also check size 
+    if (key == NULL) {
+        return NULL;
+    }
+    HashNode * bucket_nodes = buckets[hash(key)];
+    HashNode * prev = bucket_nodes;
+    HashNode * current = bucket_nodes;
+    while (current != NULL) {
+        if (strcmp(current->key, key) == 0) {
+            // Delete this node
+            if (prev == NULL) {
+                buckets[hash(key)] = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            // Is this a good practice?
+            current->next = NULL;
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+HashNode * insert(char *key, char * value) {
+    // TODO: Might also check size
+    if (key == NULL) {
+        return NULL;
+    }
+    if (value == NULL) {
+        return NULL;
+    }
+
+    HashNode * node = (HashNode *)malloc(sizeof(HashNode));
+    strcpy(node->key, key);
+    strcpy(node->value, value);
+    const unsigned int bucket_index = hash(key);
+    node->next = buckets[bucket_index];
+    buckets[bucket_index] = node;
+    
+    return node;
+}
 
 
 int main() {
