@@ -3,37 +3,40 @@
 
 #define MAX_SIZE 100
 
+// Macro to define enum with a string map for better logging of the enums
+#define GENERATE_ENUM(ENUM) ENUM,
+#define GENERATE_STRING(STRING) #STRING,
 
-// typedef enum {
-//     INSERT,
-//     ERASE,
-//     FIND
-// } Op;
-
-// static const char * Op_Str[] = {"INSERT", "ERASE", "FIND"};
-
+// Operations on the hash table as enum items via a macro
 #define FOREACH_OP(OP) \
     OP(INSERT) \
     OP(ERASE) \
     OP(FIND)
 
-#define GENERATE_ENUM(ENUM) ENUM,
-#define GENERATE_STRING(STRING) #STRING,
 
+// Defining the Op enum
 typedef enum {
     FOREACH_OP(GENERATE_ENUM)
 } Op;
 
+
+// Defining Op enum's string map
 static const char * Op_Str[] = {
     FOREACH_OP(GENERATE_STRING)
 };
 
+
+// Operations on hash table are in 2 flavours:
+// 1. Operations only involving the key i.e. find and erase
+// 2. Operations involving both the key and value i.e. insert
+
+// Key Only operation
 typedef struct {
     Op op;
     char key[MAX_SIZE];
 } OnlyKeyOp;
 
-
+// Key and value based operation
 typedef struct {
     Op op;
     char key[MAX_SIZE];
@@ -41,29 +44,42 @@ typedef struct {
 } KeyValOp;
 
 
+// Any query to the hash table is either key-only op or key-value op
 typedef union {
     OnlyKeyOp o_key_op;
     KeyValOp key_value_op;
 } query;
 
 
+// The 2 flavours of operations as enums via a macro
+#define FOREACH_QUERY_TYPE(QUERY_TYPE) \
+    QUERY_TYPE(ONLY_KEY) \
+    QUERY_TYPE(KEY_VAL)
+
+
+// Actual query type enum def.
 typedef enum {
-    ONLY_KEY,
-    KEY_VAL
+    FOREACH_QUERY_TYPE(GENERATE_ENUM)
 } query_type;
 
-static const char * query_type_str[] = {"ONLY_KEY", "KEY_VAL"};
+// String map for query type enum
+static const char * query_type_str[] = {
+    FOREACH_QUERY_TYPE(GENERATE_STRING)
+};
 
 
+// A test is composed of the actual query and its type
 typedef struct {
     query_type q_type;
     query q;
 } test_data;
 
- // TODO: How to check results of various operations in the tests?
+// TODO: How to check results of various operations in the tests?
 
- #define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q.o_key_op = {op, key}}
- #define KEY_VAL(key, val) {.q_type = KEY_VAL, .q.key_value_op = {INSERT, key, val}}
+
+// Helper macro to construct the query data structure
+#define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q.o_key_op = {op, key}}
+#define KEY_VAL(key, val) {.q_type = KEY_VAL, .q.key_value_op = {INSERT, key, val}}
 
 
 int main() {
@@ -72,11 +88,8 @@ int main() {
     printf("Running tests for hash_table\n");
 
     test_data tests[] = {
-        // {.q_type = ONLY_KEY, .q.o_key_op = {FIND, "a"}},
         ONLY_KEY(FIND, "a"),
-        // {.q_type = KEY_VAL, .q.key_value_op = {INSERT, "a", "A"}},
         KEY_VAL("a", "A"),
-        // {.q_type = ONLY_KEY, .q.o_key_op = {ERASE, "a"}},
         ONLY_KEY(ERASE, "a"),
     };
 
