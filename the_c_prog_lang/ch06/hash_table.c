@@ -95,8 +95,8 @@ typedef struct {
 
 // An entry in the buckets
 typedef struct hash_node {
-    char key[MAX_SIZE];
-    char value[MAX_SIZE];
+    char *key;
+    char *value;
     struct hash_node * next;
 } HashNode;
 
@@ -104,7 +104,8 @@ typedef struct hash_node {
 
 static HashNode * buckets[MAX_BUCKET_SIZE];
 
-unsigned int hash(char *key) {
+
+unsigned int hash(const char *key) {
     unsigned int hash_value = 0;
     for (; key != NULL && *key != '\0'; ++key) {
         hash_value += *key + 31 * hash_value;
@@ -113,66 +114,163 @@ unsigned int hash(char *key) {
 }
 
 
-HashNode * find(char *key) {
-    // TODO: Might also check size
-    if (key == NULL) {
+HashNode * find(const char *key) {
+    if (strlen(key) == 0) {
         return NULL;
     }
-    HashNode * bucket_nodes = buckets[hash(key)];
-    HashNode * current = bucket_nodes;
-    while (current != NULL) {
-        if (strcmp(current->key, key) == 0) {
+    
+    HashNode * bucket_node = buckets[hash(key)];
+    while (bucket_node != NULL) {
+        if (strcmp(bucket_node->key, key) == 0) {
             // Found
-            return current;
+            return bucket_node;
         }
-        current = current->next;
+        bucket_node = bucket_node->next;
     }
     return NULL;
 }
 
 
-HashNode * erase(char *key) {
-    // TODO: Might also check size 
-    if (key == NULL) {
+HashNode * erase(const char *key) { 
+    if (strlen(key) == 0) {
         return NULL;
     }
-    HashNode * bucket_nodes = buckets[hash(key)];
-    HashNode * prev = bucket_nodes;
-    HashNode * current = bucket_nodes;
-    while (current != NULL) {
-        if (strcmp(current->key, key) == 0) {
+    
+    HashNode * bucket_node = buckets[hash(key)];
+    HashNode * prev = bucket_node;
+    while (bucket_node != NULL) {
+        if (strcmp(bucket_node->key, key) == 0) {
             // Delete this node
             if (prev == NULL) {
-                buckets[hash(key)] = current->next;
+                buckets[hash(key)] = bucket_node->next;
             } else {
-                prev->next = current->next;
+                prev->next = bucket_node->next;
             }
             // Is this a good practice?
-            current->next = NULL;
-            return current;
+            bucket_node->next = NULL;
+            return bucket_node;
         }
-        current = current->next;
+        prev = bucket_node;
+        bucket_node = bucket_node->next;
     }
     return NULL;
 }
 
-HashNode * insert(char *key, char * value) {
-    // TODO: Might also check size
-    if (key == NULL) {
+HashNode * insert(const char *key, const char * value) {
+    if (strlen(key) == 0) {
         return NULL;
     }
-    if (value == NULL) {
+    if (strlen(value) == 0) {
         return NULL;
     }
 
-    HashNode * node = (HashNode *)malloc(sizeof(HashNode));
-    strcpy(node->key, key);
-    strcpy(node->value, value);
-    const unsigned int bucket_index = hash(key);
-    node->next = buckets[bucket_index];
-    buckets[bucket_index] = node;
+    HashNode * node = find(key);
+    if (node != NULL) {
+        strcpy(node->value, value);
+    } else {
+        node = (HashNode *)malloc(sizeof(HashNode));
+        node->key = strdup(key);
+        node->value = strdup(value);
+        const unsigned int bucket_index = hash(key);
+        node->next = buckets[bucket_index];
+        buckets[bucket_index] = node;
+    }
     
     return node;
+}
+
+void print_node(HashNode node) {
+    printf("(%s, %s)", node.key, node.value);
+}
+
+void print_hash_table(void) {
+    for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
+        printf("Bucket[%d] = [", i);
+        HashNode * node = buckets[i];
+        if (node != NULL) {
+            while (node != NULL) {
+                print_node(*node);
+                if (node->next != NULL) {
+                    printf(", ");
+                }
+                node = node->next;
+            }
+        } else {
+            printf("NULL");
+        }
+        printf("]\n");
+    }
+}
+
+void do_only_key_op(OnlyKeyOp only_key_op) {
+    switch (only_key_op.op)
+    {
+        case FIND:
+        {
+            HashNode * found_node = find(only_key_op.key);
+            print_node(*found_node);
+            break;
+        }
+        case ERASE:
+        {
+            HashNode * erased_node = erase(only_key_op.key);
+            print_node(*erased_node);
+            break;
+        }
+        default:
+        {
+            printf("ERROR: Unsupported key only operation %s\n", Op_Str[only_key_op.op]);
+            break;
+        }
+    }
+}
+
+void do_key_val_op(KeyValOp key_val_op) {
+    switch (key_val_op.op)
+    {
+        case INSERT:
+        {
+            HashNode * inserted_node = insert(key_val_op.key, key_val_op.value);
+            print_node(*inserted_node);
+            break;
+        }
+        default:
+        {
+            printf("ERROR: Unsupported key value operation %s\n", Op_Str[key_val_op.op]);
+            break;
+        }
+    }
+}
+
+void do_op(test_data op_query) {
+    switch (op_query.q_type)
+    {
+        case ONLY_KEY:
+        {
+            printf("q_type = %s, op = %s, key = %s\n",
+                    query_type_str[op_query.q_type],
+                    Op_Str[op_query.q.o_key_op.op],
+                    op_query.q.o_key_op.key);
+            do_only_key_op(op_query.q.o_key_op);
+            break;
+        }
+        case KEY_VAL:
+        {
+            printf("q_type = %s, op = %s, key = %s, val = %s\n",
+                    query_type_str[op_query.q_type],
+                    Op_Str[op_query.q.key_value_op.op],
+                    op_query.q.key_value_op.key,
+                    op_query.q.key_value_op.value);
+            do_key_val_op(op_query.q.key_value_op);
+            break;
+        }
+    
+        default:
+        {
+            printf("ERROR: Unsupported query %s\n", query_type_str[op_query.q_type]);
+            break;
+        }
+    }
 }
 
 
@@ -190,32 +288,7 @@ int main() {
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
         if (debug) {
-            switch (tests[i].q_type)
-            {
-                case ONLY_KEY:
-                {
-                    printf("q_type = %s, op = %s, key = %s\n",
-                           query_type_str[tests[i].q_type],
-                           Op_Str[tests[i].q.o_key_op.op],
-                           tests[i].q.o_key_op.key);
-                    break;
-                }
-                case KEY_VAL:
-                {
-                    printf("q_type = %s, op = %s, key = %s, val = %s\n",
-                           query_type_str[tests[i].q_type],
-                           Op_Str[tests[i].q.key_value_op.op],
-                           tests[i].q.key_value_op.key,
-                           tests[i].q.key_value_op.value);
-                    break;
-                }
-            
-                default:
-                {
-                    printf("ERROR: Unsupported operation %d\n", tests[i].q_type);
-                    break;
-                }
-            }
+            do_op(tests[i]);
         }
     }
     if (num_failed > 0) {
