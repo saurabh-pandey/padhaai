@@ -100,7 +100,7 @@ typedef struct hash_node {
     struct hash_node * next;
 } HashNode;
 
-#define MAX_BUCKET_SIZE 101
+#define MAX_BUCKET_SIZE 5
 
 static HashNode * buckets[MAX_BUCKET_SIZE];
 
@@ -137,7 +137,7 @@ HashNode * erase(const char *key) {
     }
     
     HashNode * bucket_node = buckets[hash(key)];
-    HashNode * prev = bucket_node;
+    HashNode * prev = NULL;
     while (bucket_node != NULL) {
         if (strcmp(bucket_node->key, key) == 0) {
             // Delete this node
@@ -179,8 +179,12 @@ HashNode * insert(const char *key, const char * value) {
     return node;
 }
 
-void print_node(HashNode node) {
-    printf("(%s, %s)", node.key, node.value);
+void print_node(HashNode * node) {
+    if (node != NULL) {
+        printf("(%s, %s)", node->key, node->value);
+    } else {
+        printf("(NULL)");
+    }
 }
 
 void print_hash_table(void) {
@@ -189,7 +193,7 @@ void print_hash_table(void) {
         HashNode * node = buckets[i];
         if (node != NULL) {
             while (node != NULL) {
-                print_node(*node);
+                print_node(node);
                 if (node->next != NULL) {
                     printf(", ");
                 }
@@ -208,13 +212,17 @@ void do_only_key_op(OnlyKeyOp only_key_op) {
         case FIND:
         {
             HashNode * found_node = find(only_key_op.key);
-            print_node(*found_node);
+            printf("FOUND = ");
+            print_node(found_node);
+            printf("\n");
             break;
         }
         case ERASE:
         {
             HashNode * erased_node = erase(only_key_op.key);
-            print_node(*erased_node);
+            printf("ERASED = ");
+            print_node(erased_node);
+            printf("\n");
             break;
         }
         default:
@@ -231,7 +239,9 @@ void do_key_val_op(KeyValOp key_val_op) {
         case INSERT:
         {
             HashNode * inserted_node = insert(key_val_op.key, key_val_op.value);
-            print_node(*inserted_node);
+            printf("INSERTED = ");
+            print_node(inserted_node);
+            printf("\n");
             break;
         }
         default:
@@ -289,6 +299,7 @@ int main() {
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
         if (debug) {
             do_op(tests[i]);
+            print_hash_table();
         }
     }
     if (num_failed > 0) {
