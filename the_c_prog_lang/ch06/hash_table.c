@@ -187,7 +187,7 @@ void print_node(HashNode * node) {
     }
 }
 
-void print_hash_table(void) {
+void print_all_buckets(void) {
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
         printf("Bucket[%d] = [", i);
         HashNode * node = buckets[i];
@@ -204,6 +204,28 @@ void print_hash_table(void) {
         }
         printf("]\n");
     }
+}
+
+
+void print_hash_table(void) {
+    printf("Hash Table = {");
+    for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
+        // printf("Bucket[%d] = [", i);
+        HashNode * node = buckets[i];
+        if (node != NULL) {
+            while (node != NULL) {
+                print_node(node);
+                if (node->next != NULL) {
+                    printf(", ");
+                }
+                node = node->next;
+            }
+        }
+        if (i != MAX_BUCKET_SIZE - 1) {
+            printf(", ");
+        }
+    }
+    printf("}\n");
 }
 
 void do_only_key_op(OnlyKeyOp only_key_op) {
@@ -312,6 +334,7 @@ int main() {
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
         if (debug) {
             do_op(tests[i]);
+            // print_all_buckets();
             print_hash_table();
         }
     }
