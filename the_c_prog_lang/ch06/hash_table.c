@@ -93,16 +93,51 @@ typedef struct {
 // Hash Table
 //--------------------------------------
 
-// An entry in the buckets
-typedef struct hash_node {
+// A linked list node in the buckets
+typedef struct node_list {
     char *key;
     char *value;
-    struct hash_node * next;
-} HashNode;
+    struct node_list * next;
+} NodeList;
 
 #define MAX_BUCKET_SIZE 5
 
-static HashNode * buckets[MAX_BUCKET_SIZE];
+static NodeList * buckets[MAX_BUCKET_SIZE];
+
+
+NodeList * alloc_node(const char * key, const char * value) {
+    NodeList * node = (NodeList *)malloc(sizeof(NodeList));
+    if (node == NULL) {
+        printf("ERROR: Allocating NodeList\n");
+        return NULL;
+    }
+    node->key = strdup(key);
+    node->value = strdup(value);
+    node->next = NULL;
+    return node;
+}
+
+void free_node(NodeList ** node) {
+    if (node == NULL) {
+        return;
+    }
+
+    if (*node == NULL) {
+        return;
+    }
+
+    NodeList * curr_node = *node;
+    
+    free_node(&(curr_node->next));
+
+    free(curr_node->key);
+    free(curr_node->value);
+    curr_node->key = NULL;
+    curr_node->value = NULL;
+    curr_node->next = NULL;
+    free(curr_node);
+    *node = NULL;
+}
 
 
 unsigned int hash(const char *key) {
@@ -114,12 +149,12 @@ unsigned int hash(const char *key) {
 }
 
 
-HashNode * find(const char *key) {
+NodeList * find(const char *key) {
     if (strlen(key) == 0) {
         return NULL;
     }
     
-    HashNode * bucket_node = buckets[hash(key)];
+    NodeList * bucket_node = buckets[hash(key)];
     while (bucket_node != NULL) {
         if (strcmp(bucket_node->key, key) == 0) {
             // Found
@@ -131,13 +166,13 @@ HashNode * find(const char *key) {
 }
 
 
-HashNode * erase(const char *key) { 
+NodeList * erase(const char *key) { 
     if (strlen(key) == 0) {
         return NULL;
     }
     
-    HashNode * bucket_node = buckets[hash(key)];
-    HashNode * prev = NULL;
+    NodeList * bucket_node = buckets[hash(key)];
+    NodeList * prev = NULL;
     while (bucket_node != NULL) {
         if (strcmp(bucket_node->key, key) == 0) {
             // Delete this node
@@ -156,7 +191,7 @@ HashNode * erase(const char *key) {
     return NULL;
 }
 
-HashNode * insert(const char *key, const char * value) {
+NodeList * insert(const char *key, const char * value) {
     if (strlen(key) == 0) {
         return NULL;
     }
@@ -164,13 +199,12 @@ HashNode * insert(const char *key, const char * value) {
         return NULL;
     }
 
-    HashNode * node = find(key);
+    NodeList * node = find(key);
     if (node != NULL) {
-        strcpy(node->value, value);
-    } else {
-        node = (HashNode *)malloc(sizeof(HashNode));
-        node->key = strdup(key);
+        free(node->value);
         node->value = strdup(value);
+    } else {
+        node = alloc_node(key, value);
         const unsigned int bucket_index = hash(key);
         node->next = buckets[bucket_index];
         buckets[bucket_index] = node;
@@ -179,7 +213,13 @@ HashNode * insert(const char *key, const char * value) {
     return node;
 }
 
-void print_node(HashNode * node) {
+void free_all_buckets(void) {
+    for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
+        free_node(&buckets[i]);
+    }
+}
+
+void print_node(NodeList * node) {
     if (node != NULL) {
         printf("(%s, %s)", node->key, node->value);
     } else {
@@ -190,7 +230,7 @@ void print_node(HashNode * node) {
 void print_all_buckets(void) {
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
         printf("Bucket[%d] = [", i);
-        HashNode * node = buckets[i];
+        NodeList * node = buckets[i];
         if (node != NULL) {
             while (node != NULL) {
                 print_node(node);
@@ -211,7 +251,7 @@ void print_hash_table(void) {
     printf("Hash Table = {");
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
         // printf("Bucket[%d] = [", i);
-        HashNode * node = buckets[i];
+        NodeList * node = buckets[i];
         if (node != NULL) {
             while (node != NULL) {
                 print_node(node);
@@ -233,7 +273,7 @@ void do_only_key_op(OnlyKeyOp only_key_op) {
     {
         case FIND:
         {
-            HashNode * found_node = find(only_key_op.key);
+            NodeList * found_node = find(only_key_op.key);
             printf("FOUND = ");
             print_node(found_node);
             printf("\n");
@@ -241,10 +281,11 @@ void do_only_key_op(OnlyKeyOp only_key_op) {
         }
         case ERASE:
         {
-            HashNode * erased_node = erase(only_key_op.key);
+            NodeList * erased_node = erase(only_key_op.key);
             printf("ERASED = ");
             print_node(erased_node);
             printf("\n");
+            free_node(&erased_node);
             break;
         }
         default:
@@ -260,7 +301,7 @@ void do_key_val_op(KeyValOp key_val_op) {
     {
         case INSERT:
         {
-            HashNode * inserted_node = insert(key_val_op.key, key_val_op.value);
+            NodeList * inserted_node = insert(key_val_op.key, key_val_op.value);
             printf("INSERTED = ");
             print_node(inserted_node);
             printf("\n");
@@ -338,12 +379,19 @@ int main() {
             print_hash_table();
         }
     }
+    
     if (num_failed > 0) {
         printf("%d test failed\n", num_failed);
     } else {
         printf("All tests passed\n");
     }
+
+    print_all_buckets();
     printf("Done\n");
+
+    free_all_buckets();
+
+    print_all_buckets();
 
     return 0;
 }
