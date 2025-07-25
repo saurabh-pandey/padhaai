@@ -86,7 +86,7 @@ typedef struct {
 
 // Helper macro to construct the query data structure
 #define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q.o_key_op = {op, key}}
-#define KEY_VAL(key, val) {.q_type = KEY_VAL, .q.key_value_op = {INSERT, key, val}}
+#define KEY_VAL(op, key, val) {.q_type = KEY_VAL, .q.key_value_op = {op, key, val}}
 
 
 //--------------------------------------
@@ -354,19 +354,19 @@ int main() {
 
     test_data tests[] = {
         ONLY_KEY(FIND, "a"),
-        KEY_VAL("a", "A"),
+        KEY_VAL(INSERT, "a", "A"),
         ONLY_KEY(ERASE, "a"),
-        KEY_VAL("a", "A"),
-        KEY_VAL("b", "B"),
-        KEY_VAL("c", "C"),
-        KEY_VAL("d", "D"),
-        KEY_VAL("e", "E"),
-        KEY_VAL("f", "F"),
-        KEY_VAL("g", "G"),
-        KEY_VAL("i", "I"),
-        KEY_VAL("j", "J"),
-        KEY_VAL("k", "K"),
-        KEY_VAL("l", "L"),
+        KEY_VAL(INSERT, "a", "A"),
+        KEY_VAL(INSERT, "b", "B"),
+        KEY_VAL(INSERT, "c", "C"),
+        KEY_VAL(INSERT, "d", "D"),
+        KEY_VAL(INSERT, "e", "E"),
+        KEY_VAL(INSERT, "f", "F"),
+        KEY_VAL(INSERT, "g", "G"),
+        KEY_VAL(INSERT, "i", "I"),
+        KEY_VAL(INSERT, "j", "J"),
+        KEY_VAL(INSERT, "k", "K"),
+        KEY_VAL(INSERT, "l", "L"),
         ONLY_KEY(ERASE, "f"),
         ONLY_KEY(ERASE, "b"),
     };
@@ -386,12 +386,12 @@ int main() {
         printf("All tests passed\n");
     }
 
-    print_all_buckets();
+    // print_all_buckets();
     printf("Done\n");
 
     free_all_buckets();
 
-    print_all_buckets();
+    // print_all_buckets();
 
     return 0;
 }
