@@ -90,7 +90,7 @@ typedef struct {
 
 
 //--------------------------------------
-// Hash Table
+// Hash Table Data Structure
 //--------------------------------------
 
 // A linked list node in the buckets
@@ -101,31 +101,18 @@ typedef struct node_list {
 } NodeList;
 
 
-
-typedef struct {
-    bool is_null;
-    char *key;
-    char *value;
-} test_node;
-
-typedef struct {
-    query q;
-    test_node result;
-    test_node table_before[10];
-    test_node table_after[10];
-} test_data;
-
-test_data td = {
-    .q = ONLY_KEY(FIND, "a"),
-    .result = {true, NULL, NULL},
-    .table_before = {{true, NULL, NULL}},
-    .table_after = {{true, NULL, NULL}},
-};
+//--------------------------------------
+// Hash Table Implementation
+//--------------------------------------
 
 #define MAX_BUCKET_SIZE 5
 
 static NodeList * buckets[MAX_BUCKET_SIZE];
 
+
+//--------------------------------------
+// Hash Table Memory Operations
+//--------------------------------------
 
 NodeList * alloc_node(const char * key, const char * value) {
     NodeList * node = (NodeList *)malloc(sizeof(NodeList));
@@ -138,6 +125,7 @@ NodeList * alloc_node(const char * key, const char * value) {
     node->next = NULL;
     return node;
 }
+
 
 void free_node(NodeList ** node) {
     if (node == NULL) {
@@ -161,6 +149,10 @@ void free_node(NodeList ** node) {
     *node = NULL;
 }
 
+
+//--------------------------------------
+// Hash Table Interface
+//--------------------------------------
 
 unsigned int hash(const char *key) {
     unsigned int hash_value = 0;
@@ -213,6 +205,7 @@ NodeList * erase(const char *key) {
     return NULL;
 }
 
+
 NodeList * insert(const char *key, const char * value) {
     if (strlen(key) == 0) {
         return NULL;
@@ -235,11 +228,21 @@ NodeList * insert(const char *key, const char * value) {
     return node;
 }
 
+
+//--------------------------------------
+// Hash Table Cleanup
+//--------------------------------------
+
 void free_all_buckets(void) {
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
         free_node(&buckets[i]);
     }
 }
+
+
+//--------------------------------------
+// Hash Table Print
+//--------------------------------------
 
 void print_node(NodeList * node) {
     if (node != NULL) {
@@ -248,6 +251,7 @@ void print_node(NodeList * node) {
         printf("(NULL)");
     }
 }
+
 
 void print_all_buckets(void) {
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
@@ -272,7 +276,6 @@ void print_all_buckets(void) {
 void print_hash_table(void) {
     printf("Hash Table = {");
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
-        // printf("Bucket[%d] = [", i);
         NodeList * node = buckets[i];
         if (node != NULL) {
             while (node != NULL) {
@@ -283,12 +286,33 @@ void print_hash_table(void) {
                 node = node->next;
             }
         }
-        if ((node != NULL) && (i != (MAX_BUCKET_SIZE - 1))) {
+        if ((buckets[i] != NULL) && (i != (MAX_BUCKET_SIZE - 1))) {
             printf(", ");
         }
     }
     printf("}\n");
 }
+
+
+//--------------------------------------
+// Hash Table Query Helper Operations
+//--------------------------------------
+
+// A test node to check if it is null and if not null the keys and value
+typedef struct {
+    bool is_null;
+    char *key;
+    char *value;
+} test_node;
+
+
+// Test data with query, result, hash table state before and after for comparison
+typedef struct {
+    query q;
+    test_node result;
+    test_node table_before[10];
+    test_node table_after[10];
+} test_data;
 
 void do_only_key_op(OnlyKeyOp only_key_op) {
     switch (only_key_op.op)
@@ -318,6 +342,7 @@ void do_only_key_op(OnlyKeyOp only_key_op) {
     }
 }
 
+
 void do_key_val_op(KeyValOp key_val_op) {
     switch (key_val_op.op)
     {
@@ -337,6 +362,7 @@ void do_key_val_op(KeyValOp key_val_op) {
     }
 }
 
+
 void do_op(test_data td) {
     const query qr = td.q;
     switch (qr.q_type)
@@ -344,19 +370,19 @@ void do_op(test_data td) {
         case ONLY_KEY:
         {
             printf("q_type = %s, op = %s, key = %s\n",
-                    query_type_str[qr.q_type],
-                    Op_Str[qr.q_op.o_key_op.op],
-                    qr.q_op.o_key_op.key);
+                   query_type_str[qr.q_type],
+                   Op_Str[qr.q_op.o_key_op.op],
+                   qr.q_op.o_key_op.key);
             do_only_key_op(qr.q_op.o_key_op);
             break;
         }
         case KEY_VAL:
         {
             printf("q_type = %s, op = %s, key = %s, val = %s\n",
-                    query_type_str[qr.q_type],
-                    Op_Str[qr.q_op.key_value_op.op],
-                    qr.q_op.key_value_op.key,
-                    qr.q_op.key_value_op.value);
+                   query_type_str[qr.q_type],
+                   Op_Str[qr.q_op.key_value_op.op],
+                   qr.q_op.key_value_op.key,
+                   qr.q_op.key_value_op.value);
             do_key_val_op(qr.q_op.key_value_op);
             break;
         }
@@ -370,6 +396,10 @@ void do_op(test_data td) {
 }
 
 
+//--------------------------------------
+// Let the game begin!
+//--------------------------------------
+
 int main() {
     bool debug = true;
     
@@ -378,7 +408,7 @@ int main() {
     test_data tests[] = {
         {
             .q = ONLY_KEY(FIND, "a"),
-            .result = {true, NULL, NULL},
+            .result = {true, "a", "A"},
             .table_before = {{true, NULL, NULL}},
             .table_after = {{true, NULL, NULL}}
         },
@@ -399,6 +429,18 @@ int main() {
             .result = {false, "a", "A"},
             .table_before = {{false, "a", "A"}},
             .table_after = {{true, NULL, NULL}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "a", "A"),
+            .result = {false, "a", "A"},
+            .table_before = {{true, NULL, NULL}},
+            .table_after = {{false, "a", "A"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "b", "B"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
         },
         // ONLY_KEY(FIND, "a"),
         // KEY_VAL(INSERT, "a", "A"),
