@@ -55,7 +55,7 @@ typedef struct {
 typedef union {
     OnlyKeyOp o_key_op;
     KeyValOp key_value_op;
-} query;
+} query_op;
 
 
 // The 2 flavours of operations as enums via a macro
@@ -75,18 +75,18 @@ static const char * query_type_str[] = {
 };
 
 
-// A test is composed of the actual query and its type
+// Actual query is composed of the query type and the query op
 typedef struct {
     query_type q_type;
-    query q;
-} test_data;
+    query_op q_op;
+} query;
 
 // TODO: How to check results of various operations in the tests?
 
 
 // Helper macro to construct the query data structure
-#define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q.o_key_op = {op, key}}
-#define KEY_VAL(op, key, val) {.q_type = KEY_VAL, .q.key_value_op = {op, key, val}}
+#define ONLY_KEY(op, key) {.q_type = ONLY_KEY, .q_op.o_key_op = {op, key}}
+#define KEY_VAL(op, key, val) {.q_type = KEY_VAL, .q_op.key_value_op = {op, key, val}}
 
 
 //--------------------------------------
@@ -99,6 +99,28 @@ typedef struct node_list {
     char *value;
     struct node_list * next;
 } NodeList;
+
+
+
+typedef struct {
+    bool is_null;
+    char *key;
+    char *value;
+} test_node;
+
+typedef struct {
+    query q;
+    test_node result;
+    test_node table_before[10];
+    test_node table_after[10];
+} test_data;
+
+test_data td = {
+    .q = ONLY_KEY(FIND, "a"),
+    .result = {true, NULL, NULL},
+    .table_before = {{true, NULL, NULL}},
+    .table_after = {{true, NULL, NULL}},
+};
 
 #define MAX_BUCKET_SIZE 5
 
@@ -261,7 +283,7 @@ void print_hash_table(void) {
                 node = node->next;
             }
         }
-        if (i != MAX_BUCKET_SIZE - 1) {
+        if ((node != NULL) && (i != (MAX_BUCKET_SIZE - 1))) {
             printf(", ");
         }
     }
@@ -315,32 +337,33 @@ void do_key_val_op(KeyValOp key_val_op) {
     }
 }
 
-void do_op(test_data op_query) {
-    switch (op_query.q_type)
+void do_op(test_data td) {
+    const query qr = td.q;
+    switch (qr.q_type)
     {
         case ONLY_KEY:
         {
             printf("q_type = %s, op = %s, key = %s\n",
-                    query_type_str[op_query.q_type],
-                    Op_Str[op_query.q.o_key_op.op],
-                    op_query.q.o_key_op.key);
-            do_only_key_op(op_query.q.o_key_op);
+                    query_type_str[qr.q_type],
+                    Op_Str[qr.q_op.o_key_op.op],
+                    qr.q_op.o_key_op.key);
+            do_only_key_op(qr.q_op.o_key_op);
             break;
         }
         case KEY_VAL:
         {
             printf("q_type = %s, op = %s, key = %s, val = %s\n",
-                    query_type_str[op_query.q_type],
-                    Op_Str[op_query.q.key_value_op.op],
-                    op_query.q.key_value_op.key,
-                    op_query.q.key_value_op.value);
-            do_key_val_op(op_query.q.key_value_op);
+                    query_type_str[qr.q_type],
+                    Op_Str[qr.q_op.key_value_op.op],
+                    qr.q_op.key_value_op.key,
+                    qr.q_op.key_value_op.value);
+            do_key_val_op(qr.q_op.key_value_op);
             break;
         }
     
         default:
         {
-            printf("ERROR: Unsupported query %s\n", query_type_str[op_query.q_type]);
+            printf("ERROR: Unsupported query %s\n", query_type_str[qr.q_type]);
             break;
         }
     }
@@ -353,22 +376,46 @@ int main() {
     printf("Running tests for hash_table\n");
 
     test_data tests[] = {
-        ONLY_KEY(FIND, "a"),
-        KEY_VAL(INSERT, "a", "A"),
-        ONLY_KEY(ERASE, "a"),
-        KEY_VAL(INSERT, "a", "A"),
-        KEY_VAL(INSERT, "b", "B"),
-        KEY_VAL(INSERT, "c", "C"),
-        KEY_VAL(INSERT, "d", "D"),
-        KEY_VAL(INSERT, "e", "E"),
-        KEY_VAL(INSERT, "f", "F"),
-        KEY_VAL(INSERT, "g", "G"),
-        KEY_VAL(INSERT, "i", "I"),
-        KEY_VAL(INSERT, "j", "J"),
-        KEY_VAL(INSERT, "k", "K"),
-        KEY_VAL(INSERT, "l", "L"),
-        ONLY_KEY(ERASE, "f"),
-        ONLY_KEY(ERASE, "b"),
+        {
+            .q = ONLY_KEY(FIND, "a"),
+            .result = {true, NULL, NULL},
+            .table_before = {{true, NULL, NULL}},
+            .table_after = {{true, NULL, NULL}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "a", "A"),
+            .result = {false, "a", "A"},
+            .table_before = {{true, NULL, NULL}},
+            .table_after = {{false, "a", "A"}}
+        },
+        {
+            .q = ONLY_KEY(FIND, "a"),
+            .result = {false, "a", "A"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}}
+        },
+        {
+            .q = ONLY_KEY(ERASE, "a"),
+            .result = {false, "a", "A"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{true, NULL, NULL}}
+        },
+        // ONLY_KEY(FIND, "a"),
+        // KEY_VAL(INSERT, "a", "A"),
+        // ONLY_KEY(ERASE, "a"),
+        // KEY_VAL(INSERT, "a", "A"),
+        // KEY_VAL(INSERT, "b", "B"),
+        // KEY_VAL(INSERT, "c", "C"),
+        // KEY_VAL(INSERT, "d", "D"),
+        // KEY_VAL(INSERT, "e", "E"),
+        // KEY_VAL(INSERT, "f", "F"),
+        // KEY_VAL(INSERT, "g", "G"),
+        // KEY_VAL(INSERT, "i", "I"),
+        // KEY_VAL(INSERT, "j", "J"),
+        // KEY_VAL(INSERT, "k", "K"),
+        // KEY_VAL(INSERT, "l", "L"),
+        // ONLY_KEY(ERASE, "f"),
+        // ONLY_KEY(ERASE, "b"),
     };
 
     unsigned int num_failed = 0;
