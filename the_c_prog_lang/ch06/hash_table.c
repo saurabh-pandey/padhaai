@@ -411,18 +411,20 @@ int main() {
     printf("Running tests for hash_table\n");
 
     pair data[] = {
-        {"a", "A"}, {"b", "B"}, {"c", "C"}
+        {"a", "A"}, {"b", "B"}, {"c", "C"}, {"d", "D"}, {"ee", "EE"}, {"fff", "FFF"}
     };
 
+    size_t index = 0;
+    char buffer[100];
     for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
-        pair pr = data[i];
-        char buffer[100];
-        printf("sz key = %zu\n", strlen(pr.key));
-        printf("sz val = %zu\n", strlen(pr.val));
-        const size_t sz = 5 + strlen(pr.key) + strlen(pr.val);
-        int ret = snprintf(buffer, sz, "(%s, %s)", pr.key, pr.val);
+        pair pr = data[i];        
+        const int needed = snprintf(NULL, 0, "(%s, %s)", pr.key, pr.val);
+        printf("needed = %d\n", needed);
+        const int ret = snprintf(buffer + index, needed + 1, "(%s, %s)", pr.key, pr.val);
+        index += ret;
         printf("ret = %d, buf = %s\n", ret, buffer);
     }
+    printf("buf = %s, index = %zu\n", buffer, index);
 
     return 0;
 
