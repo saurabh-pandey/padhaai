@@ -400,10 +400,31 @@ void do_op(test_data td) {
 // Let the game begin!
 //--------------------------------------
 
+typedef struct {
+    char *key;
+    char *val;
+} pair; 
+
 int main() {
     bool debug = true;
     
     printf("Running tests for hash_table\n");
+
+    pair data[] = {
+        {"a", "A"}, {"b", "B"}, {"c", "C"}
+    };
+
+    for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
+        pair pr = data[i];
+        char buffer[100];
+        printf("sz key = %zu\n", strlen(pr.key));
+        printf("sz val = %zu\n", strlen(pr.val));
+        const size_t sz = 5 + strlen(pr.key) + strlen(pr.val);
+        int ret = snprintf(buffer, sz, "(%s, %s)", pr.key, pr.val);
+        printf("ret = %d, buf = %s\n", ret, buffer);
+    }
+
+    return 0;
 
     test_data tests[] = {
         {
