@@ -293,6 +293,35 @@ void print_hash_table(void) {
     printf("}\n");
 }
 
+void stringify_hash_table(char *output) {
+    size_t index = 0;
+    for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
+        NodeList * node = buckets[i];
+        if (node != NULL) {
+            while (node != NULL) {
+                const int needed = snprintf(NULL, 0, "(%s, %s)", node->key, node->value);
+                printf("needed = %d\n", needed);
+                const int ret = snprintf(output + index,
+                                         needed + 1,
+                                         "(%s, %s)",
+                                         node->key,
+                                         node->value);
+                index += ret;
+                printf("ret = %d, buf = %s\n", ret, output);
+                // print_node(node);
+                // if (node->next != NULL) {
+                //     printf(", ");
+                // }
+                node = node->next;
+            }
+        }
+        // if ((buckets[i] != NULL) && (i != (MAX_BUCKET_SIZE - 1))) {
+        //     printf(", ");
+        // }
+    }
+    // printf("}\n");
+}
+
 
 //--------------------------------------
 // Hash Table Query Helper Operations
@@ -426,7 +455,7 @@ int main() {
     }
     printf("buf = %s, index = %zu\n", buffer, index);
 
-    return 0;
+    // return 0;
 
     test_data tests[] = {
         {
@@ -465,6 +494,54 @@ int main() {
             .table_before = {{false, "a", "A"}},
             .table_after = {{false, "a", "A"}, {false, "b", "B"}}
         },
+        {
+            .q = KEY_VAL(INSERT, "c", "C"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "d", "D"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "e", "E"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "f", "F"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "g", "G"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "h", "H"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "i", "I"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
+        {
+            .q = KEY_VAL(INSERT, "j", "J"),
+            .result = {false, "b", "B"},
+            .table_before = {{false, "a", "A"}},
+            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+        },
         // ONLY_KEY(FIND, "a"),
         // KEY_VAL(INSERT, "a", "A"),
         // ONLY_KEY(ERASE, "a"),
@@ -497,6 +574,10 @@ int main() {
     } else {
         printf("All tests passed\n");
     }
+
+    char hash_table_string[1000];
+    stringify_hash_table(hash_table_string);
+    printf("Hash table string = %s\n", hash_table_string);
 
     // print_all_buckets();
     printf("Done\n");
