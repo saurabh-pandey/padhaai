@@ -327,20 +327,13 @@ void stringify_hash_table(char *output) {
 // Hash Table Query Helper Operations
 //--------------------------------------
 
-// A test node to check if it is null and if not null the keys and value
-typedef struct {
-    bool is_null;
-    char *key;
-    char *value;
-} test_node;
-
 
 // Test data with query, result, hash table state before and after for comparison
 typedef struct {
     query q;
-    test_node result;
-    test_node table_before[10];
-    test_node table_after[10];
+    char *result;
+    char *table_before;
+    char *table_after;
 } test_data;
 
 void do_only_key_op(OnlyKeyOp only_key_op) {
@@ -459,88 +452,34 @@ int main() {
 
     test_data tests[] = {
         {
-            .q = ONLY_KEY(FIND, "a"),
-            .result = {true, "a", "A"},
-            .table_before = {{true, NULL, NULL}},
-            .table_after = {{true, NULL, NULL}}
+            .q = ONLY_KEY(FIND, "a"), .result = "",
+            .table_before = "",
+            .table_after = ""
         },
         {
-            .q = KEY_VAL(INSERT, "a", "A"),
-            .result = {false, "a", "A"},
-            .table_before = {{true, NULL, NULL}},
-            .table_after = {{false, "a", "A"}}
+            .q = KEY_VAL(INSERT, "a", "A"), .result = "(a, A)",
+            .table_before = "",
+            .table_after = "(a, A)"
         },
         {
-            .q = ONLY_KEY(FIND, "a"),
-            .result = {false, "a", "A"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}}
+            .q = ONLY_KEY(FIND, "a"), .result = "(a, A)",
+            .table_before = "(a, A)",
+            .table_after = "(a, A)"
         },
         {
-            .q = ONLY_KEY(ERASE, "a"),
-            .result = {false, "a", "A"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{true, NULL, NULL}}
+            .q = ONLY_KEY(ERASE, "a"), .result = "(a, A)",
+            .table_before = "(a, A)",
+            .table_after = ""
         },
         {
-            .q = KEY_VAL(INSERT, "a", "A"),
-            .result = {false, "a", "A"},
-            .table_before = {{true, NULL, NULL}},
-            .table_after = {{false, "a", "A"}}
+            .q = KEY_VAL(INSERT, "a", "A"), .result = "(a, A)",
+            .table_before = "",
+            .table_after = "(a, A)"
         },
         {
-            .q = KEY_VAL(INSERT, "b", "B"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "c", "C"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "d", "D"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "e", "E"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "f", "F"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "g", "G"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "h", "H"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "i", "I"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
-        },
-        {
-            .q = KEY_VAL(INSERT, "j", "J"),
-            .result = {false, "b", "B"},
-            .table_before = {{false, "a", "A"}},
-            .table_after = {{false, "a", "A"}, {false, "b", "B"}}
+            .q = KEY_VAL(INSERT, "b", "B"), .result = "(b, B)",
+            .table_before = "(a, A)",
+            .table_after = "(a, A)(b, B)"
         },
         // ONLY_KEY(FIND, "a"),
         // KEY_VAL(INSERT, "a", "A"),
@@ -565,7 +504,10 @@ int main() {
         if (debug) {
             do_op(tests[i]);
             // print_all_buckets();
-            print_hash_table();
+            // print_hash_table();
+            char hash_table_string[1000];
+            stringify_hash_table(hash_table_string);
+            printf("Hash table string = %s\n", hash_table_string);
         }
     }
     
@@ -577,7 +519,7 @@ int main() {
 
     char hash_table_string[1000];
     stringify_hash_table(hash_table_string);
-    printf("Hash table string = %s\n", hash_table_string);
+    printf("Final Hash table string = %s\n", hash_table_string);
 
     // print_all_buckets();
     printf("Done\n");
