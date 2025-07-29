@@ -300,14 +300,14 @@ void stringify_hash_table(char *output) {
         if (node != NULL) {
             while (node != NULL) {
                 const int needed = snprintf(NULL, 0, "(%s, %s)", node->key, node->value);
-                printf("needed = %d\n", needed);
+                // printf("needed = %d\n", needed);
                 const int ret = snprintf(output + index,
                                          needed + 1,
                                          "(%s, %s)",
                                          node->key,
                                          node->value);
                 index += ret;
-                printf("ret = %d, buf = %s\n", ret, output);
+                // printf("ret = %d, buf = %s\n", ret, output);
                 // print_node(node);
                 // if (node->next != NULL) {
                 //     printf(", ");
@@ -422,31 +422,31 @@ void do_op(test_data td) {
 // Let the game begin!
 //--------------------------------------
 
-typedef struct {
-    char *key;
-    char *val;
-} pair; 
+// typedef struct {
+//     char *key;
+//     char *val;
+// } pair;
 
 int main() {
     bool debug = true;
     
     printf("Running tests for hash_table\n");
 
-    pair data[] = {
-        {"a", "A"}, {"b", "B"}, {"c", "C"}, {"d", "D"}, {"ee", "EE"}, {"fff", "FFF"}
-    };
+    // pair data[] = {
+    //     {"a", "A"}, {"b", "B"}, {"c", "C"}, {"d", "D"}, {"ee", "EE"}, {"fff", "FFF"}
+    // };
 
-    size_t index = 0;
-    char buffer[100];
-    for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
-        pair pr = data[i];        
-        const int needed = snprintf(NULL, 0, "(%s, %s)", pr.key, pr.val);
-        printf("needed = %d\n", needed);
-        const int ret = snprintf(buffer + index, needed + 1, "(%s, %s)", pr.key, pr.val);
-        index += ret;
-        printf("ret = %d, buf = %s\n", ret, buffer);
-    }
-    printf("buf = %s, index = %zu\n", buffer, index);
+    // size_t index = 0;
+    // char buffer[100];
+    // for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
+    //     pair pr = data[i];        
+    //     const int needed = snprintf(NULL, 0, "(%s, %s)", pr.key, pr.val);
+    //     printf("needed = %d\n", needed);
+    //     const int ret = snprintf(buffer + index, needed + 1, "(%s, %s)", pr.key, pr.val);
+    //     index += ret;
+    //     printf("ret = %d, buf = %s\n", ret, buffer);
+    // }
+    // printf("buf = %s, index = %zu\n", buffer, index);
 
     // return 0;
 
@@ -481,6 +481,51 @@ int main() {
             .table_before = "(a, A)",
             .table_after = "(a, A)(b, B)"
         },
+        {
+            .q = KEY_VAL(INSERT, "c", "C"), .result = "(c, C)",
+            .table_before = "(a, A)(b, B)",
+            .table_after = "(a, A)(b, B)(c, C)"
+        },
+        {
+            .q = KEY_VAL(INSERT, "d", "D"), .result = "(d, D)",
+            .table_before = "(a, A)(b, B)(c, C)",
+            .table_after = "(d, D)(a, A)(b, B)(c, C)"
+        },
+        {
+            .q = KEY_VAL(INSERT, "e", "E"), .result = "(e, E)",
+            .table_before = "(d, D)(a, A)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(a, A)(b, B)(c, C)"
+        },
+        {
+            .q = KEY_VAL(INSERT, "f", "F"), .result = "(f, F)",
+            .table_before = "(d, D)(e, E)(a, A)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(f, F)(a, A)(b, B)(c, C)"
+        },
+        {
+            .q = KEY_VAL(INSERT, "g", "G"), .result = "(g, G)",
+            .table_before = "(d, D)(e, E)(f, F)(a, A)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(f, F)(a, A)(g, G)(b, B)(c, C)"
+        },
+        {
+            .q = ONLY_KEY(ERASE, "f"), .result = "(f, F)",
+            .table_before = "(d, D)(e, E)(f, F)(a, A)(g, G)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(a, A)(g, G)(b, B)(c, C)"
+        },
+        {
+            .q = ONLY_KEY(ERASE, "a"), .result = "(a, A)",
+            .table_before = "(d, D)(e, E)(a, A)(g, G)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(g, G)(b, B)(c, C)"
+        },
+        {
+            .q = KEY_VAL(INSERT, "a", "A"), .result = "(a, A)",
+            .table_before = "(d, D)(e, E)(g, G)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(a, A)(g, G)(b, B)(c, C)"
+        },
+        {
+            .q = KEY_VAL(INSERT, "f", "F"), .result = "(f, F)",
+            .table_before = "(d, D)(e, E)(a, A)(g, G)(b, B)(c, C)",
+            .table_after = "(d, D)(e, E)(f, F)(a, A)(g, G)(b, B)(c, C)"
+        },
         // ONLY_KEY(FIND, "a"),
         // KEY_VAL(INSERT, "a", "A"),
         // ONLY_KEY(ERASE, "a"),
@@ -501,13 +546,28 @@ int main() {
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
+        char hash_table_string[1000] = "";
         if (debug) {
+            hash_table_string[0] = '\0';
+            stringify_hash_table(hash_table_string);
+            if (strcmp(hash_table_string, tests[i].table_before) != 0) {
+                printf("Before table string = %s\n", hash_table_string);
+                printf("Before table expect = %s\n", tests[i].table_before);
+            }
+            
             do_op(tests[i]);
             // print_all_buckets();
             // print_hash_table();
-            char hash_table_string[1000];
+            
+            hash_table_string[0] = '\0';
             stringify_hash_table(hash_table_string);
-            printf("Hash table string = %s\n", hash_table_string);
+            // printf("After table string = %s\n", hash_table_string);
+            // printf("After table expect = %s\n", tests[i].table_after);
+            // printf("After strcmp = %d\n\n", strcmp(hash_table_string, tests[i].table_after));
+            if (strcmp(hash_table_string, tests[i].table_after) != 0) {
+                printf("Before table string = %s\n", hash_table_string);
+                printf("Before table expect = %s\n", tests[i].table_after);
+            }
         }
     }
     
@@ -517,11 +577,11 @@ int main() {
         printf("All tests passed\n");
     }
 
-    char hash_table_string[1000];
-    stringify_hash_table(hash_table_string);
-    printf("Final Hash table string = %s\n", hash_table_string);
+    // char hash_table_string[1000];
+    // stringify_hash_table(hash_table_string);
+    // printf("Final Hash table string = %s\n", hash_table_string);
 
-    // print_all_buckets();
+    print_all_buckets();
     printf("Done\n");
 
     free_all_buckets();
