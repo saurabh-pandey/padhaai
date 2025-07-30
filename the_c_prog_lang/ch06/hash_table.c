@@ -293,6 +293,15 @@ void print_hash_table(void) {
     printf("}\n");
 }
 
+int stringify_node(const NodeList * node, char *output) {
+    int chars_written = 0;
+    if (node != NULL) {
+        const int needed = snprintf(NULL, 0, "(%s, %s)", node->key, node->value);
+        chars_written = snprintf(output, needed + 1, "(%s, %s)", node->key, node->value);
+    }
+    return chars_written;
+}
+
 void stringify_hash_table(char *output) {
     size_t index = 0;
     for (int i = 0; i < MAX_BUCKET_SIZE; ++i) {
@@ -336,23 +345,31 @@ typedef struct {
     char *table_after;
 } test_data;
 
-void do_only_key_op(OnlyKeyOp only_key_op) {
+void do_only_key_op(OnlyKeyOp only_key_op, const char *expected) {
     switch (only_key_op.op)
     {
         case FIND:
         {
             NodeList * found_node = find(only_key_op.key);
-            printf("FOUND = ");
-            print_node(found_node);
-            printf("\n");
+            char result[100] = "";
+            stringify_node(found_node, result);
+            if (strcmp(result, expected) != 0) {
+                printf("ERROR in FOUND result = ");
+                print_node(found_node);
+                printf("\n");
+            }
             break;
         }
         case ERASE:
         {
             NodeList * erased_node = erase(only_key_op.key);
-            printf("ERASED = ");
-            print_node(erased_node);
-            printf("\n");
+            char result[100] = "";
+            stringify_node(erased_node, result);
+            if (strcmp(result, expected) != 0) {
+                printf("ERROR in ERASED result = ");
+                print_node(erased_node);
+                printf("\n");
+            }
             free_node(&erased_node);
             break;
         }
@@ -365,15 +382,19 @@ void do_only_key_op(OnlyKeyOp only_key_op) {
 }
 
 
-void do_key_val_op(KeyValOp key_val_op) {
+void do_key_val_op(KeyValOp key_val_op, const char *expected) {
     switch (key_val_op.op)
     {
         case INSERT:
         {
             NodeList * inserted_node = insert(key_val_op.key, key_val_op.value);
-            printf("INSERTED = ");
-            print_node(inserted_node);
-            printf("\n");
+            char result[100] = "";
+            stringify_node(inserted_node, result);
+            if (strcmp(result, expected) != 0) {
+                printf("ERROR in INSERTED result = ");
+                print_node(inserted_node);
+                printf("\n");
+            }
             break;
         }
         default:
@@ -395,7 +416,7 @@ void do_op(test_data td) {
                    query_type_str[qr.q_type],
                    Op_Str[qr.q_op.o_key_op.op],
                    qr.q_op.o_key_op.key);
-            do_only_key_op(qr.q_op.o_key_op);
+            do_only_key_op(qr.q_op.o_key_op, td.result);
             break;
         }
         case KEY_VAL:
@@ -405,7 +426,7 @@ void do_op(test_data td) {
                    Op_Str[qr.q_op.key_value_op.op],
                    qr.q_op.key_value_op.key,
                    qr.q_op.key_value_op.value);
-            do_key_val_op(qr.q_op.key_value_op);
+            do_key_val_op(qr.q_op.key_value_op, td.result);
             break;
         }
     
