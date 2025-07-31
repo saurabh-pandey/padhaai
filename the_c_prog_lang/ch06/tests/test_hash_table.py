@@ -1,7 +1,7 @@
 import pathlib
-import subprocess
 import unittest
 
+from . import valgrind
 
 class TestHashTable(unittest.TestCase):
     @classmethod
@@ -10,10 +10,10 @@ class TestHashTable(unittest.TestCase):
         cls.exe = pathlib.Path(p.parents[1] / 'bin' / p.stem[len("test_"):])
 
     def test_run(self):
-        output = subprocess.run([self.exe],
-                                capture_output=True,
-                                text=True).stdout
-        self.assertEqual(output.splitlines(),
+        self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
+        stdout, stderr, retcode = valgrind.run(self.exe)
+        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        self.assertEqual(stdout.splitlines(),
                          ['Running tests for hash_table', 'All tests passed', 'Done'])
 
 

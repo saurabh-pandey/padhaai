@@ -14,7 +14,7 @@ def parse_valgrind_output(output):
     if match:
         return 0
 
-def run(exe, input, args=[]):
+def run(exe, input="", args=[]):
     cmd = ["valgrind", "--leak-check=full", exe, *args]
 
     try:

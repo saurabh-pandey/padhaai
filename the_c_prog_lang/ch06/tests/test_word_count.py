@@ -1,6 +1,5 @@
 import collections
 import pathlib
-import subprocess
 import textwrap
 import unittest
 
