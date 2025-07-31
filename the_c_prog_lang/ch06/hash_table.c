@@ -293,6 +293,11 @@ void print_hash_table(void) {
     printf("}\n");
 }
 
+
+//--------------------------------------
+// Hash Table To String
+//--------------------------------------
+
 int stringify_node(const NodeList * node, char *output) {
     int chars_written = 0;
     if (node != NULL) {
@@ -309,26 +314,16 @@ void stringify_hash_table(char *output) {
         if (node != NULL) {
             while (node != NULL) {
                 const int needed = snprintf(NULL, 0, "(%s, %s)", node->key, node->value);
-                // printf("needed = %d\n", needed);
                 const int ret = snprintf(output + index,
                                          needed + 1,
                                          "(%s, %s)",
                                          node->key,
                                          node->value);
                 index += ret;
-                // printf("ret = %d, buf = %s\n", ret, output);
-                // print_node(node);
-                // if (node->next != NULL) {
-                //     printf(", ");
-                // }
                 node = node->next;
             }
         }
-        // if ((buckets[i] != NULL) && (i != (MAX_BUCKET_SIZE - 1))) {
-        //     printf(", ");
-        // }
     }
-    // printf("}\n");
 }
 
 
@@ -337,7 +332,7 @@ void stringify_hash_table(char *output) {
 //--------------------------------------
 
 
-// Test data with query, result, hash table state before and after for comparison
+// Test data with query, result of query, hash table state before and after for comparison
 typedef struct {
     query q;
     char *result;
@@ -345,7 +340,10 @@ typedef struct {
     char *table_after;
 } test_data;
 
-void do_only_key_op(OnlyKeyOp only_key_op, const char *expected) {
+bool do_only_key_op(OnlyKeyOp only_key_op, const char *expected) {
+    bool debug = false;
+    
+    bool test_result = true;
     switch (only_key_op.op)
     {
         case FIND:
@@ -354,9 +352,12 @@ void do_only_key_op(OnlyKeyOp only_key_op, const char *expected) {
             char result[100] = "";
             stringify_node(found_node, result);
             if (strcmp(result, expected) != 0) {
-                printf("ERROR in FOUND result = ");
-                print_node(found_node);
-                printf("\n");
+                test_result = false;
+                if (debug) {
+                    printf("ERROR in FOUND result = ");
+                    print_node(found_node);
+                    printf("\n");
+                }
             }
             break;
         }
@@ -366,23 +367,32 @@ void do_only_key_op(OnlyKeyOp only_key_op, const char *expected) {
             char result[100] = "";
             stringify_node(erased_node, result);
             if (strcmp(result, expected) != 0) {
-                printf("ERROR in ERASED result = ");
-                print_node(erased_node);
-                printf("\n");
+                test_result = false;
+                if (debug) {
+                    printf("ERROR in ERASED result = ");
+                    print_node(erased_node);
+                    printf("\n");
+                }
             }
             free_node(&erased_node);
             break;
         }
         default:
         {
+            test_result = false;
             printf("ERROR: Unsupported key only operation %s\n", Op_Str[only_key_op.op]);
             break;
         }
     }
+
+    return test_result;
 }
 
 
-void do_key_val_op(KeyValOp key_val_op, const char *expected) {
+bool do_key_val_op(KeyValOp key_val_op, const char *expected) {
+    bool debug = false;
+    
+    bool test_result = true;
     switch (key_val_op.op)
     {
         case INSERT:
@@ -391,51 +401,67 @@ void do_key_val_op(KeyValOp key_val_op, const char *expected) {
             char result[100] = "";
             stringify_node(inserted_node, result);
             if (strcmp(result, expected) != 0) {
-                printf("ERROR in INSERTED result = ");
-                print_node(inserted_node);
-                printf("\n");
+                test_result = false;
+                if (debug) {
+                    printf("ERROR in INSERTED result = ");
+                    print_node(inserted_node);
+                    printf("\n");
+                }
             }
             break;
         }
         default:
         {
+            test_result = false;
             printf("ERROR: Unsupported key value operation %s\n", Op_Str[key_val_op.op]);
             break;
         }
     }
+
+    return test_result;
 }
 
 
-void do_op(test_data td) {
+bool do_op(test_data td) {
+    bool debug = false;
+    
+    bool test_result = true;
     const query qr = td.q;
     switch (qr.q_type)
     {
         case ONLY_KEY:
         {
-            printf("q_type = %s, op = %s, key = %s\n",
-                   query_type_str[qr.q_type],
-                   Op_Str[qr.q_op.o_key_op.op],
-                   qr.q_op.o_key_op.key);
-            do_only_key_op(qr.q_op.o_key_op, td.result);
+            if (debug) {
+                printf("q_type = %s, op = %s, key = %s\n",
+                       query_type_str[qr.q_type],
+                       Op_Str[qr.q_op.o_key_op.op],
+                       qr.q_op.o_key_op.key);
+            }
+            test_result = do_only_key_op(qr.q_op.o_key_op, td.result);
             break;
         }
         case KEY_VAL:
         {
-            printf("q_type = %s, op = %s, key = %s, val = %s\n",
-                   query_type_str[qr.q_type],
-                   Op_Str[qr.q_op.key_value_op.op],
-                   qr.q_op.key_value_op.key,
-                   qr.q_op.key_value_op.value);
-            do_key_val_op(qr.q_op.key_value_op, td.result);
+            if (debug) {
+                printf("q_type = %s, op = %s, key = %s, val = %s\n",
+                       query_type_str[qr.q_type],
+                       Op_Str[qr.q_op.key_value_op.op],
+                       qr.q_op.key_value_op.key,
+                       qr.q_op.key_value_op.value);
+            }
+            test_result = do_key_val_op(qr.q_op.key_value_op, td.result);
             break;
         }
     
         default:
         {
+            test_result = false;
             printf("ERROR: Unsupported query %s\n", query_type_str[qr.q_type]);
             break;
         }
     }
+
+    return test_result;
 }
 
 
@@ -443,33 +469,10 @@ void do_op(test_data td) {
 // Let the game begin!
 //--------------------------------------
 
-// typedef struct {
-//     char *key;
-//     char *val;
-// } pair;
-
 int main() {
     bool debug = true;
     
     printf("Running tests for hash_table\n");
-
-    // pair data[] = {
-    //     {"a", "A"}, {"b", "B"}, {"c", "C"}, {"d", "D"}, {"ee", "EE"}, {"fff", "FFF"}
-    // };
-
-    // size_t index = 0;
-    // char buffer[100];
-    // for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
-    //     pair pr = data[i];        
-    //     const int needed = snprintf(NULL, 0, "(%s, %s)", pr.key, pr.val);
-    //     printf("needed = %d\n", needed);
-    //     const int ret = snprintf(buffer + index, needed + 1, "(%s, %s)", pr.key, pr.val);
-    //     index += ret;
-    //     printf("ret = %d, buf = %s\n", ret, buffer);
-    // }
-    // printf("buf = %s, index = %zu\n", buffer, index);
-
-    // return 0;
 
     test_data tests[] = {
         {
@@ -547,47 +550,37 @@ int main() {
             .table_before = "(d, D)(e, E)(a, A)(g, G)(b, B)(c, C)",
             .table_after = "(d, D)(e, E)(f, F)(a, A)(g, G)(b, B)(c, C)"
         },
-        // ONLY_KEY(FIND, "a"),
-        // KEY_VAL(INSERT, "a", "A"),
-        // ONLY_KEY(ERASE, "a"),
-        // KEY_VAL(INSERT, "a", "A"),
-        // KEY_VAL(INSERT, "b", "B"),
-        // KEY_VAL(INSERT, "c", "C"),
-        // KEY_VAL(INSERT, "d", "D"),
-        // KEY_VAL(INSERT, "e", "E"),
-        // KEY_VAL(INSERT, "f", "F"),
-        // KEY_VAL(INSERT, "g", "G"),
-        // KEY_VAL(INSERT, "i", "I"),
-        // KEY_VAL(INSERT, "j", "J"),
-        // KEY_VAL(INSERT, "k", "K"),
-        // KEY_VAL(INSERT, "l", "L"),
-        // ONLY_KEY(ERASE, "f"),
-        // ONLY_KEY(ERASE, "b"),
     };
 
     unsigned int num_failed = 0;
     for (int i = 0; i < sizeof(tests)/sizeof(test_data); ++i) {
         char hash_table_string[1000] = "";
         if (debug) {
+            // Check hash table before the op
             hash_table_string[0] = '\0';
             stringify_hash_table(hash_table_string);
             if (strcmp(hash_table_string, tests[i].table_before) != 0) {
-                printf("Before table string = %s\n", hash_table_string);
-                printf("Before table expect = %s\n", tests[i].table_before);
+                ++num_failed;
+                if (debug) {
+                    printf("Before table string = %s\n", hash_table_string);
+                    printf("Before table expect = %s\n", tests[i].table_before);
+                }
             }
             
-            do_op(tests[i]);
-            // print_all_buckets();
-            // print_hash_table();
+            // Do the Op
+            if (do_op(tests[i]) == false) {
+                ++num_failed;
+            }
             
+            // Check hash table after the op
             hash_table_string[0] = '\0';
             stringify_hash_table(hash_table_string);
-            // printf("After table string = %s\n", hash_table_string);
-            // printf("After table expect = %s\n", tests[i].table_after);
-            // printf("After strcmp = %d\n\n", strcmp(hash_table_string, tests[i].table_after));
             if (strcmp(hash_table_string, tests[i].table_after) != 0) {
-                printf("Before table string = %s\n", hash_table_string);
-                printf("Before table expect = %s\n", tests[i].table_after);
+                ++num_failed;
+                if (debug) {
+                    printf("After table string = %s\n", hash_table_string);
+                    printf("After table expect = %s\n", tests[i].table_after);
+                }
             }
         }
     }
@@ -598,16 +591,9 @@ int main() {
         printf("All tests passed\n");
     }
 
-    // char hash_table_string[1000];
-    // stringify_hash_table(hash_table_string);
-    // printf("Final Hash table string = %s\n", hash_table_string);
-
-    print_all_buckets();
     printf("Done\n");
 
     free_all_buckets();
-
-    // print_all_buckets();
 
     return 0;
 }
