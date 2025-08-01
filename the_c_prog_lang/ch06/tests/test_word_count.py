@@ -18,8 +18,6 @@ class TestWordCount(unittest.TestCase):
         input = textwrap.dedent('''\
             now is the time for all good men to come to the aid of their party
         ''')
-        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        # self._check_word_count(input, output)
         self._run_and_test_tree_view(input)
         self._run_and_test_count_view(input)
     
@@ -31,16 +29,12 @@ class TestWordCount(unittest.TestCase):
             now i have added a fourth line to see if it works
             finally a fifth line to finish things
         ''')
-        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        # self._check_word_count(input, output)
         self._run_and_test_tree_view(input)
         self._run_and_test_count_view(input)
     
     def test_empty(self):
         input = textwrap.dedent('''\
         ''')
-        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        # self._check_word_count(input, output)
         self._run_and_test_tree_view(input)
         self._run_and_test_count_view(input)
     
@@ -52,8 +46,6 @@ class TestWordCount(unittest.TestCase):
             Since we have tested above line we test now what
             Let us try another line that will test best as well
         ''')
-        # output = subprocess.run([self.exe], capture_output=True, text=True, input=input).stdout
-        # self._check_word_count(input, output)
         self._run_and_test_tree_view(input)
         self._run_and_test_count_view(input)
     
