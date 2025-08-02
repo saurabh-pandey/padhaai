@@ -20,18 +20,17 @@ void minprintf(char *fmt, ...) {
                 case 'd':
                 {
                     i_val = va_arg(ap, int);
-                    printf("Found Int %d", i_val);
+                    printf("%d", i_val);
                     break;
                 }
                 case 'f':
                 {
                     d_val = va_arg(ap, double);
-                    printf("Found Double %f", d_val);
+                    printf("%f", d_val);
                     break;
                 }
                 case 's':
                 {
-                    printf("Found Str ");
                     for (s_val = va_arg(ap, char *); *s_val != '\0'; ++s_val) {
                         putchar(*s_val);
                     }
@@ -53,6 +52,12 @@ int main() {
     printf("Running tests for minprintf\n");
 
     minprintf("input int %d input double %f input str %s\n", 42, 3.14, "Hello, World");
+    minprintf("Another test with negative int %d\n", -10);
+    minprintf("Another test with negative double %f\n", -2.71);
+    minprintf("Another test with empty string \"%s\"\n", "");
+    minprintf("%s%d%f\n", "ABC", 123, 3.21);
+
+    printf("Done\n");
     
     return 0;
 }
