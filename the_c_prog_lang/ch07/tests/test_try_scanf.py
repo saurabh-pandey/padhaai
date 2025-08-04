@@ -15,6 +15,9 @@ class TestTryScanf(unittest.TestCase):
             412
             3.141
             helloworld
+            (-17, 5, 43)
+            03-Nov-1897
+            03/01/2021
         ''')
         output = subprocess.run([self.exe],
                                 capture_output=True,
