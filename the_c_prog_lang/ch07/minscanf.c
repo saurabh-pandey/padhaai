@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 
 void minscanf(char *fmt, ...) {
     va_list ap;
+    char c;
     char *p;
     int *i_val;
     float *d_val;
@@ -12,19 +14,23 @@ void minscanf(char *fmt, ...) {
     
     va_start(ap, fmt);
     for (p = fmt; *p != '\0'; ++p) {
-        printf("p = %c\n", *p);
+        printf("p = %c, c = %c\n", *p, c);
         if (*p == '%') {
             ++p;
             switch (*p)
             {
                 case 'd':
                 {
+                    printf("Case d\n");
                     i_val = va_arg(ap, int*);
                     // printf("%d", i_val);
                     // scanf("%d", i_val);
-                    char c;
                     int num = 0;
-                    while ((c = getchar()) != '\n') {
+                    while (1) {
+                        c = getchar();
+                        if (!isdigit(c)) {
+                            break;
+                        }
                         // printf("  c = %c\n", c);
                         num = (c - '0') + 10 * num;
                         // printf("  num = %d\n", num);
@@ -34,13 +40,17 @@ void minscanf(char *fmt, ...) {
                 }
                 case 'f':
                 {
+                    printf("Case f\n");
                     d_val = va_arg(ap, float*);
                     // printf("%f", d_val);
                     // scanf("%f", d_val);
-                    char c;
                     char str[25];
                     int i = 0;
-                    while ((c = getchar()) != '\n') {
+                    while (1) {
+                        c = getchar();
+                        if (c != '.' && !isdigit(c)) {
+                            break;
+                        }
                         // printf("  c = %c\n", c);
                         str[i++] = c;
                         // printf("  num = %d\n", num);
@@ -51,11 +61,11 @@ void minscanf(char *fmt, ...) {
                 }
                 case 's':
                 {
+                    printf("Case s\n");
                     // for (s_val = va_arg(ap, char *); *s_val != '\0'; ++s_val) {
                     //     putchar(*s_val);
                     // }
                     s_val = va_arg(ap, char*);
-                    char c;
                     int i = 0;
                     while ((c = getchar()) != '\n') {
                         // printf("  c = %c\n", c);
@@ -93,10 +103,11 @@ int main() {
     minscanf("%s", str);
     printf("Str = %s\n", str);
 
-    // num = 0;
-    // real = 0;
+    num = 0;
+    real = 0;
+    scanf("%d, %f", &num, &real);
     // minscanf("%d, %f", &num, &real);
-    // printf("Num = %d, real = %f\n", num, real);
+    printf("Num = %d, real = %f\n", num, real);
 
     // num = 0;
     // str[0] = '\0';
