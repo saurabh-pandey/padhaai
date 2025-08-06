@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 
 void minscanf(char *fmt, ...) {
@@ -11,9 +12,8 @@ void minscanf(char *fmt, ...) {
     
     va_start(ap, fmt);
     for (p = fmt; *p != '\0'; ++p) {
-        if (*p != '%') {
-            // putchar(*p);
-        } else {
+        printf("p = %c\n", *p);
+        if (*p == '%') {
             ++p;
             switch (*p)
             {
@@ -21,14 +21,32 @@ void minscanf(char *fmt, ...) {
                 {
                     i_val = va_arg(ap, int*);
                     // printf("%d", i_val);
-                    scanf("%d", i_val);
+                    // scanf("%d", i_val);
+                    char c;
+                    int num = 0;
+                    while ((c = getchar()) != '\n') {
+                        // printf("  c = %c\n", c);
+                        num = (c - '0') + 10 * num;
+                        // printf("  num = %d\n", num);
+                    }
+                    *i_val = num;
                     break;
                 }
                 case 'f':
                 {
                     d_val = va_arg(ap, float*);
                     // printf("%f", d_val);
-                    scanf("%f", d_val);
+                    // scanf("%f", d_val);
+                    char c;
+                    char str[25];
+                    int i = 0;
+                    while ((c = getchar()) != '\n') {
+                        // printf("  c = %c\n", c);
+                        str[i++] = c;
+                        // printf("  num = %d\n", num);
+                    }
+                    str[i] = '\0';
+                    *d_val = atof(str);
                     break;
                 }
                 case 's':
@@ -37,7 +55,15 @@ void minscanf(char *fmt, ...) {
                     //     putchar(*s_val);
                     // }
                     s_val = va_arg(ap, char*);
-                    scanf("%s", s_val);
+                    char c;
+                    int i = 0;
+                    while ((c = getchar()) != '\n') {
+                        // printf("  c = %c\n", c);
+                        s_val[i++] = c;
+                        // printf("  num = %d\n", num);
+                    }
+                    s_val[i] = '\0';
+                    // scanf("%s", s_val);
                     break;
                 }
                 default:
@@ -66,6 +92,21 @@ int main() {
     char str[20];
     minscanf("%s", str);
     printf("Str = %s\n", str);
+
+    // num = 0;
+    // real = 0;
+    // minscanf("%d, %f", &num, &real);
+    // printf("Num = %d, real = %f\n", num, real);
+
+    // num = 0;
+    // str[0] = '\0';
+    // minscanf("%d, %s", &num, str);
+    // printf("Num = %d, str = %s\n", num, str);
+
+    // real = 0;
+    // str[0] = '\0';
+    // minscanf("%f, %s", &real, str);
+    // printf("Real = %f, str = %s\n", real, str);
 
     printf("Done\n");
     
