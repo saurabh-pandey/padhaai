@@ -25,6 +25,70 @@ void getinput(char *inp) {
     return;
 }
 
+int getint(char **inp, char *out) {
+    int i = 0;
+    while (1) {
+        char c = **inp;
+        printf("  c = %c\n", c);
+        
+        if ((i == 0) && isspace(c)) {
+            ++(*inp);
+            continue;
+        }
+        
+        if (!isdigit(c)) {
+            break;
+        }
+        ++(*inp);
+        // printf("  c = %c\n", c);
+        out[i++] = c;
+        // printf("  num = %d\n", num);
+    }
+    out[i] = '\0';
+    return i;
+}
+
+int getfloat(char **inp, char *out) {
+    int i = 0;
+    while (1) {
+        char c = **inp;
+        printf("  c = %c\n", c);
+        
+        if ((i == 0) && isspace(c)) {
+            ++(*inp);
+            continue;
+        }
+        
+        if (c != '.' && !isdigit(c)) {
+            break;
+        }
+        ++(*inp);
+        // printf("  c = %c\n", c);
+        out[i++] = c;
+        // printf("  num = %d\n", num);
+    }
+    out[i] = '\0';
+    return i;
+}
+
+int getstr(char **inp, char *out) {
+    int i = 0;
+    while (**inp != '\0') {
+        char c = **inp;
+        printf("  c = %c\n", c);
+        
+        if (isspace(c)) {
+            printf("  isspace true\n");
+            break;
+        }
+        ++(*inp);
+        // printf("  c = %c\n", c);
+        out[i++] = c;
+    }
+    out[i] = '\0';
+    return i;
+}
+
 
 void minscanf(char *fmt, ...) {
     char input[MAX_INPUT_SIZE];
@@ -67,20 +131,26 @@ void minscanf(char *fmt, ...) {
                     i_val = va_arg(ap, int*);
                     // printf("%d", i_val);
                     // scanf("%d", i_val);
-                    int num = 0;
-                    while (1) {
-                        char c = *inp_p;
-                        printf("  c = %c\n", c);
-                        if (!isdigit(c)) {
-                            break;
-                        }
-                        // printf("  c = %c\n", c);
-                        num = (c - '0') + 10 * num;
-                        ++inp_p;
-                        // printf("  num = %d\n", num);
-                    }
-                    printf("  num = %d\n", num);
-                    *i_val = num;
+                    // int num = 0;
+                    char str[25];
+                    printf(" inp before = %c\n", *inp_p);
+                    getint(&inp_p, str);
+                    printf(" inp after = %c\n", *inp_p);
+                    // while (1) {
+                    //     char c = *inp_p;
+                    //     printf("  c = %c\n", c);
+                    //     if (!isdigit(c)) {
+                    //         break;
+                    //     }
+                    //     // printf("  c = %c\n", c);
+                    //     num = (c - '0') + 10 * num;
+                    //     ++inp_p;
+                    //     // printf("  num = %d\n", num);
+                    // }
+                    // printf("  num = %d\n", num);
+                    // *i_val = num;
+                    *i_val = atoi(str);
+                    printf("  num = %d\n", *i_val);
                     break;
                 }
                 case 'f':
@@ -90,19 +160,25 @@ void minscanf(char *fmt, ...) {
                     // printf("%f", d_val);
                     // scanf("%f", d_val);
                     char str[25];
-                    int i = 0;
-                    while (1) {
-                        char c = *inp_p;
-                        ++inp_p;
-                        printf("  c = %c\n", c);
-                        if (c != '.' && !isdigit(c)) {
-                            break;
-                        }
-                        // printf("  c = %c\n", c);
-                        str[i++] = c;
-                        // printf("  num = %d\n", num);
-                    }
-                    str[i] = '\0';
+                    // int i = 0;
+                    // while (1) {
+                    //     char c = *inp_p;
+                    //     ++inp_p;
+                    //     printf("  c = %c\n", c);
+                        
+                    //     if ((i == 0) && isspace(c)) {
+                    //         continue;
+                    //     }
+                        
+                    //     if (c != '.' && !isdigit(c)) {
+                    //         break;
+                    //     }
+                    //     // printf("  c = %c\n", c);
+                    //     str[i++] = c;
+                    //     // printf("  num = %d\n", num);
+                    // }
+                    // str[i] = '\0';
+                    getfloat(&inp_p, str);
                     *d_val = atof(str);
                     break;
                 }
@@ -113,18 +189,20 @@ void minscanf(char *fmt, ...) {
                     //     putchar(*s_val);
                     // }
                     s_val = va_arg(ap, char*);
-                    int i = 0;
-                    while (*inp_p != '\0') {
-                        char c = *inp_p;
-                        ++inp_p;
-                        printf("  c = %c\n", c);
-                        if (isspace(c)) {
-                            break;
-                        }
-                        s_val[i++] = c;
-                        // printf("  num = %d\n", num);
-                    }
-                    s_val[i] = '\0';
+                    getstr(&inp_p, s_val);
+                    // int i = 0;
+                    // while (*inp_p != '\0') {
+                    //     char c = *inp_p;
+                    //     ++inp_p;
+                    //     printf("  c = %c\n", c);
+                    //     if (isspace(c)) {
+                    //         printf("  isspace true\n");
+                    //         break;
+                    //     }
+                    //     s_val[i++] = c;
+                    //     // printf("  num = %d\n", num);
+                    // }
+                    // s_val[i] = '\0';
                     // scanf("%s", s_val);
                     break;
                 }
@@ -148,22 +226,22 @@ int main() {
     minscanf("%d", &num);
     printf("int = %d\n", num);
 
-    // float real = 0;
-    // printf("Enter a float: ");
-    // minscanf("%f", &real);
-    // printf("float = %f\n", real);
+    float real = 0;
+    printf("Enter a float: ");
+    minscanf("%f", &real);
+    printf("float = %f\n", real);
 
-    // char str[20];
-    // printf("Enter a str: ");
-    // minscanf("%s", str);
-    // printf("Str = %s\n", str);
+    char str[20];
+    printf("Enter a str: ");
+    minscanf("%s", str);
+    printf("Str = %s\n", str);
 
-    // int num = 0;
-    // float real = 0.0;
-    // printf("Enter an int(i) and a float(f) like i, f: ");
-    // // scanf("%d, %f", &num, &real);
-    // minscanf("%d,%f", &num, &real);
-    // printf("Num = %d, real = %f\n", num, real);
+    num = 0;
+    real = 0.0;
+    printf("Enter an int(i) and a float(f) like i, f: ");
+    // scanf("%d, %f", &num, &real);
+    minscanf("%d,%f", &num, &real);
+    printf("Num = %d, real = %f\n", num, real);
 
     // num = 0;
     // str[0] = '\0';
