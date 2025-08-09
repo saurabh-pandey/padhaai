@@ -197,19 +197,20 @@ int main() {
     num = 0;
     real = 0.0;
     printf("Enter an int(i) and a float(f) like i, f: ");
-    // scanf("%d, %f", &num, &real);
     minscanf("%d,%f", &num, &real);
     printf("Num = %d, real = %f\n", num, real);
 
-    // num = 0;
-    // str[0] = '\0';
-    // minscanf("%d, %s", &num, str);
-    // printf("Num = %d, str = %s\n", num, str);
+    num = 0;
+    str[0] = '\0';
+    printf("Enter an int(i) and a str(s) like i, s: ");
+    minscanf("%d,%s", &num, str);
+    printf("Num = %d, str = %s\n", num, str);
 
-    // real = 0;
-    // str[0] = '\0';
-    // minscanf("%f, %s", &real, str);
-    // printf("Real = %f, str = %s\n", real, str);
+    real = 0;
+    str[0] = '\0';
+    printf("Enter an real(f) and a str(s) like f, s: ");
+    minscanf("%f,%s", &real, str);
+    printf("Real = %f, str = %s\n", real, str);
 
     printf("Done\n");
     
