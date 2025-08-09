@@ -92,8 +92,13 @@ int getstr(char **inp, char *out) {
         printf("  c = %c\n", c);
         
         if (isspace(c)) {
-            printf("  isspace true\n");
-            break;
+            if (i == 0) {
+                ++(*inp);
+                continue;
+            } else {
+                // printf("  isspace true\n");
+                break;
+            }
         }
         ++(*inp);
         // printf("  c = %c\n", c);
@@ -120,12 +125,19 @@ void minscanf(char *fmt, ...) {
     for (fmt_p = fmt; *fmt_p != '\0'; ++fmt_p) {
         printf("fmt_p = %c\n", *fmt_p);
         if (*fmt_p != '%') {
+            if (isspace(*fmt_p)) {
+                continue;
+            }
+            
             while(*inp_p != '\0') {
                 printf("  inp_p = %c\n", *inp_p);
+                printf("  fmt_p = %c\n", *fmt_p);
+                // Ignore all spaces
                 if (isspace(*inp_p)) {
                     ++inp_p;
                     continue;
                 }
+                
                 if (*fmt_p != *inp_p) {
                     printf("WARNING: Mismatch\n");
                     ++inp_p;
@@ -197,19 +209,19 @@ int main() {
     num = 0;
     real = 0.0;
     printf("Enter an int(i) and a float(f) like i, f: ");
-    minscanf("%d,%f", &num, &real);
+    minscanf("%d, %f", &num, &real);
     printf("Num = %d, real = %f\n", num, real);
 
     num = 0;
     str[0] = '\0';
     printf("Enter an int(i) and a str(s) like i, s: ");
-    minscanf("%d,%s", &num, str);
+    minscanf("%d, %s", &num, str);
     printf("Num = %d, str = %s\n", num, str);
 
     real = 0;
     str[0] = '\0';
     printf("Enter an real(f) and a str(s) like f, s: ");
-    minscanf("%f,%s", &real, str);
+    minscanf("%f, %s", &real, str);
     printf("Real = %f, str = %s\n", real, str);
 
     printf("Done\n");
