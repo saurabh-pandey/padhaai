@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #define MAX_INPUT_SIZE 100
+#define MAX_STR_SIZE 20
 
 
 void getinput(char *inp) {
@@ -11,17 +12,18 @@ void getinput(char *inp) {
     int i = 0;
     while (i < (MAX_INPUT_SIZE - 1)) {
         c = getchar();
-        printf("c = %c\n", c);
         if (c == EOF) {
             break;
         }
         if (c == '\n') {
+            if (i == 0) {
+                continue;
+            }
             break;
         }
         inp[i++] = c;
     }
     inp[i] = '\0';
-    printf("Input = %s\n", inp);
     return;
 }
 
@@ -29,8 +31,6 @@ int getint(char **inp, char *out) {
     int i = 0;
     while (1) {
         char c = **inp;
-        printf("  c = %c\n", c);
-        
         if (i == 0) {
             if (isspace(c)) {
                 ++(*inp);
@@ -47,9 +47,7 @@ int getint(char **inp, char *out) {
             break;
         }
         ++(*inp);
-        // printf("  c = %c\n", c);
         out[i++] = c;
-        // printf("  num = %d\n", num);
     }
     out[i] = '\0';
     return i;
@@ -59,8 +57,6 @@ int getfloat(char **inp, char *out) {
     int i = 0;
     while (1) {
         char c = **inp;
-        printf("  c = %c\n", c);
-        
         if (i == 0) {
             if (isspace(c)) {
                 ++(*inp);
@@ -77,9 +73,7 @@ int getfloat(char **inp, char *out) {
             break;
         }
         ++(*inp);
-        // printf("  c = %c\n", c);
         out[i++] = c;
-        // printf("  num = %d\n", num);
     }
     out[i] = '\0';
     return i;
@@ -89,19 +83,15 @@ int getstr(char **inp, char *out) {
     int i = 0;
     while (**inp != '\0') {
         char c = **inp;
-        printf("  c = %c\n", c);
-        
         if (isspace(c)) {
             if (i == 0) {
                 ++(*inp);
                 continue;
             } else {
-                // printf("  isspace true\n");
                 break;
             }
         }
         ++(*inp);
-        // printf("  c = %c\n", c);
         out[i++] = c;
     }
     out[i] = '\0';
@@ -114,7 +104,6 @@ void minscanf(char *fmt, ...) {
     getinput(input);
     
     va_list ap;
-    // char c;
     char *fmt_p;
     char *inp_p = input;
     int *i_val;
@@ -123,15 +112,12 @@ void minscanf(char *fmt, ...) {
     
     va_start(ap, fmt);
     for (fmt_p = fmt; *fmt_p != '\0'; ++fmt_p) {
-        printf("fmt_p = %c\n", *fmt_p);
         if (*fmt_p != '%') {
             if (isspace(*fmt_p)) {
                 continue;
             }
             
             while(*inp_p != '\0') {
-                printf("  inp_p = %c\n", *inp_p);
-                printf("  fmt_p = %c\n", *fmt_p);
                 // Ignore all spaces
                 if (isspace(*inp_p)) {
                     ++inp_p;
@@ -153,32 +139,29 @@ void minscanf(char *fmt, ...) {
             {
                 case 'd':
                 {
-                    printf("Case d\n");
                     i_val = va_arg(ap, int*);
-                    char str[25];
+                    char str[MAX_STR_SIZE];
                     getint(&inp_p, str);
                     *i_val = atoi(str);
                     break;
                 }
                 case 'f':
                 {
-                    printf("Case f\n");
                     d_val = va_arg(ap, float*);
-                    char str[25];
+                    char str[MAX_STR_SIZE];
                     getfloat(&inp_p, str);
                     *d_val = atof(str);
                     break;
                 }
                 case 's':
                 {
-                    printf("Case s\n");
                     s_val = va_arg(ap, char*);
                     getstr(&inp_p, s_val);
                     break;
                 }
                 default:
                 {
-                    // putchar(*p);
+                    printf("Format char %c is not yet supported\n", *fmt_p);
                     break;
                 }
             }
@@ -188,41 +171,97 @@ void minscanf(char *fmt, ...) {
 }
 
 
-int main() {
-    printf("Running tests for minscanf\n");
-
+void test_int(void) {
     int num = 0;
+    
     printf("Enter an int: ");
     minscanf("%d", &num);
     printf("int = %d\n", num);
+}
 
+
+void test_float(void) {
     float real = 0;
+    
     printf("Enter a float: ");
     minscanf("%f", &real);
     printf("float = %f\n", real);
+}
 
-    char str[20];
+
+void test_str(void) {
+    char str[MAX_STR_SIZE];
+    
     printf("Enter a str: ");
     minscanf("%s", str);
     printf("Str = %s\n", str);
+}
 
-    num = 0;
-    real = 0.0;
+
+void test_int_float_pair(void) {
+    int num = 0;
+    float real = 0.0;
+    
     printf("Enter an int(i) and a float(f) like i, f: ");
     minscanf("%d, %f", &num, &real);
-    printf("Num = %d, real = %f\n", num, real);
+    printf("Num = %d, float = %f\n", num, real);
+}
 
-    num = 0;
-    str[0] = '\0';
+
+void test_int_str_pair(void) {
+    int num = 0;
+    char str[MAX_STR_SIZE];
+    
     printf("Enter an int(i) and a str(s) like i, s: ");
     minscanf("%d, %s", &num, str);
     printf("Num = %d, str = %s\n", num, str);
+}
 
-    real = 0;
-    str[0] = '\0';
+
+void test_float_str_pair(void) {
+    float real = 0.0;
+    char str[MAX_STR_SIZE];
+    
     printf("Enter an real(f) and a str(s) like f, s: ");
     minscanf("%f, %s", &real, str);
-    printf("Real = %f, str = %s\n", real, str);
+    printf("Float = %f, str = %s\n", real, str);
+}
+
+
+void test_three_nums(void) {
+    int num1 = 0;
+    int num2 = 0;
+    int num3 = 0;
+    
+    printf("Enter three numbers like (n1, n2, n3): ");
+    minscanf("(%d, %d, %d)", &num1, &num2, &num3);
+    printf("Three numbers are (%d, %d, %d)\n", num1, num2, num3);
+}
+
+
+void test_date(void) {
+    int date = 0;
+    int month = 0;
+    int year = 0;
+
+    printf("Enter date in dd/mm/yyyy format (e.g. 02/03/1978): ");
+    scanf("%d/%d/%d", &date, &month, &year);
+    printf("Entered date is %d/%d/%d\n", date, month, year);
+}
+
+int main() {
+    printf("Running tests for minscanf\n");
+
+    test_int();
+    test_float();
+    test_str();
+
+    test_int_float_pair();
+    test_int_str_pair();
+    test_float_str_pair();
+
+    test_three_nums();
+    test_date();
 
     printf("Done\n");
     
