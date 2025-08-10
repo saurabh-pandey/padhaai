@@ -12,10 +12,17 @@ void getinput(char *inp) {
     int i = 0;
     while (i < (MAX_INPUT_SIZE - 1)) {
         c = getchar();
+
+        // Input is assumed to end at EOF
         if (c == EOF) {
             break;
         }
+
+        // Input is assumed to end at newline but ...
         if (c == '\n') {
+            // if it is the first valid character I ignore it.
+            // This allows to handle the case where a previous call to minscanf had the last
+            // newline in the buffer and thus appears as the first char in the next minscanf call.
             if (i == 0) {
                 continue;
             }
@@ -27,22 +34,25 @@ void getinput(char *inp) {
     return;
 }
 
+
 int getint(char **inp, char *out) {
     int i = 0;
     while (1) {
         char c = **inp;
         if (i == 0) {
+            // Ignore all the preceding spaces before a sign or digit
             if (isspace(c)) {
                 ++(*inp);
                 continue;
             }
+            // Account for negative numbers
             if (c == '-') {
                 ++(*inp);
                 out[i++] = c;
                 continue;
             }
         }
-        
+        // Not a digit break
         if (!isdigit(c)) {
             break;
         }
@@ -53,15 +63,18 @@ int getint(char **inp, char *out) {
     return i;
 }
 
+
 int getfloat(char **inp, char *out) {
     int i = 0;
     while (1) {
         char c = **inp;
         if (i == 0) {
+            // Ignore all the preceding spaces before a sign or digit or a decimal point
             if (isspace(c)) {
                 ++(*inp);
                 continue;
             }
+            // Account for -ve floats
             if (c == '-') {
                 ++(*inp);
                 out[i++] = c;
@@ -69,6 +82,7 @@ int getfloat(char **inp, char *out) {
             }
         }
         
+        // Not a digit or a decimal point so break
         if (c != '.' && !isdigit(c)) {
             break;
         }
@@ -79,11 +93,13 @@ int getfloat(char **inp, char *out) {
     return i;
 }
 
+
 int getstr(char **inp, char *out) {
     int i = 0;
     while (**inp != '\0') {
         char c = **inp;
         if (isspace(c)) {
+            // Ignore all the preceding spaces before a non space char arrives
             if (i == 0) {
                 ++(*inp);
                 continue;
@@ -100,6 +116,7 @@ int getstr(char **inp, char *out) {
 
 
 void minscanf(char *fmt, ...) {
+    // First fetch the input as a string. Later I match it with the format string.
     char input[MAX_INPUT_SIZE];
     getinput(input);
     
@@ -112,18 +129,22 @@ void minscanf(char *fmt, ...) {
     
     va_start(ap, fmt);
     for (fmt_p = fmt; *fmt_p != '\0'; ++fmt_p) {
+        // Non-format related characters are matched as it is
         if (*fmt_p != '%') {
+            // Ignore all spaces in format string
             if (isspace(*fmt_p)) {
                 continue;
             }
             
+            // Now match the non-space format char with input char
             while(*inp_p != '\0') {
-                // Ignore all spaces
+                // Ignore all spaces in input string
                 if (isspace(*inp_p)) {
                     ++inp_p;
                     continue;
                 }
                 
+                // Match format with input and warn in case of mismatch
                 if (*fmt_p != *inp_p) {
                     printf("WARNING: Mismatch\n");
                     ++inp_p;
@@ -134,6 +155,7 @@ void minscanf(char *fmt, ...) {
                 }
             }
         } else {
+            // % should be followed by a valid input char
             ++fmt_p;
             switch (*fmt_p)
             {
@@ -171,6 +193,7 @@ void minscanf(char *fmt, ...) {
 }
 
 
+// All the test functions
 void test_int(void) {
     int num = 0;
     
@@ -248,6 +271,7 @@ void test_date(void) {
     scanf("%d/%d/%d", &date, &month, &year);
     printf("Entered date is %d/%d/%d\n", date, month, year);
 }
+
 
 int main() {
     printf("Running tests for minscanf\n");
