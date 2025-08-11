@@ -5,7 +5,7 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = minprintf try_scanf minscanf
+JUST_EXECS = minprintf try_scanf minscanf simple_cat
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
