@@ -3,40 +3,28 @@
 #include <linux/limits.h>
 
 
+void filecopy(FILE *in, FILE *out) {
+    int c = 0;
+    while ((c = getc(in)) != EOF) {
+        putc(c, out);
+    }
+    // Print a newline after the EOF
+    putc('\n', out);
+}
+
+
 int main(int argc, char *argv[]) {
-    printf("Running simple_cat\n");
-
-    char cwd[PATH_MAX];
-   if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd);
-   } else {
-       perror("getcwd() error");
-       return 1;
-   }
-
-   char exec_path[PATH_MAX];
-   ssize_t len = readlink("/proc/self/exe", exec_path, sizeof(exec_path) - 1);
-    if (len == -1) {
-        perror("Error reading symbolic link");
-        return 1;
-    }
-
-    // Null-terminate the path
-    exec_path[len] = '\0';
-
-    printf("Path to exec is '%s'\n", exec_path);
-
-
-    FILE *fp;
-    if ((fp = fopen("tests/data/text1.txt", "r")) != NULL) {
-        int c = 0;
-        while ((c = getc(fp)) != EOF) {
-            putc(c, stdout);
-        }
+    if (argc == 1) {
+        filecopy(stdin, stdout);
     } else {
-        printf("ERROR: fp is null\n");
+        for (int i = 1; i < argc; ++i) {
+            FILE *fp;
+            if ((fp = fopen(argv[i], "r")) != NULL) {
+                filecopy(fp, stdout);
+            } else {
+                printf("ERROR: Can't open file %s\n", argv[i]);
+            }
+        }
     }
-
-    printf("Done\n");
     return 0;
 }

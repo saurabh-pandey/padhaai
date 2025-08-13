@@ -1,0 +1,3 @@
+Hello world!
+Now it is a another file.
+But with 3 lines.
