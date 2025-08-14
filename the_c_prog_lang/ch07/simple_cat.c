@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
             if ((fp = fopen(argv[i], "r")) != NULL) {
                 filecopy(fp, stdout);
             } else {
-                printf("ERROR: Can't open file %s\n", argv[i]);
+                fprintf(stderr, "ERROR: Can't open file %s\n", argv[i]);
             }
         }
     }

@@ -27,7 +27,7 @@ class TestSimpleCat(unittest.TestCase):
                           'Now it is a another file.',
                           'But with 3 lines.'])
     
-    def test_no_files(self):
+    def test_stdin(self):
         arr_inp = textwrap.dedent('''\
             Hello world
             Now this is a newline
@@ -37,6 +37,13 @@ class TestSimpleCat(unittest.TestCase):
                                 text=True,
                                 input=arr_inp).stdout
         self.assertEqual(output.splitlines(), ['Hello world', 'Now this is a newline', ''])
+    
+    def test_stderr(self):
+        result = subprocess.run([self.exe, "tests/data/no_file.txt"],
+                                capture_output=True,
+                                text=True)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(result.stderr, "ERROR: Can't open file tests/data/no_file.txt\n")
 
 
 if __name__ == '__main__':
