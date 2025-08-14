@@ -9,11 +9,11 @@ int main(int argc, char *argv[]) {
     } else {
         FILE *file1 = fopen(argv[1], "r");
         if (file1 == NULL) {
-            fprintf(stderr, "ERROR: %s Can't open file %s\n", argv[1]);
+            fprintf(stderr, "ERROR: %s Can't open file %s\n", argv[0], argv[1]);
         }
         FILE *file2 = fopen(argv[2], "r");
         if (file2 == NULL) {
-            fprintf(stderr, "ERROR: %s Can't open file %s\n", argv[2]);
+            fprintf(stderr, "ERROR: %s Can't open file %s\n", argv[0], argv[2]);
         }
         
         while (0) {
