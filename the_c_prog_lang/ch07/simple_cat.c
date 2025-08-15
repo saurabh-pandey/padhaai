@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <linux/limits.h>
 
@@ -21,8 +22,10 @@ int main(int argc, char *argv[]) {
             FILE *fp;
             if ((fp = fopen(argv[i], "r")) != NULL) {
                 filecopy(fp, stdout);
+                fclose(fp);
             } else {
                 fprintf(stderr, "ERROR: Can't open file %s\n", argv[i]);
+                exit(1);
             }
         }
     }
