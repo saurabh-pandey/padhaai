@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <linux/limits.h>
 
+#define MAX_LINE_LEN 150
+
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -27,17 +29,17 @@ int main(int argc, char *argv[]) {
         int nums_file2_lines = 0;
         while (1) {
             // read line in each file
-            char line1[150];
+            char line1[MAX_LINE_LEN];
             int is_file1_eof = 0;
-            if ((is_file1_eof == 0) && (fgets(line1, 150, file1) != NULL)) {
+            if ((is_file1_eof == 0) && (fgets(line1, MAX_LINE_LEN, file1) != NULL)) {
                 ++nums_file1_lines;
             } else {
                 is_file1_eof = 1;
             }
 
-            char line2[150];
+            char line2[MAX_LINE_LEN];
             int is_file2_eof = 0;
-            if ((is_file2_eof == 0) && (fgets(line2, 150, file2) != NULL)) {
+            if ((is_file2_eof == 0) && (fgets(line2, MAX_LINE_LEN, file2) != NULL)) {
                 ++nums_file2_lines;
             } else {
                 is_file2_eof = 1;
