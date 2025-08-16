@@ -30,7 +30,6 @@ int main(int argc, char *argv[]) {
             char line1[150];
             int is_file1_eof = 0;
             if ((is_file1_eof == 0) && (fgets(line1, 150, file1) != NULL)) {
-                printf("Line1: %s\n", line1);
                 ++nums_file1_lines;
             } else {
                 is_file1_eof = 1;
@@ -39,7 +38,6 @@ int main(int argc, char *argv[]) {
             char line2[150];
             int is_file2_eof = 0;
             if ((is_file2_eof == 0) && (fgets(line2, 150, file2) != NULL)) {
-                printf("Line2: %s\n", line2);
                 ++nums_file2_lines;
             } else {
                 is_file2_eof = 1;
@@ -47,24 +45,22 @@ int main(int argc, char *argv[]) {
 
             // compare
             if (is_file1_eof == 0 && is_file2_eof == 0) {
-                // Compare if 
+                // Both files have lines so compare the lines
                 if (strcmp(line1, line2) == 0) {
-                   printf("  Lines match\n");
                    ++nums_match;
                 } else {
-                    printf("  Lines don't match due to strcmp\n");
                     ++nums_mismatch;
                 }
             } else if ((is_file1_eof == 1) && (is_file2_eof == 1)) {
                 // Break if both files are EOF
                 break;
             } else {
-                printf("  Lines don't match because EOF\n");
+                // One file has reached EOF so it is a one-side diff now
                 ++nums_one_sided;
             }
         }
 
-        printf("Some overall statistics:\n");
+        printf("Overall diff statistics:\n");
         printf("No. of lines matching      = %d\n", nums_match);
         printf("No. of lines with diff     = %d\n", nums_mismatch);
         printf("No. of lines only one file = %d\n", nums_one_sided);
