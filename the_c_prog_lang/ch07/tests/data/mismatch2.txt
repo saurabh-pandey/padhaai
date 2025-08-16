@@ -1,0 +1,15 @@
+This is file that will not match with another one called match2.txt. Now this will have a few lines 
+but it should not be exactly matching with the other. I recall there was some extension in vs-code
+where we could generate "lorem ipsums" of any size. Maybe it is a good extension to create this 
+file.
+Manually writing such file is also not bad if it is just about a few lines only.
+Starting another paragraph with some connected but slightly different view of the same idea. It is 
+about how many lines to write. Currently I am on line no. 6 but I guess going 2 digits is what I am 
+aiming for. Having files total lines in 2 digits will test the code with a reasonable line variety 
+I guess.
+It would be better to also have some bullet points and some punctuations like comma, colon, dash 
+etc. Let's start with some bullet points:
+  1. I had some commas
+  2. I also had one dash in vs-code before. Now I have two!
+  3. Colon was used to start this list.
+Nice file so far. Also reached two-digits line no. with even knowing about it. This is cool.
