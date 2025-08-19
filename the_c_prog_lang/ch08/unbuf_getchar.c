@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// #define EOF -1
-
-int my_getchar() {
+int unbuf_getchar() {
     char c;
     ssize_t n = read(0, &c, 1);
     return n == 1 ? (unsigned int)c : EOF;
@@ -11,7 +9,7 @@ int my_getchar() {
 
 int main() {
     char c;
-    while ((c = my_getchar()) != EOF) {
+    while ((c = unbuf_getchar()) != EOF) {
         printf("%c", c);
     }
 
