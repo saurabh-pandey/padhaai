@@ -8,18 +8,14 @@ int buf_getchar() {
     static char *bufp = buffer;
     static ssize_t n = 0;
 
-    // printf("n = %ld\n", n);
     if (n == 0) {
-        // printf("Reading again\n");
         n = read(0, buffer, sizeof buffer);
         bufp = buffer;
     }
 
     if (n == 0) {
-        // printf("EOF\n");
         return EOF;
     } else {
-        // printf("Using buffer n = %ld\n", n);
         char c = *bufp;
         ++bufp;
         --n;
