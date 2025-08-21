@@ -5,7 +5,7 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = in_out unbuf_getchar buf_getchar
+JUST_EXECS = in_out unbuf_getchar buf_getchar simple_cp
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
