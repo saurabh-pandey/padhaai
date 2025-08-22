@@ -1,0 +1,4 @@
+This is file supposed to be copied to output.txt in this same folder.
+It is copied using simple_cp exe.
+Let's see if this work!!!
+Get set go!!!
