@@ -4,7 +4,7 @@ import unittest
 import os
 
 
-class TestSimpleCp(unittest.TestCase):
+class TestSysCp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         p = pathlib.Path(__file__)
@@ -41,7 +41,7 @@ class TestSimpleCp(unittest.TestCase):
         result = subprocess.run([self.exe], capture_output=True, text=True)
         self.assertEqual(result.stderr,
                          "Usage: /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/bin/"
-                         "simple_cp source_file copied_file\n")
+                         "sys_cp source_file copied_file\n")
         self.assertFalse(os.path.exists("tests/data/output.txt"),
                         "The file 'tests/data/output.txt' should not exist.")
 
