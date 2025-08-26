@@ -5,7 +5,7 @@ BIN=bin
 $(shell mkdir -p $(BIN))
 
 
-JUST_EXECS = in_out unbuf_getchar buf_getchar sys_cp sys_cat read_n_bytes
+JUST_EXECS = in_out unbuf_getchar buf_getchar sys_cp sys_cat lseek_trials
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
