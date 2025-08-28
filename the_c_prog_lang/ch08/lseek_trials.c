@@ -61,25 +61,26 @@ ssize_t seek_data_opened_file(int fd, off_t offset, char * buffer, int nbytes) {
 }
 
 
-// This program tries to open a file given as the argument and the read at many offsets for a range 
-// of bytes. This array like reading of file is done using lseek command.
+// This program tries to open a file given as the argument and then read at many offsets for a 
+// range of bytes. This array like reading of file is done using lseek command.
 // It also uses two different ways to call lseek.
 int main(int argc, char *argv[]) {
     if (argc != 2) {
-        printf("Usage: %s input_file\n", argv[0]);
+        fprintf(stderr, "Usage: %s input_file\n", argv[0]);
+        return -1;
     }
 
     int fd = open(argv[1], O_RDONLY);
     if (fd == -1) {
         char error_msg[MAX_BUFFER_SIZE];
-        snprintf(error_msg, sizeof(error_msg), "Error while opening file %s", argv[1]);
+        snprintf(error_msg, sizeof(error_msg), "Error while opening %s", argv[1]);
         perror(error_msg);
         exit(1);
     }
 
     printf("\n");
-    printf("%-10s %-10s %-10s\n", "offset", "bytes", "nread");
-    printf("=================================\n");
+    printf("%-10s %-10s %-10s %-10s\n", "index", "offset", "bytes", "nread");
+    printf("========================================\n");
 
     int total_cycles = 0;
     ssize_t nread = 0;
@@ -102,7 +103,7 @@ int main(int argc, char *argv[]) {
                 printf("ERROR: nread mismatch\n");
             } else {
                 nread = nread1;
-                printf("%-10ld %-10d %-10zd\n", offset, nbytes, nread);
+                printf("%-10d %-10ld %-10d %-10zd\n", total_cycles, offset, nbytes, nread);
             }
 
             if (strcmp(buffer1, buffer2) != 0) {
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
             }
             if (nread < nbytes) {
                 // For this offset the buffer was bigger than the amount of data available. It is 
-                // of no use to further increase the buffer size. This time to take a break!
+                // of no use to further increase the buffer size. This is time to take a break!
                 break;
             }
             
@@ -122,7 +123,7 @@ int main(int argc, char *argv[]) {
         printf("\n"); // New offset vertical separator in the table
     } while (nread > 0);
 
-    printf("\n\nTotal cycles = %d\n\n", total_cycles);
+    // printf("\n\nTotal cycles = %d\n\n", total_cycles);
 
     close(fd);
 
