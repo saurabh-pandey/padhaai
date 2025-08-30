@@ -5,7 +5,7 @@
 #include <unistd.h>
 // #include <fcntl.h>
 // #include <error.h>
-// #include <stdlib.h>
+#include <stdlib.h>
 // #include <string.h>
 
 
@@ -27,6 +27,20 @@ void print_usage(int is_error, const char *argv_0) {
     fprintf((is_error) ? stderr : stdout, "\nExample: %s -v -f some_file.txt\n\n", argv_0);
 }
 
+int string_to_size_t(const char *input, size_t *num) {
+    char *endptr = NULL;
+    unsigned long long val = strtoull(input, &endptr, 10);
+
+    if (*endptr != '\0') {
+        fprintf(stderr, "Invalid input %s to convert to size_t\n", input);
+        return -1;
+    }
+
+    *num = (size_t)val;
+
+    return 0;
+}
+
 
 int main(int argc, char *argv[]) {
     printf("Read nbytes given an offset from a file\n");
@@ -34,7 +48,9 @@ int main(int argc, char *argv[]) {
 
     int use_seek_data = 0;
     char * inp_file = NULL;
-    while ((opt = getopt(argc, argv, "hvf:")) != -1) {
+    size_t nbytes = 0;
+    off_t offset = 0;
+    while ((opt = getopt(argc, argv, "hvf:n:o:")) != -1) {
         printf("opt = %c\n", (char)opt);
         switch (opt) {
         case 'h':
@@ -48,6 +64,15 @@ int main(int argc, char *argv[]) {
         case 'f':
             printf("Option f with arg %s\n", optarg);
             inp_file = optarg;
+            break;
+        case 'n':
+            printf("Option n with arg %s\n", optarg);
+            if (string_to_size_t(optarg, &nbytes) == -1) {
+                return 1;
+            }
+            break;
+        case 'o':
+            printf("Option o with arg %s\n", optarg);
             break;
         default:
             print_usage(1, argv[0]);
