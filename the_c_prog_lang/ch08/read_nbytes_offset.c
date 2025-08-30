@@ -19,25 +19,58 @@ int read_nbytes_from_pos_seek_data(int fd, off_t pos, size_t nbytes, char *buf) 
 }
 
 
+void print_usage(int is_error, const char *argv_0) {
+    fprintf((is_error) ? stderr : stdout, "Usage: %s [-h] [-v] [-f file]\n", argv_0);
+    fprintf((is_error) ? stderr : stdout, "  -h  Help\n");
+    fprintf((is_error) ? stderr : stdout, "  -v  Enable SEEK_DATA version (Default SEEK_SET)\n");
+    fprintf((is_error) ? stderr : stdout, "  -f  File to seek\n");
+    fprintf((is_error) ? stderr : stdout, "\nExample: %s -v -f some_file.txt\n\n", argv_0);
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Read nbytes given an offset from a file\n");
     int opt;
-    while ((opt = getopt(argc, argv, "ab:c:")) != -1) {
+
+    int use_seek_data = 0;
+    char * inp_file = NULL;
+    while ((opt = getopt(argc, argv, "hvf:")) != -1) {
+        printf("opt = %c\n", (char)opt);
         switch (opt) {
-        case 'a':
-            printf("Option a\n");
+        case 'h':
+            printf("Option h\n");
+            print_usage(0, argv[0]);
+            return 0;
+        case 'v':
+            printf("Option v\n");
+            use_seek_data = 1;
             break;
-        case 'b':
-            printf("Option b with arg %s\n", optarg);
-            break;
-        case 'c':
-            printf("Option c with arg %s\n", optarg);
+        case 'f':
+            printf("Option f with arg %s\n", optarg);
+            inp_file = optarg;
             break;
         default:
-            fprintf(stderr, "Usage: %s [-a] [-b val] [-c val]\n", argv[0]);
+            print_usage(1, argv[0]);
             return 1;
         }
     }
+
+    if (inp_file == NULL) {
+        fprintf(stderr, "\nPlease provide an input file using \"-f some_file\" option\n\n");
+        print_usage(1, argv[0]);
+        return 1;
+    }
+
+    printf("argc = %d, optind = %d\n", argc, optind);
+
+    int nread = 0;
+    if (use_seek_data) {
+        nread = read_nbytes_from_pos_seek_data(0, 0, 0, NULL);
+    } else {
+        nread = read_nbytes_from_pos_seek_set(0, 0, 0, NULL);
+    }
+
+    printf("nread = %d\n", nread);
 
     return 0;
 }
