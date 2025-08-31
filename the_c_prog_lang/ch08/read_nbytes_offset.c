@@ -7,6 +7,7 @@
 // #include <error.h>
 #include <stdlib.h>
 // #include <string.h>
+#include <stdint.h>
 
 
 void print_usage(int is_error, const char *argv_0) {
@@ -70,41 +71,36 @@ int read_nbytes_from_pos_seek_data(int fd, off_t pos, size_t nbytes, char *buf) 
 
 
 int main(int argc, char *argv[]) {
-    printf("Read nbytes given an offset from a file\n");
     int opt;
 
+    // Input data
     int use_seek_data = 0;
     char * inp_file = NULL;
-    size_t nbytes = 0;
-    off_t offset = 0;
+    size_t nbytes = SIZE_MAX;
+    off_t offset = -1;
     while ((opt = getopt(argc, argv, "hvf:n:o:")) != -1) {
-        printf("opt = %c\n", (char)opt);
         switch (opt) {
         case 'h':
-            printf("Option h\n");
             print_usage(0, argv[0]);
             return 0;
         case 'v':
-            printf("Option v\n");
             use_seek_data = 1;
             break;
         case 'f':
-            printf("Option f with arg %s\n", optarg);
             inp_file = optarg;
             break;
         case 'n':
-            printf("Option n with arg %s\n", optarg);
             if (string_to_size_t(optarg, &nbytes) == -1) {
                 return 1;
             }
             break;
         case 'o':
-            printf("Option o with arg %s\n", optarg);
             if (string_to_long(optarg, &offset) == -1) {
                 return 1;
             }
             break;
         default:
+            fprintf(stderr, "\nERROR: Unknow option\n\n");
             print_usage(1, argv[0]);
             return 1;
         }
@@ -113,19 +109,25 @@ int main(int argc, char *argv[]) {
     printf("argc = %d, optind = %d\n", argc, optind);
 
     if (inp_file == NULL) {
-        fprintf(stderr, "\nPlease provide an input file using \"-f some_file\" option\n\n");
+        fprintf(stderr, "\nERROR: Please provide an input file using \"-f some_file\" option\n\n");
+        print_usage(1, argv[0]);
+        return 1;
+    }
+
+    if (nbytes == SIZE_MAX) {
+        fprintf(stderr, "\nERROR: nbytes is a compulsory parameter\n\n");
         print_usage(1, argv[0]);
         return 1;
     }
 
     if (nbytes == 0) {
-        fprintf(stderr, "\nnbytes has to be a positive number\n\n");
+        fprintf(stderr, "\nERROR: nbytes has to be a positive number\n\n");
         print_usage(1, argv[0]);
         return 1;
     }
 
-    if (offset >= 0) {
-        fprintf(stderr, "\nOffset must be non-negative\n\n");
+    if (offset < 0) {
+        fprintf(stderr, "\nERROR: Offset must be non-negative\n\n");
         print_usage(1, argv[0]);
         return 1;
     }
