@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("argc = %d, optind = %d\n", argc, optind);
+    // printf("argc = %d, optind = %d\n", argc, optind);
 
     if (inp_file == NULL) {
         fprintf(stderr, "\nERROR: Please provide an input file using \"-f some_file\" option\n\n");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("use_seek_data = %d, file = %s, nbytes = %zu, offset = %ld\n", use_seek_data, inp_file, nbytes, offset);
+    // printf("use_seek_data = %d, file = %s, nbytes = %zu, offset = %ld\n", use_seek_data, inp_file, nbytes, offset);
 
     int nread = 0;
     if (use_seek_data) {
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
         nread = read_nbytes_from_pos_seek_set(0, 0, 0, NULL);
     }
 
-    printf("nread = %d\n", nread);
+    // printf("nread = %d\n", nread);
 
     return 0;
 }
