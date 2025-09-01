@@ -3,11 +3,13 @@
 
 #include <stdio.h>
 #include <unistd.h>
-// #include <fcntl.h>
-// #include <error.h>
+#include <fcntl.h>
 #include <stdlib.h>
-// #include <string.h>
 #include <stdint.h>
+
+
+#define MAX_CHAR_ARR_SIZE 100
+#define MAX_BUFFER_SIZE 1000
 
 
 void print_usage(int is_error, const char *argv_0) {
@@ -61,12 +63,18 @@ int string_to_long(const char *input, off_t *num) {
 
 
 int read_nbytes_from_pos_seek_set(int fd, off_t pos, size_t nbytes, char *buf) {
-    return 0;
+    if (lseek(fd, pos, SEEK_SET) == -1) {
+        return -1;
+    }
+    return read(fd, buf, nbytes);
 }
 
 
 int read_nbytes_from_pos_seek_data(int fd, off_t pos, size_t nbytes, char *buf) {
-    return 0;
+    if (lseek(fd, pos, SEEK_DATA) == -1) {
+        return -1;
+    }
+    return read(fd, buf, nbytes);
 }
 
 
@@ -132,16 +140,38 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // printf("use_seek_data = %d, file = %s, nbytes = %zu, offset = %ld\n", use_seek_data, inp_file, nbytes, offset);
+    printf("use_seek_data = %d, file = %s, nbytes = %zu, offset = %ld\n", use_seek_data, inp_file, nbytes, offset);
 
-    int nread = 0;
-    if (use_seek_data) {
-        nread = read_nbytes_from_pos_seek_data(0, 0, 0, NULL);
-    } else {
-        nread = read_nbytes_from_pos_seek_set(0, 0, 0, NULL);
+    const int fd = open(inp_file, O_RDONLY);
+    if (fd == -1) {
+        char msg_prefix[MAX_CHAR_ARR_SIZE];
+        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while opening file %s", inp_file);
+        perror(msg_prefix);
+        exit(1);
     }
 
-    // printf("nread = %d\n", nread);
+    int nread = 0;
+    char buffer[MAX_BUFFER_SIZE];
+    buffer[0] = '\0';
+    if (use_seek_data) {
+        nread = read_nbytes_from_pos_seek_data(fd, offset, nbytes, buffer);
+    } else {
+        nread = read_nbytes_from_pos_seek_set(fd, offset, nbytes, buffer);
+    }
+    if (nread == -1) {
+        char msg_prefix[MAX_CHAR_ARR_SIZE];
+        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while read file %s", inp_file);
+        perror(msg_prefix);
+        close(fd);
+        exit(1);
+    }
+    buffer[nread] = '\0';
+
+    printf("nread = %d\n", nread);
+    printf("Contents of buffer:\n");
+    printf("%s\n", buffer);
+
+    close(fd);
 
     return 0;
 }
