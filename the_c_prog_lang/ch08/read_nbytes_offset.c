@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
     const int fd = open(inp_file, O_RDONLY);
     if (fd == -1) {
         char msg_prefix[MAX_CHAR_ARR_SIZE];
-        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while opening file %s", inp_file);
+        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while opening file%s", inp_file);
         perror(msg_prefix);
         exit(1);
     }

@@ -1,6 +1,7 @@
 import pathlib
 import subprocess
 import unittest
+import os
 
 
 class TestReadNbytesOffset(unittest.TestCase):
@@ -38,29 +39,35 @@ class TestReadNbytesOffset(unittest.TestCase):
                           'read_nbytes_offset -v -f some_file.txt -n 16 -o 10',
                           ''])
 
-    # def test_run(self):
-        # result = subprocess.run([self.exe, "tests/data/text.txt"],
-        #                         capture_output=True,
-        #                         text=True)
-        # output_rows = TestLseekTrials._parse_rows(result.stdout.splitlines())
-        # # Test if output is not empty
-        # self.assertTrue(output_rows)
-        
-        # # Fetch expected output
-        # parent_path = pathlib.Path(__file__).parent
-        # data_file_path = parent_path / "data" / "expected.txt"
-        # expected_rows = []
-        # with open(data_file_path) as expected_f:
-        #     expected_rows = TestLseekTrials._parse_rows(expected_f.readlines())
-        # self.assertEqual(output_rows, expected_rows)
+    def test_run(self):
+        parent_path = pathlib.Path(__file__).parent
+        data_file_path = parent_path / "data" / "text.txt"
+        for offset in range(0, 1):
+            for nbytes in range(1, 50):
+                result = subprocess.run([self.exe,
+                                        "-f",
+                                        f"{data_file_path}",
+                                        "-n",
+                                        f"{nbytes}",
+                                        "-o",
+                                        f"{offset}"],
+                                        capture_output=True,
+                                        text=True)
+                print("\nC output = ", result.stdout)
+                print("\nC error = ", result.stderr)
+                with open(data_file_path) as inp_f:
+                    inp_f.seek(offset, os.SEEK_SET)
+                    data = inp_f.read(nbytes)
+                    print("\nPy data: ", data)
     
 
-    # def test_bad_input(self):
-    #     result = subprocess.run([self.exe, "tests/data/input1.txt"],
-    #                             capture_output=True,
-    #                             text=True)
-    #     self.assertEqual(result.stderr,
-    #                      "Error while opening tests/data/input1.txt: No such file or directory\n")
+    def test_bad_input(self):
+        result = subprocess.run([self.exe, "-f tests/data/input1.txt", "-n 10", "-o 0"],
+                                capture_output=True,
+                                text=True)
+        self.assertEqual(result.stderr,
+                         "ERROR while opening file tests/data/input1.txt: No such file or"
+                         " directory\n")
     
     
     def test_no_arg(self):
