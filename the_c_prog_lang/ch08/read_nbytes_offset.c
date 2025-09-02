@@ -78,33 +78,36 @@ int read_nbytes_from_pos_seek_data(int fd, off_t pos, size_t nbytes, char *buf) 
 }
 
 
-int main(int argc, char *argv[]) {
+typedef struct _arg_val {
+    int use_seek_data;
+    char * inp_file;
+    size_t nbytes;
+    off_t offset;
+} ArgVal;
+
+
+int parse_args(int argc, char *argv[], ArgVal *vals) {
     int opt;
 
-    // Input data
-    int use_seek_data = 0;
-    char * inp_file = NULL;
-    size_t nbytes = SIZE_MAX;
-    off_t offset = -1;
     while ((opt = getopt(argc, argv, "hvf:n:o:")) != -1) {
         switch (opt) {
         case 'h':
             print_usage(0, argv[0]);
             return 0;
         case 'v':
-            use_seek_data = 1;
+            vals->use_seek_data = 1;
             break;
         case 'f':
-            inp_file = optarg;
+            vals->inp_file = optarg;
             break;
         case 'n':
-            if (string_to_size_t(optarg, &nbytes) == -1) {
-                return 1;
+            if (string_to_size_t(optarg, &(vals->nbytes)) == -1) {
+                return -1;
             }
             break;
         case 'o':
-            if (string_to_long(optarg, &offset) == -1) {
-                return 1;
+            if (string_to_long(optarg, &(vals->offset)) == -1) {
+                return -1;
             }
             break;
         default:
@@ -114,7 +117,19 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // printf("argc = %d, optind = %d\n", argc, optind);
+    return 0;
+}
+
+
+int main(int argc, char *argv[]) {
+    int opt;
+
+    // Input data
+    int use_seek_data = 0;
+    char * inp_file = NULL;
+    size_t nbytes = SIZE_MAX;
+    off_t offset = -1;
+    
 
     if (inp_file == NULL) {
         fprintf(stderr, "\nERROR: Please provide an input file using \"-f some_file\" option\n\n");
@@ -139,8 +154,6 @@ int main(int argc, char *argv[]) {
         print_usage(1, argv[0]);
         return 1;
     }
-
-    printf("use_seek_data = %d, file = %s, nbytes = %zu, offset = %ld\n", use_seek_data, inp_file, nbytes, offset);
 
     const int fd = open(inp_file, O_RDONLY);
     if (fd == -1) {
@@ -167,9 +180,7 @@ int main(int argc, char *argv[]) {
     }
     buffer[nread] = '\0';
 
-    printf("nread = %d\n", nread);
-    printf("Contents of buffer:\n");
-    printf("%s\n", buffer);
+    printf("%s", buffer);
 
     close(fd);
 

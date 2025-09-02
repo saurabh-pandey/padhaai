@@ -42,7 +42,7 @@ class TestReadNbytesOffset(unittest.TestCase):
     def test_run(self):
         parent_path = pathlib.Path(__file__).parent
         data_file_path = parent_path / "data" / "text.txt"
-        for offset in range(0, 1):
+        for offset in range(0, 46):
             for nbytes in range(1, 50):
                 result = subprocess.run([self.exe,
                                         "-f",
@@ -53,12 +53,13 @@ class TestReadNbytesOffset(unittest.TestCase):
                                         f"{offset}"],
                                         capture_output=True,
                                         text=True)
-                print("\nC output = ", result.stdout)
-                print("\nC error = ", result.stderr)
+                self.assertFalse(result.stderr,
+                                 f"Error encountered in offset = {offset}, nbytes = {nbytes}")
                 with open(data_file_path) as inp_f:
                     inp_f.seek(offset, os.SEEK_SET)
-                    data = inp_f.read(nbytes)
-                    print("\nPy data: ", data)
+                    expected = inp_f.read(nbytes)
+                    self.assertEqual(expected, result.stdout,
+                                     f"Output mismatch in offset = {offset}, nbytes = {nbytes}")
     
 
     def test_bad_input(self):
