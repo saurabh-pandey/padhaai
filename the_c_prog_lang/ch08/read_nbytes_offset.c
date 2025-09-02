@@ -113,7 +113,7 @@ int parse_args(int argc, char *argv[], ArgVal *vals) {
         default:
             fprintf(stderr, "\nERROR: Unknow option\n\n");
             print_usage(1, argv[0]);
-            return 1;
+            return -1;
         }
     }
 
@@ -121,44 +121,50 @@ int parse_args(int argc, char *argv[], ArgVal *vals) {
 }
 
 
-int main(int argc, char *argv[]) {
-    int opt;
-
-    // Input data
-    int use_seek_data = 0;
-    char * inp_file = NULL;
-    size_t nbytes = SIZE_MAX;
-    off_t offset = -1;
-    
-
-    if (inp_file == NULL) {
+int test_args_validity(ArgVal arg_val, char *exe) {
+    if (arg_val.inp_file == NULL) {
         fprintf(stderr, "\nERROR: Please provide an input file using \"-f some_file\" option\n\n");
-        print_usage(1, argv[0]);
-        return 1;
+        print_usage(1, exe);
+        return -1;
     }
 
-    if (nbytes == SIZE_MAX) {
+    if (arg_val.nbytes == SIZE_MAX) {
         fprintf(stderr, "\nERROR: nbytes is a compulsory parameter\n\n");
-        print_usage(1, argv[0]);
-        return 1;
+        print_usage(1, exe);
+        return -1;
     }
 
-    if (nbytes == 0) {
+    if (arg_val.nbytes == 0) {
         fprintf(stderr, "\nERROR: nbytes has to be a positive number\n\n");
-        print_usage(1, argv[0]);
-        return 1;
+        print_usage(1, exe);
+        return -1;
     }
 
-    if (offset < 0) {
+    if (arg_val.offset < 0) {
         fprintf(stderr, "\nERROR: Offset must be non-negative\n\n");
-        print_usage(1, argv[0]);
+        print_usage(1, exe);
+        return -1;
+    }
+
+    return 0;
+}
+
+
+int main(int argc, char *argv[]) {
+    ArgVal arg_val = {0, NULL, SIZE_MAX, -1};
+
+    if (parse_args(argc, argv, &arg_val) == -1) {
         return 1;
     }
 
-    const int fd = open(inp_file, O_RDONLY);
+    if (test_args_validity(arg_val, argv[0]) == -1) {
+        return 1;
+    }
+    
+    const int fd = open(arg_val.inp_file, O_RDONLY);
     if (fd == -1) {
         char msg_prefix[MAX_CHAR_ARR_SIZE];
-        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while opening file%s", inp_file);
+        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while opening file%s", arg_val.inp_file);
         perror(msg_prefix);
         exit(1);
     }
@@ -166,14 +172,14 @@ int main(int argc, char *argv[]) {
     int nread = 0;
     char buffer[MAX_BUFFER_SIZE];
     buffer[0] = '\0';
-    if (use_seek_data) {
-        nread = read_nbytes_from_pos_seek_data(fd, offset, nbytes, buffer);
+    if (arg_val.use_seek_data) {
+        nread = read_nbytes_from_pos_seek_data(fd, arg_val.offset, arg_val.nbytes, buffer);
     } else {
-        nread = read_nbytes_from_pos_seek_set(fd, offset, nbytes, buffer);
+        nread = read_nbytes_from_pos_seek_set(fd, arg_val.offset, arg_val.nbytes, buffer);
     }
     if (nread == -1) {
         char msg_prefix[MAX_CHAR_ARR_SIZE];
-        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while read file %s", inp_file);
+        snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while read file %s", arg_val.inp_file);
         perror(msg_prefix);
         close(fd);
         exit(1);
