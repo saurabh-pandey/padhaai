@@ -141,6 +141,31 @@ int my_fclose(MY_FILE *stream) {
 }
 
 
+// Some ideas on how to drive this:
+// 1. We have to call my_fopen, my_fclose, my_fgetc, my_fputc, my_fseek
+// 2. my_fopen acquires a row in the file_table
+// 3. my_fclose releases the passed row from the file_table
+// 4. I Need to map the acquired resources to the ones that I want to close
+// 5. I might pass my_fopen with a slot in the acquired table
+// 6. Later I might use the above slot to close it
+// 7. Slot allotted in step 5 might also be used in other in functions
+// 8. State of file_table and function's response is tested
+// An example test script (or playbook or tape) might look like:
+// fopen, path0, mode0, 0
+// file_table, 1
+// fopen, path1, mode1, 1
+// file_table, 2
+// fclose, 1
+// file_table, 1
+// fopen, path2, mode2, 1
+// file_table, 2
+// fgetc, 0
+// fputc, 1
+// fclose, 1
+// file_table, 1
+// fclose, 0
+// file_table, 0
+
 int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
 
