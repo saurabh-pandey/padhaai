@@ -152,12 +152,11 @@ int main(int argc, char *argv[]) {
         MY_FILE *f = my_fopen(argv[1], "r");
         if (f == NULL) {
             printf("Unable to open the file %s\n", argv[1]);
-            return 1;
+            // return 1;
+        } else {
+            printf("Opened file fd = %d\n", f->fd);
+            open_files[i] = f;
         }
-        printf("Opened file fd = %d\n", f->fd);
-
-        open_files[i] = f;
-
         print_file_table();
     }
     
