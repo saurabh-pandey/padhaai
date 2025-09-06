@@ -34,8 +34,8 @@ void print_my_file(MY_FILE *f) {
     printf("{%d, %s, %s, %ld}", f->fd, f->buf, f->curr, f->count);
 }
 
-void print_file_table() {
-    printf("File table\n");
+void print_file_table(const char*prefix) {
+    printf("%s: File table\n", prefix);
     for (int i = 0; i < MAX_FILES; ++i) {
         printf("%d => ", (i + 1));
         print_my_file(&(file_table[i]));
@@ -44,7 +44,7 @@ void print_file_table() {
 }
 
 
-MY_FILE *find_slot_in_file_table() {
+MY_FILE *fetch_first_free_file_from_table() {
     for (int i = 0; i < MAX_FILES; ++i) {
         MY_FILE *curr_f = &(file_table[i]);
         if (curr_f->fd == -1) {
@@ -71,7 +71,7 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
                 // exit(1);
                 return NULL;
             }
-            MY_FILE *f = find_slot_in_file_table();
+            MY_FILE *f = fetch_first_free_file_from_table();
             if (f == NULL) {
                 printf("ERROR: Seems like file table is full\n");
                 return NULL;
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0}));
 
-    print_file_table();
+    print_file_table("Beginning");
     MY_FILE *open_files[6] = {NULL};
     for (int i = 0; i < 6; ++i) {
         MY_FILE *f = my_fopen(argv[1], "r");
@@ -182,15 +182,24 @@ int main(int argc, char *argv[]) {
             printf("Opened file fd = %d\n", f->fd);
             open_files[i] = f;
         }
-        print_file_table();
+        char prefix[BUFFER_SIZE];
+        prefix[0] = '\0';
+        snprintf(prefix, BUFFER_SIZE, "After opening %d file", (i + 1));
+        print_file_table(prefix);
     }
     
     for (int i = 0; i < 6; ++i) {
+        char prefix[BUFFER_SIZE];
+        prefix[0] = '\0';
+        snprintf(prefix, BUFFER_SIZE, "Before closing %d file", (i + 1));
+        print_file_table(prefix);
         my_fclose(open_files[i]);
-        print_file_table();
+        prefix[0] = '\0';
+        snprintf(prefix, BUFFER_SIZE, "After closing %d file", (i + 1));
+        print_file_table(prefix);
     }
 
-    print_file_table();
+    print_file_table("End");
 
     return 0;
 }
