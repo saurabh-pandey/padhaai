@@ -54,9 +54,45 @@ MY_FILE *fetch_first_free_file_from_table() {
     return NULL;
 }
 
+size_t fill_used_files(MY_FILE *used_fds[]) {
+    size_t total_used_files = 0;
+    for (int i = 0; i < MAX_FILES; ++i) {
+        MY_FILE *curr_f = &(file_table[i]);
+        if (curr_f->fd != -1) {
+            used_fds[total_used_files] = curr_f;
+            ++total_used_files;
+        }
+    }
+    return total_used_files;
+}
+
+
+size_t fill_used_fds(int *used_fds) {
+    size_t total_used_fds = 0;
+    for (int i = 0; i < MAX_FILES; ++i) {
+        MY_FILE *curr_f = &(file_table[i]);
+        if (curr_f->fd != -1) {
+            used_fds[total_used_fds] = curr_f->fd;
+            ++total_used_fds;
+        }
+    }
+    return total_used_fds;
+}
+
+
+size_t count_open_fds() {
+    size_t total_used_fds = 0;
+    for (int i = 0; i < MAX_FILES; ++i) {
+        if (file_table[i].fd != -1) {
+            ++total_used_fds;
+        }
+    }
+    return total_used_fds;
+}
+
 
 MY_FILE *my_fopen(const char *pathname, const char *mode) {
-    printf("Calling my_fopen for path = %s, mode = %s\n", pathname, mode);
+    // printf("Calling my_fopen for path = %s, mode = %s\n", pathname, mode);
 
     switch (*mode)
     {
@@ -136,70 +172,113 @@ int my_fclose(MY_FILE *stream) {
     stream->fd = -1;
     // TODO: Might do some cleanup of other members of the file ptr
     
-    printf("Closing file with fd = %d\n", fd);
+    // printf("Closing file with fd = %d\n", fd);
     return close(fd);
 }
 
 
-// Some ideas on how to drive this:
-// 1. We have to call my_fopen, my_fclose, my_fgetc, my_fputc, my_fseek
-// 2. my_fopen acquires a row in the file_table
-// 3. my_fclose releases the passed row from the file_table
-// 4. I Need to map the acquired resources to the ones that I want to close
-// 5. I might pass my_fopen with a slot in the acquired table
-// 6. Later I might use the above slot to close it
-// 7. Slot allotted in step 5 might also be used in other in functions
-// 8. State of file_table and function's response is tested
-// An example test script (or playbook or tape) might look like:
-// fopen, path0, mode0, 0
-// file_table, 1
-// fopen, path1, mode1, 1
-// file_table, 2
-// fclose, 1
-// file_table, 1
-// fopen, path2, mode2, 1
-// file_table, 2
-// fgetc, 0
-// fputc, 1
-// fclose, 1
-// file_table, 1
-// fclose, 0
-// file_table, 0
+// Test functions
+#define NUM_FILES_WITHIN_LIMITS 3
+
+int check_fd_count(int expected) {
+    int actual = -1;
+    if ((actual = count_open_fds()) != expected) {
+        printf("ERROR: Expected open fds to be %d but actual is %d\n", expected, actual);
+        return 1;
+    }
+    return 0;
+}
+
+int test_open_close_within_limits(int debug) {
+    const char *inp_file_name = "tests/data/input.txt";
+    
+    if (debug) {
+        print_file_table("Beginning");
+    }
+    
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
+    MY_FILE *open_files[NUM_FILES_WITHIN_LIMITS] = {NULL};
+    for (int i = 0; i < NUM_FILES_WITHIN_LIMITS; ++i) {
+        MY_FILE *f = my_fopen(inp_file_name, "r");
+        if (f == NULL) {
+            printf("ERROR: Unable to open the file %s\n", inp_file_name);
+            return 1;
+        } else {
+            if (debug) {
+                printf("Opened file fd = %d\n", f->fd);
+            }
+            
+            open_files[i] = f;
+            
+            if (check_fd_count(i + 1) != 0) {
+               return 1;
+            }
+        }
+        if (debug) {
+            char prefix[BUFFER_SIZE];
+            prefix[0] = '\0';
+            snprintf(prefix, BUFFER_SIZE, "After opening %d file", (i + 1));
+            print_file_table(prefix);
+        }
+    }
+    
+    for (int i = 0; i < NUM_FILES_WITHIN_LIMITS; ++i) {
+        if (debug) {
+            char prefix[BUFFER_SIZE];
+            prefix[0] = '\0';
+            snprintf(prefix, BUFFER_SIZE, "Before closing %d file", (i + 1));
+            print_file_table(prefix);
+        }
+        
+        if (check_fd_count(NUM_FILES_WITHIN_LIMITS - i) != 0) {
+            return 1;
+        }
+        
+        my_fclose(open_files[i]);
+        
+        if (debug) {
+            char prefix[BUFFER_SIZE];
+            prefix[0] = '\0';
+            snprintf(prefix, BUFFER_SIZE, "After closing %d file", (i + 1));
+            print_file_table(prefix);
+        }
+
+        if (check_fd_count(NUM_FILES_WITHIN_LIMITS - i - 1) != 0) {
+            return 1;
+        }
+    }
+
+    if (debug) {
+        print_file_table("End");
+    }
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
 
 int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
 
+    // Initialize the fd table
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0}));
 
-    print_file_table("Beginning");
-    MY_FILE *open_files[6] = {NULL};
-    for (int i = 0; i < 6; ++i) {
-        MY_FILE *f = my_fopen(argv[1], "r");
-        if (f == NULL) {
-            printf("Unable to open the file %s\n", argv[1]);
-            // return 1;
-        } else {
-            printf("Opened file fd = %d\n", f->fd);
-            open_files[i] = f;
-        }
-        char prefix[BUFFER_SIZE];
-        prefix[0] = '\0';
-        snprintf(prefix, BUFFER_SIZE, "After opening %d file", (i + 1));
-        print_file_table(prefix);
-    }
-    
-    for (int i = 0; i < 6; ++i) {
-        char prefix[BUFFER_SIZE];
-        prefix[0] = '\0';
-        snprintf(prefix, BUFFER_SIZE, "Before closing %d file", (i + 1));
-        print_file_table(prefix);
-        my_fclose(open_files[i]);
-        prefix[0] = '\0';
-        snprintf(prefix, BUFFER_SIZE, "After closing %d file", (i + 1));
-        print_file_table(prefix);
+    int failed = 0;
+    // Start all the tests
+    if ((failed = test_open_close_within_limits(0)) != 0)
+    {
+        printf("ERROR: test_open_close_within_limits\n");
     }
 
-    print_file_table("End");
+    if (failed) {
+        printf("ERROR: Failed with some tests\n");
+    }
 
     return 0;
 }
