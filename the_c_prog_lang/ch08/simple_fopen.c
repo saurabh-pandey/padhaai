@@ -7,6 +7,7 @@
 #define MAX_FILES 5
 #define MAX_CHAR_ARR_SIZE 100
 #define BUFFER_SIZE 100
+#define FILE_CREATE_PERMS 0644
 
 
 #define FILL_ARRAY(arr, val) do {               \
@@ -101,10 +102,6 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
             // Read mode
             const int fd = open(pathname, O_RDONLY);
             if (fd == -1) {
-                // char msg_prefix[MAX_CHAR_ARR_SIZE];
-                // snprintf(msg_prefix, sizeof(msg_prefix), "ERROR while opening file%s", pathname);
-                // perror(msg_prefix);
-                // exit(1);
                 return NULL;
             }
             MY_FILE *f = fetch_first_free_file_from_table();
@@ -123,11 +120,47 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
         case 'w':
         {
             // Write mode
+            const int fd = creat(pathname, FILE_CREATE_PERMS);
+            if (fd == -1) {
+                return NULL;
+            }
+            MY_FILE *f = fetch_first_free_file_from_table();
+            if (f == NULL) {
+                printf("ERROR: Seems like file table is full\n");
+                return NULL;
+            }
+            f->fd = fd;
+            f->buf[0] = '\0';
+            // TODO: Is this correct or shall curr be assigned to buf?
+            f->curr = NULL;
+            f->count = 0;
+            return f;
             break;
         }
         case 'a':
         {
             // Append mode
+            const int fd = open(pathname, O_WRONLY);
+            if (fd == -1) {
+                return NULL;
+            }
+            // Move to the end of file
+            const off_t ret = lseek(fd, 0, SEEK_END);
+            if (ret == -1) {
+                printf("Error while moving to the end\n");
+                return NULL;
+            }
+            MY_FILE *f = fetch_first_free_file_from_table();
+            if (f == NULL) {
+                printf("ERROR: Seems like file table is full\n");
+                return NULL;
+            }
+            f->fd = fd;
+            f->buf[0] = '\0';
+            // TODO: Is this correct or shall curr be assigned to buf?
+            f->curr = NULL;
+            f->count = 0;
+            return f;
             break;
         }
     
