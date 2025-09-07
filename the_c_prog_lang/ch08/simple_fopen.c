@@ -295,6 +295,18 @@ int test_open_close_within_limits(int debug) {
     return 0;
 }
 
+int test_create(int debug) {
+    const char *new_file_name = "tests/data/creat.txt";
+    MY_FILE *f = my_fopen(new_file_name, "w");
+    if (f == NULL) {
+        printf("ERROR: Unable to creat the file %s\n", new_file_name);
+        return 1;
+    }
+
+    printf("Created file fd = %d\n", f->fd);
+    return 0;
+}
+
 
 int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
@@ -307,6 +319,11 @@ int main(int argc, char *argv[]) {
     if ((failed = test_open_close_within_limits(0)) != 0)
     {
         printf("ERROR: test_open_close_within_limits\n");
+    }
+
+    if ((failed = test_create(0)) != 0)
+    {
+        printf("ERROR: test_create\n");
     }
 
     if (failed) {
