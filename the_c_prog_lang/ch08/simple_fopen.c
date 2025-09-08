@@ -55,6 +55,20 @@ MY_FILE *fetch_first_free_file_from_table() {
     return NULL;
 }
 
+MY_FILE *create_file_from_fd(int fd) {
+    MY_FILE *f = fetch_first_free_file_from_table();
+    if (f == NULL) {
+        printf("ERROR: Seems like file table is full\n");
+        return NULL;
+    }
+    f->fd = fd;
+    f->buf[0] = '\0';
+    // TODO: Is this correct or shall curr be assigned to buf?
+    f->curr = NULL;
+    f->count = 0;
+    return f;
+}
+
 size_t fill_used_files(MY_FILE *used_fds[]) {
     size_t total_used_files = 0;
     for (int i = 0; i < MAX_FILES; ++i) {
@@ -104,17 +118,7 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
             if (fd == -1) {
                 return NULL;
             }
-            MY_FILE *f = fetch_first_free_file_from_table();
-            if (f == NULL) {
-                printf("ERROR: Seems like file table is full\n");
-                return NULL;
-            }
-            f->fd = fd;
-            f->buf[0] = '\0';
-            // TODO: Is this correct or shall curr be assigned to buf?
-            f->curr = NULL;
-            f->count = 0;
-            return f;
+            return create_file_from_fd(fd);
             break;
         }
         case 'w':
@@ -124,48 +128,35 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
             if (fd == -1) {
                 return NULL;
             }
-            MY_FILE *f = fetch_first_free_file_from_table();
-            if (f == NULL) {
-                printf("ERROR: Seems like file table is full\n");
-                return NULL;
-            }
-            f->fd = fd;
-            f->buf[0] = '\0';
-            // TODO: Is this correct or shall curr be assigned to buf?
-            f->curr = NULL;
-            f->count = 0;
-            return f;
+            return create_file_from_fd(fd);
             break;
         }
         case 'a':
         {
             // Append mode
-            const int fd = open(pathname, O_WRONLY);
+            int fd = open(pathname, O_WRONLY);
+            if (fd == -1) {
+                // Maybe the file was not found so create one
+                fd = creat(pathname, FILE_CREATE_PERMS);
+            }
             if (fd == -1) {
                 return NULL;
             }
+            
             // Move to the end of file
             const off_t ret = lseek(fd, 0, SEEK_END);
             if (ret == -1) {
                 printf("Error while moving to the end\n");
                 return NULL;
             }
-            MY_FILE *f = fetch_first_free_file_from_table();
-            if (f == NULL) {
-                printf("ERROR: Seems like file table is full\n");
-                return NULL;
-            }
-            f->fd = fd;
-            f->buf[0] = '\0';
-            // TODO: Is this correct or shall curr be assigned to buf?
-            f->curr = NULL;
-            f->count = 0;
-            return f;
+            return create_file_from_fd(fd);
             break;
         }
-    
         default:
+        {
+            printf("Error: File mode %c not supported\n", *mode);
             break;
+        }
     }
     return NULL;
 }
@@ -307,6 +298,18 @@ int test_create(int debug) {
     return 0;
 }
 
+int test_append(int debug) {
+    const char *file_name = "tests/data/append.txt";
+    MY_FILE *f = my_fopen(file_name, "a");
+    if (f == NULL) {
+        printf("ERROR: Unable to creat/open the file %s\n", file_name);
+        return 1;
+    }
+
+    printf("Append file fd = %d\n", f->fd);
+    return 0;
+}
+
 
 int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
@@ -324,6 +327,11 @@ int main(int argc, char *argv[]) {
     if ((failed = test_create(0)) != 0)
     {
         printf("ERROR: test_create\n");
+    }
+
+    if ((failed = test_append(0)) != 0)
+    {
+        printf("ERROR: test_append\n");
     }
 
     if (failed) {
