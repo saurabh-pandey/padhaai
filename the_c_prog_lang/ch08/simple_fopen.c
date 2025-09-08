@@ -162,14 +162,19 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
 }
 
 int my_fgetc(MY_FILE *stream) {
-    int c;
-    int nread = 0;
-    while ((nread = read(stream->fd, &c, 1)) > 0)
-    {
-        printf("%c", c);
+    // TODO: Here I fill the stream struct
+    // I can have 2 modes here:
+    // 1. Unbuffered mode: Fill 1 character at a time
+    // 2. Buffered mode: Fill some "page" at a time
+
+    // This is unbuffered mode
+    int nread = read(stream->fd, stream->buf, 1);
+    stream->count = nread;
+    printf("nread = %d\n", nread);
+    if (nread == 0) {
+        return EOF;
     }
-    printf("\n");
-    return nread;
+    return stream->buf[0];
 }
 
 int my_fclose(MY_FILE *stream) {
@@ -288,25 +293,76 @@ int test_open_close_within_limits(int debug) {
 
 int test_create(int debug) {
     const char *new_file_name = "tests/data/creat.txt";
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
     MY_FILE *f = my_fopen(new_file_name, "w");
     if (f == NULL) {
         printf("ERROR: Unable to creat the file %s\n", new_file_name);
         return 1;
     }
 
+    if (check_fd_count(1) != 0) {
+        return 1;
+    }
+
     printf("Created file fd = %d\n", f->fd);
+
+    my_fclose(f);
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
     return 0;
 }
 
 int test_append(int debug) {
     const char *file_name = "tests/data/append.txt";
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
     MY_FILE *f = my_fopen(file_name, "a");
     if (f == NULL) {
         printf("ERROR: Unable to creat/open the file %s\n", file_name);
         return 1;
     }
 
+    if (check_fd_count(1) != 0) {
+        return 1;
+    }
+
     printf("Append file fd = %d\n", f->fd);
+    my_fclose(f);
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
+    return 0;
+}
+
+int test_read(int debug) {
+    const char *file_name = "tests/data/input.txt";
+
+    MY_FILE *f = my_fopen(file_name, "r");
+    if (f == NULL) {
+        printf("ERROR: Unable to open the file for reading %s\n", file_name);
+        return 1;
+    }
+
+    int c;
+    while((c = my_fgetc(f)) != EOF) {
+        printf("fgetc read c = %c\n", c);
+    }
+
+    printf("fgetc done\n");
+
+
     return 0;
 }
 
@@ -332,6 +388,11 @@ int main(int argc, char *argv[]) {
     if ((failed = test_append(0)) != 0)
     {
         printf("ERROR: test_append\n");
+    }
+
+    if ((failed = test_read(0)) != 0)
+    {
+        printf("ERROR: test_read\n");
     }
 
     if (failed) {
