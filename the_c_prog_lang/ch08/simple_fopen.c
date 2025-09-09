@@ -168,13 +168,33 @@ int my_fgetc(MY_FILE *stream) {
     // 2. Buffered mode: Fill some "page" at a time
 
     // This is unbuffered mode
-    int nread = read(stream->fd, stream->buf, 1);
-    stream->count = nread;
-    printf("nread = %d\n", nread);
-    if (nread == 0) {
+    // int nread = read(stream->fd, stream->buf, 1);
+    // stream->count = nread;
+    // printf("nread = %d\n", nread);
+    // if (nread == 0) {
+    //     return EOF;
+    // }
+    // return stream->buf[0];
+
+    // This is buffered mode
+    if (stream->count == 0) {
+        printf("Read now\n");
+        int nread = read(stream->fd, stream->buf, BUFFER_SIZE);
+        stream->count = nread;
+        stream->curr = stream->buf;
+    }
+    // printf("nread = %d\n", nread);
+
+    if (stream->count == 0) {
+        printf("Reached EOF\n");
         return EOF;
     }
-    return stream->buf[0];
+    printf("Use buffer now\n");
+    int c = *(stream->curr);
+    (stream->curr)++;
+    (stream->count)--;
+    
+    return c;
 }
 
 int my_fclose(MY_FILE *stream) {
