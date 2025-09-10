@@ -6,7 +6,9 @@
 
 #define MAX_FILES 5
 #define MAX_CHAR_ARR_SIZE 100
-#define BUFFER_SIZE 100
+#define PRINT_BUFFER_SIZE 100
+#define READ_BUFFER_SIZE 1
+// #define READ_BUFFER_SIZE 100
 #define FILE_CREATE_PERMS 0644
 
 
@@ -21,7 +23,7 @@
 
 typedef struct MY_FILE {
     int fd; // File descriptor
-    char buf[BUFFER_SIZE]; // Buffer
+    char buf[READ_BUFFER_SIZE]; // Buffer
     char *curr; // Read pointer to buffer
     size_t count; // Amount of buffer still unread
 } MY_FILE;
@@ -179,7 +181,7 @@ int my_fgetc(MY_FILE *stream) {
     // This is buffered mode
     if (stream->count == 0) {
         printf("Read now\n");
-        int nread = read(stream->fd, stream->buf, BUFFER_SIZE);
+        int nread = read(stream->fd, stream->buf, READ_BUFFER_SIZE);
         stream->count = nread;
         stream->curr = stream->buf;
     }
@@ -267,18 +269,18 @@ int test_open_close_within_limits(int debug) {
             }
         }
         if (debug) {
-            char prefix[BUFFER_SIZE];
+            char prefix[PRINT_BUFFER_SIZE];
             prefix[0] = '\0';
-            snprintf(prefix, BUFFER_SIZE, "After opening %d file", (i + 1));
+            snprintf(prefix, PRINT_BUFFER_SIZE, "After opening %d file", (i + 1));
             print_file_table(prefix);
         }
     }
     
     for (int i = 0; i < NUM_FILES_WITHIN_LIMITS; ++i) {
         if (debug) {
-            char prefix[BUFFER_SIZE];
+            char prefix[PRINT_BUFFER_SIZE];
             prefix[0] = '\0';
-            snprintf(prefix, BUFFER_SIZE, "Before closing %d file", (i + 1));
+            snprintf(prefix, PRINT_BUFFER_SIZE, "Before closing %d file", (i + 1));
             print_file_table(prefix);
         }
         
@@ -289,9 +291,9 @@ int test_open_close_within_limits(int debug) {
         my_fclose(open_files[i]);
         
         if (debug) {
-            char prefix[BUFFER_SIZE];
+            char prefix[PRINT_BUFFER_SIZE];
             prefix[0] = '\0';
-            snprintf(prefix, BUFFER_SIZE, "After closing %d file", (i + 1));
+            snprintf(prefix, PRINT_BUFFER_SIZE, "After closing %d file", (i + 1));
             print_file_table(prefix);
         }
 
