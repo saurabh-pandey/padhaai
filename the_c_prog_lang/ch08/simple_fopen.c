@@ -3,11 +3,13 @@
 #include <fcntl.h> // open(), creat()
 #include <unistd.h> // close()
 
+#include <stdlib.h> // malloc()
+
 
 #define MAX_FILES 5
 #define MAX_CHAR_ARR_SIZE 100
 #define PRINT_BUFFER_SIZE 100
-#define READ_BUFFER_SIZE 1
+#define READ_BUFFER_SIZE 100
 // #define READ_BUFFER_SIZE 100
 #define FILE_CREATE_PERMS 0644
 
@@ -23,7 +25,8 @@
 
 typedef struct MY_FILE {
     int fd; // File descriptor
-    char buf[READ_BUFFER_SIZE]; // Buffer
+    // char buf[READ_BUFFER_SIZE]; // Fixed size Buffer
+    char *buf; // Malloc buffer
     char *curr; // Read pointer to buffer
     size_t count; // Amount of buffer still unread
 } MY_FILE;
@@ -33,8 +36,12 @@ MY_FILE file_table[MAX_FILES];
 void print_my_file(MY_FILE *f) {
     if (f == NULL) {
         printf("NULL");
+    } else {
+        printf("{fd = %d, ", f->fd);
+        printf("buf = %s, ", f->buf == NULL ? "NULL" : f->buf);
+        printf("curr = %s, ", f->curr == NULL ? "NULL" : f->curr);
+        printf("count = %ld}", f->count);
     }
-    printf("{%d, %s, %s, %ld}", f->fd, f->buf, f->curr, f->count);
 }
 
 void print_file_table(const char*prefix) {
@@ -64,7 +71,8 @@ MY_FILE *create_file_from_fd(int fd) {
         return NULL;
     }
     f->fd = fd;
-    f->buf[0] = '\0';
+    // f->buf[0] = '\0';
+    f->buf = NULL;
     // TODO: Is this correct or shall curr be assigned to buf?
     f->curr = NULL;
     f->count = 0;
@@ -181,6 +189,9 @@ int my_fgetc(MY_FILE *stream) {
     // This is buffered mode
     if (stream->count == 0) {
         printf("Read now\n");
+        if (stream->buf == NULL) {
+            stream->buf = (char *)malloc(READ_BUFFER_SIZE);
+        }
         int nread = read(stream->fd, stream->buf, READ_BUFFER_SIZE);
         stream->count = nread;
         stream->curr = stream->buf;
@@ -221,6 +232,9 @@ int my_fclose(MY_FILE *stream) {
     // Free this table entry
     const int fd = stream->fd;
     stream->fd = -1;
+    free(stream->buf);
+    stream->buf = NULL;
+    stream->curr = NULL;
     // TODO: Might do some cleanup of other members of the file ptr
     
     // printf("Closing file with fd = %d\n", fd);
@@ -384,6 +398,7 @@ int test_read(int debug) {
 
     printf("fgetc done\n");
 
+    my_fclose(f);
 
     return 0;
 }
