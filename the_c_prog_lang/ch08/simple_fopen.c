@@ -10,7 +10,7 @@
 #define MAX_CHAR_ARR_SIZE 100
 #define PRINT_BUFFER_SIZE 100
 #define READ_BUFFER_SIZE 100
-// #define READ_BUFFER_SIZE 100
+#define WRITE_BUFFER_SIZE 100
 #define FILE_CREATE_PERMS 0644
 
 
@@ -209,6 +209,49 @@ int my_fgetc(MY_FILE *stream) {
     
     return c;
 }
+
+
+int my_fputc(int c, MY_FILE *stream) {
+    // TODO: Here I fill the stream struct
+    // I can have 2 modes here:
+    // 1. Unbuffered mode: Fill 1 character at a time
+    // 2. Buffered mode: Fill some "page" at a time
+
+    // This is unbuffered mode
+    // int nread = read(stream->fd, stream->buf, 1);
+    // stream->count = nread;
+    // printf("nread = %d\n", nread);
+    // if (nread == 0) {
+    //     return EOF;
+    // }
+    // return stream->buf[0];
+
+    // This is buffered mode
+    if (stream->count == WRITE_BUFFER_SIZE) {
+        printf("Write now\n");
+        
+        ssize_t nwrite = write(stream->fd, stream->buf, WRITE_BUFFER_SIZE);
+        printf("nwrite = %ld\n", nwrite);
+        stream->count = 0;
+        // stream->curr = stream->buf;
+    }
+    // printf("nread = %d\n", nread);
+    if (stream->buf == NULL) {
+        stream->buf = (char *)malloc(WRITE_BUFFER_SIZE);
+    }
+
+    // if (stream->count == 0) {
+    //     printf("Reached EOF\n");
+    //     return EOF;
+    // }
+    printf("Fill buffer now\n");
+    stream->buf[stream->count] = (char)c;
+    // int c = *(stream->curr);
+    (stream->count)++;
+    
+    return c;
+}
+
 
 int my_fclose(MY_FILE *stream) {
     if (stream == NULL) {
