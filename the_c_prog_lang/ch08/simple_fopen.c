@@ -259,6 +259,8 @@ int my_fclose(MY_FILE *stream) {
         return -1;
     }
 
+    // TODO: Before cleaning the buffer if it is write or append mode then I should flush it.
+
     // Free this table entry
     const int fd = stream->fd;
     stream->fd = -1;
@@ -465,6 +467,8 @@ int test_fputc(int debug) {
     }
     // This is to ensure a flush of buffer
     // TODO: Find a better way?
+    // 1. Maybe we should flush the buffer at the time of closing for write mode
+    // 2. Read until '\0' and flush at '\0'
     my_fputc(EOF, f);
     
     my_fclose(f);
