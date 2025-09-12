@@ -217,37 +217,24 @@ int my_fputc(int c, MY_FILE *stream) {
     // 1. Unbuffered mode: Fill 1 character at a time
     // 2. Buffered mode: Fill some "page" at a time
 
-    // This is unbuffered mode
-    // int nread = read(stream->fd, stream->buf, 1);
-    // stream->count = nread;
-    // printf("nread = %d\n", nread);
-    // if (nread == 0) {
-    //     return EOF;
-    // }
-    // return stream->buf[0];
-
-    // This is buffered mode
-    if (stream->count == WRITE_BUFFER_SIZE) {
-        printf("Write now\n");
-        
-        ssize_t nwrite = write(stream->fd, stream->buf, WRITE_BUFFER_SIZE);
-        printf("nwrite = %ld\n", nwrite);
-        stream->count = 0;
-        // stream->curr = stream->buf;
-    }
-    // printf("nread = %d\n", nread);
     if (stream->buf == NULL) {
         stream->buf = (char *)malloc(WRITE_BUFFER_SIZE);
     }
 
-    // if (stream->count == 0) {
-    //     printf("Reached EOF\n");
-    //     return EOF;
-    // }
-    printf("Fill buffer now\n");
-    stream->buf[stream->count] = (char)c;
-    // int c = *(stream->curr);
-    (stream->count)++;
+    if (c != EOF) {
+        printf("Fill buffer now\n");
+        stream->buf[stream->count] = (char)c;
+        // int c = *(stream->curr);
+        (stream->count)++;
+    }
+
+    if ((stream->count == WRITE_BUFFER_SIZE) || (c == '\n') || (c == EOF)) {
+        printf("Write now\n");
+        const ssize_t nwrite = write(stream->fd, stream->buf, stream->count);
+        printf("nwrite = %ld\n", nwrite);
+        stream->count = 0;
+        // stream->curr = stream->buf;
+    }
     
     return c;
 }
@@ -447,6 +434,49 @@ int test_read(int debug) {
 }
 
 
+int test_fputc(int debug) {
+    const char *new_file_name = "tests/data/creat.txt";
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
+    MY_FILE *f = my_fopen(new_file_name, "w");
+    if (f == NULL) {
+        printf("ERROR: Unable to creat the file %s\n", new_file_name);
+        return 1;
+    }
+
+    if (check_fd_count(1) != 0) {
+        return 1;
+    }
+
+    printf("Created file fd = %d\n", f->fd);
+
+    const char * data = "This is a small sentence that I am going to write. Now I will explicitly\n"
+                        "add a newline. It is on a newline now. Let's add some more, what,\n"
+                        "punctuation marks. We have come a long way!!!";
+
+    
+    for (int i = 0; data[i] != '\0'; ++i) {
+        printf("Char = %c, sleeping for 1s\n", data[i]);
+        // sleep(1);
+        my_fputc(data[i], f);
+    }
+    // This is to ensure a flush of buffer
+    // TODO: Find a better way?
+    my_fputc(EOF, f);
+    
+    my_fclose(f);
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
+    return 0;
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
 
@@ -471,6 +501,11 @@ int main(int argc, char *argv[]) {
     }
 
     if ((failed = test_read(0)) != 0)
+    {
+        printf("ERROR: test_read\n");
+    }
+
+    if ((failed = test_fputc(0)) != 0)
     {
         printf("ERROR: test_read\n");
     }
