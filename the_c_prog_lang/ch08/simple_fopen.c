@@ -25,10 +25,9 @@
 
 typedef struct MY_FILE {
     int fd; // File descriptor
-    // char buf[READ_BUFFER_SIZE]; // Fixed size Buffer
-    char *buf; // Malloc buffer
+    char *buf; // Buffer
     char *curr; // Read pointer to buffer
-    size_t count; // Amount of buffer still unread
+    size_t count; // Amount of buffer in use
 } MY_FILE;
 
 MY_FILE file_table[MAX_FILES];
@@ -71,9 +70,7 @@ MY_FILE *create_file_from_fd(int fd) {
         return NULL;
     }
     f->fd = fd;
-    // f->buf[0] = '\0';
     f->buf = NULL;
-    // TODO: Is this correct or shall curr be assigned to buf?
     f->curr = NULL;
     f->count = 0;
     return f;
@@ -117,8 +114,6 @@ size_t count_open_fds() {
 
 
 MY_FILE *my_fopen(const char *pathname, const char *mode) {
-    // printf("Calling my_fopen for path = %s, mode = %s\n", pathname, mode);
-
     switch (*mode)
     {
         case 'r':
@@ -146,7 +141,7 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
             // Append mode
             int fd = open(pathname, O_WRONLY);
             if (fd == -1) {
-                // Maybe the file was not found so create one
+                // The file was not found so create one
                 fd = creat(pathname, FILE_CREATE_PERMS);
             }
             if (fd == -1) {
@@ -172,31 +167,18 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
 }
 
 int my_fgetc(MY_FILE *stream) {
-    // TODO: Here I fill the stream struct
-    // I can have 2 modes here:
-    // 1. Unbuffered mode: Fill 1 character at a time
-    // 2. Buffered mode: Fill some "page" at a time
-
-    // This is unbuffered mode
-    // int nread = read(stream->fd, stream->buf, 1);
-    // stream->count = nread;
-    // printf("nread = %d\n", nread);
-    // if (nread == 0) {
-    //     return EOF;
-    // }
-    // return stream->buf[0];
-
-    // This is buffered mode
     if (stream->count == 0) {
         printf("Read now\n");
         if (stream->buf == NULL) {
-            stream->buf = (char *)malloc(READ_BUFFER_SIZE);
+            if ((stream->buf = (char *)malloc(READ_BUFFER_SIZE)) == NULL) {
+                printf("Error: Failed to allocate buffer for file fd %d\n", stream->fd);
+                return EOF;
+            }
         }
         int nread = read(stream->fd, stream->buf, READ_BUFFER_SIZE);
         stream->count = nread;
         stream->curr = stream->buf;
     }
-    // printf("nread = %d\n", nread);
 
     if (stream->count == 0) {
         printf("Reached EOF\n");
@@ -414,7 +396,7 @@ int test_append(int debug) {
     return 0;
 }
 
-int test_read(int debug) {
+int test_fgetc(int debug) {
     const char *file_name = "tests/data/input.txt";
 
     MY_FILE *f = my_fopen(file_name, "r");
@@ -504,14 +486,14 @@ int main(int argc, char *argv[]) {
         printf("ERROR: test_append\n");
     }
 
-    if ((failed = test_read(0)) != 0)
+    if ((failed = test_fgetc(0)) != 0)
     {
-        printf("ERROR: test_read\n");
+        printf("ERROR: test_fgetc\n");
     }
 
     if ((failed = test_fputc(0)) != 0)
     {
-        printf("ERROR: test_read\n");
+        printf("ERROR: test_fputc\n");
     }
 
     if (failed) {
