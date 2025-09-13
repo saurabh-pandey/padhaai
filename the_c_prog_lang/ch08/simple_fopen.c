@@ -171,11 +171,15 @@ int my_fgetc(MY_FILE *stream) {
         printf("Read now\n");
         if (stream->buf == NULL) {
             if ((stream->buf = (char *)malloc(READ_BUFFER_SIZE)) == NULL) {
-                printf("Error: Failed to allocate buffer for file fd %d\n", stream->fd);
+                printf("Error: Failed to allocate buffer while reading for fd %d\n", stream->fd);
                 return EOF;
             }
         }
-        int nread = read(stream->fd, stream->buf, READ_BUFFER_SIZE);
+        int nread = 0;
+        if ((nread = read(stream->fd, stream->buf, READ_BUFFER_SIZE)) < 0) {
+            printf("Error: Failed to read from file fd %d\n", stream->fd);
+            return EOF;
+        }
         stream->count = nread;
         stream->curr = stream->buf;
     }
@@ -200,13 +204,19 @@ int my_fputc(int c, MY_FILE *stream) {
     // 2. Buffered mode: Fill some "page" at a time
 
     if (stream->buf == NULL) {
-        stream->buf = (char *)malloc(WRITE_BUFFER_SIZE);
+        if ((stream->buf = (char *)malloc(WRITE_BUFFER_SIZE)) == NULL) {
+            printf("Error: Failed to allocate buffer while writing for fd %d\n", stream->fd);
+            return EOF;
+        }
+        stream->curr = stream->buf;
     }
 
     if (c != EOF) {
         printf("Fill buffer now\n");
-        stream->buf[stream->count] = (char)c;
+        *(stream->curr) = (char)c;
+        // stream->buf[stream->count] = (char)c;
         // int c = *(stream->curr);
+        (stream->curr)++;
         (stream->count)++;
     }
 
@@ -215,7 +225,7 @@ int my_fputc(int c, MY_FILE *stream) {
         const ssize_t nwrite = write(stream->fd, stream->buf, stream->count);
         printf("nwrite = %ld\n", nwrite);
         stream->count = 0;
-        // stream->curr = stream->buf;
+        stream->curr = stream->buf;
     }
     
     return c;
