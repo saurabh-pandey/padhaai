@@ -22,15 +22,24 @@
 } while (0)
 
 
+// File mode flags
+#define FLAG_READ  0x01 // 0001
+#define FLAG_WRITE 0x02 // 0010
+#define FLAG_EOF   0x04 // 0100
+#define FLAG_UNBUF 0x08 // 1000
+
 
 typedef struct MY_FILE {
     int fd; // File descriptor
     char *buf; // Buffer
     char *curr; // Read pointer to buffer
     size_t count; // Amount of buffer in use
+    int flag; // Mode of file
 } MY_FILE;
 
+// File table of the process
 MY_FILE file_table[MAX_FILES];
+
 
 void print_my_file(MY_FILE *f) {
     if (f == NULL) {
@@ -39,7 +48,8 @@ void print_my_file(MY_FILE *f) {
         printf("{fd = %d, ", f->fd);
         printf("buf = %s, ", f->buf == NULL ? "NULL" : f->buf);
         printf("curr = %s, ", f->curr == NULL ? "NULL" : f->curr);
-        printf("count = %ld}", f->count);
+        printf("count = %ld, ", f->count);
+        printf("flag = %d}", f->flag);
     }
 }
 
@@ -73,6 +83,7 @@ MY_FILE *create_file_from_fd(int fd) {
     f->buf = NULL;
     f->curr = NULL;
     f->count = 0;
+    f->flag = 0;
     return f;
 }
 
@@ -123,7 +134,9 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
             if (fd == -1) {
                 return NULL;
             }
-            return create_file_from_fd(fd);
+            MY_FILE *f = create_file_from_fd(fd);
+            f->flag |= FLAG_READ;
+            return f;
             break;
         }
         case 'w':
@@ -133,7 +146,9 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
             if (fd == -1) {
                 return NULL;
             }
-            return create_file_from_fd(fd);
+            MY_FILE *f = create_file_from_fd(fd);
+            f->flag |= FLAG_WRITE;
+            return f;
             break;
         }
         case 'a':
@@ -154,7 +169,9 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
                 printf("Error while moving to the end\n");
                 return NULL;
             }
-            return create_file_from_fd(fd);
+            MY_FILE *f = create_file_from_fd(fd);
+            f->flag |= FLAG_WRITE;
+            return f;
             break;
         }
         default:
@@ -167,16 +184,26 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
 }
 
 int my_fgetc(MY_FILE *stream) {
+    if (stream == NULL) {
+        printf("Error: NULL stream in my_fgetc\n");
+        return -1;
+    }
+
+    if ((stream->flag & FLAG_READ) == 0) {
+        printf("Error: File not in read mode for fd %d\n", stream->fd);
+    }
+
     if (stream->count == 0) {
         printf("Read now\n");
+        const int bufsize = (stream->flag & FLAG_UNBUF) ? 1 : READ_BUFFER_SIZE;
         if (stream->buf == NULL) {
-            if ((stream->buf = (char *)malloc(READ_BUFFER_SIZE)) == NULL) {
+            if ((stream->buf = (char *)malloc(bufsize)) == NULL) {
                 printf("Error: Failed to allocate buffer while reading for fd %d\n", stream->fd);
                 return EOF;
             }
         }
         int nread = 0;
-        if ((nread = read(stream->fd, stream->buf, READ_BUFFER_SIZE)) < 0) {
+        if ((nread = read(stream->fd, stream->buf, bufsize)) < 0) {
             printf("Error: Failed to read from file fd %d\n", stream->fd);
             return EOF;
         }
@@ -197,14 +224,44 @@ int my_fgetc(MY_FILE *stream) {
 }
 
 
-int my_fputc(int c, MY_FILE *stream) {
-    // TODO: Here I fill the stream struct
-    // I can have 2 modes here:
-    // 1. Unbuffered mode: Fill 1 character at a time
-    // 2. Buffered mode: Fill some "page" at a time
+int my_fflush(MY_FILE *stream) {
+    if (stream == NULL) {
+        // TODO: Here libc flushes all write streams in the file table
+        return 0;
+    }
 
+    if ((stream->flag & FLAG_WRITE) == 0) {
+        // Not a write stream so don't do anything for now
+        return 0;
+    }
+
+    printf("Write now\n");
+    ssize_t nwrite = 0;
+    if ((nwrite = write(stream->fd, stream->buf, stream->count)) < 0) {
+        printf("Error: Failed to write from file fd %d\n", stream->fd);
+        return EOF;
+    }
+
+    printf("nwrite = %ld\n", nwrite);
+    stream->count = 0;
+    stream->curr = stream->buf;
+    return 0;
+}
+
+
+int my_fputc(int c, MY_FILE *stream) {
+    if (stream == NULL) {
+        printf("Error: NULL stream in my_fputc\n");
+        return -1;
+    }
+
+    if ((stream->flag & FLAG_WRITE) == 0) {
+        printf("Error: File not in write mode for fd %d\n", stream->fd);
+    }
+
+    const int bufsize = (stream->flag & FLAG_UNBUF) ? 1 : WRITE_BUFFER_SIZE;
     if (stream->buf == NULL) {
-        if ((stream->buf = (char *)malloc(WRITE_BUFFER_SIZE)) == NULL) {
+        if ((stream->buf = (char *)malloc(bufsize)) == NULL) {
             printf("Error: Failed to allocate buffer while writing for fd %d\n", stream->fd);
             return EOF;
         }
@@ -220,12 +277,8 @@ int my_fputc(int c, MY_FILE *stream) {
         (stream->count)++;
     }
 
-    if ((stream->count == WRITE_BUFFER_SIZE) || (c == '\n') || (c == EOF)) {
-        printf("Write now\n");
-        const ssize_t nwrite = write(stream->fd, stream->buf, stream->count);
-        printf("nwrite = %ld\n", nwrite);
-        stream->count = 0;
-        stream->curr = stream->buf;
+    if ((stream->count == bufsize) || (c == '\n') || (c == EOF)) {
+        my_fflush(stream);
     }
     
     return c;
@@ -252,14 +305,19 @@ int my_fclose(MY_FILE *stream) {
     }
 
     // TODO: Before cleaning the buffer if it is write or append mode then I should flush it.
+    if (stream->flag & FLAG_WRITE) {
+        printf("Write mode so flush before closing\n");
+        my_fflush(stream);
+    }
 
-    // Free this table entry
+    // Reset and Free this table entry
     const int fd = stream->fd;
     stream->fd = -1;
     free(stream->buf);
     stream->buf = NULL;
     stream->curr = NULL;
-    // TODO: Might do some cleanup of other members of the file ptr
+    stream->count = 0;
+    stream->flag = 0;
     
     // printf("Closing file with fd = %d\n", fd);
     return close(fd);
@@ -461,7 +519,7 @@ int test_fputc(int debug) {
     // TODO: Find a better way?
     // 1. Maybe we should flush the buffer at the time of closing for write mode
     // 2. Read until '\0' and flush at '\0'
-    my_fputc(EOF, f);
+    // my_fputc(EOF, f);
     
     my_fclose(f);
 
@@ -477,7 +535,7 @@ int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
 
     // Initialize the fd table
-    FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0}));
+    FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
 
     int failed = 0;
     // Start all the tests
