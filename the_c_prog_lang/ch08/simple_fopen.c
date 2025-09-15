@@ -271,8 +271,6 @@ int my_fputc(int c, MY_FILE *stream) {
     if (c != EOF) {
         printf("Fill buffer now\n");
         *(stream->curr) = (char)c;
-        // stream->buf[stream->count] = (char)c;
-        // int c = *(stream->curr);
         (stream->curr)++;
         (stream->count)++;
     }
@@ -409,6 +407,7 @@ int test_open_close_within_limits(int debug) {
     return 0;
 }
 
+
 int test_create(int debug) {
     const char *new_file_name = "tests/data/creat.txt";
 
@@ -437,6 +436,7 @@ int test_create(int debug) {
     return 0;
 }
 
+
 int test_append(int debug) {
     const char *file_name = "tests/data/append.txt";
 
@@ -461,27 +461,6 @@ int test_append(int debug) {
         return 1;
     }
     
-    return 0;
-}
-
-int test_fgetc(int debug) {
-    const char *file_name = "tests/data/input.txt";
-
-    MY_FILE *f = my_fopen(file_name, "r");
-    if (f == NULL) {
-        printf("ERROR: Unable to open the file for reading %s\n", file_name);
-        return 1;
-    }
-
-    int c;
-    while((c = my_fgetc(f)) != EOF) {
-        printf("fgetc read c = %c\n", c);
-    }
-
-    printf("fgetc done\n");
-
-    my_fclose(f);
-
     return 0;
 }
 
@@ -511,15 +490,8 @@ int test_fputc(int debug) {
 
     
     for (int i = 0; data[i] != '\0'; ++i) {
-        printf("Char = %c, sleeping for 1s\n", data[i]);
-        // sleep(1);
         my_fputc(data[i], f);
     }
-    // This is to ensure a flush of buffer
-    // TODO: Find a better way?
-    // 1. Maybe we should flush the buffer at the time of closing for write mode
-    // 2. Read until '\0' and flush at '\0'
-    // my_fputc(EOF, f);
     
     my_fclose(f);
 
@@ -527,6 +499,34 @@ int test_fputc(int debug) {
         return 1;
     }
     
+    return 0;
+}
+
+
+int test_fgetc(int debug) {
+    const char *file_name = "tests/data/creat.txt";
+
+    MY_FILE *f = my_fopen(file_name, "r");
+    if (f == NULL) {
+        printf("ERROR: Unable to open the file for reading %s\n", file_name);
+        return 1;
+    }
+
+    char read_data[1000];
+    int i = 0;
+    int c;
+    while((c = my_fgetc(f)) != EOF) {
+        read_data[i] = (char)c;
+        // printf("fgetc read c = %c\n", c);
+        ++i;
+    }
+    read_data[i] = '\0';
+
+    // printf("fgetc done\n");
+    printf("Read data = %s\n", read_data);
+
+    my_fclose(f);
+
     return 0;
 }
 
@@ -554,14 +554,14 @@ int main(int argc, char *argv[]) {
         printf("ERROR: test_append\n");
     }
 
-    if ((failed = test_fgetc(0)) != 0)
-    {
-        printf("ERROR: test_fgetc\n");
-    }
-
     if ((failed = test_fputc(0)) != 0)
     {
         printf("ERROR: test_fputc\n");
+    }
+
+    if ((failed = test_fgetc(0)) != 0)
+    {
+        printf("ERROR: test_fgetc\n");
     }
 
     if (failed) {
