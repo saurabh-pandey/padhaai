@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include <fcntl.h> // open(), creat()
-#include <unistd.h> // close()
+#include <unistd.h> // close(), lseek()
 
 #include <stdlib.h> // malloc()
 
@@ -282,6 +282,14 @@ int my_fputc(int c, MY_FILE *stream) {
     }
     
     return c;
+}
+
+
+int my_fseek(MY_FILE *stream, long offset, int whence) {
+    // Update the stream and then do the below syscall. Finally check for errors.
+
+    // off_t lseek(int fd, off_t offset, int whence);
+    return 0;
 }
 
 
