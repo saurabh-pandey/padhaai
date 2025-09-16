@@ -42,6 +42,7 @@ typedef struct MY_FILE {
 // File table of the process
 MY_FILE file_table[MAX_FILES];
 
+// Data used to test read, write and append tests
 const char * data = "This is a small sentence that I am going to write. Now I will explicitly\n"
                     "add a newline. It is on a newline now. Let's add some more, what,\n"
                     "punctuation marks. We have come a long way!!!";
@@ -169,7 +170,7 @@ MY_FILE *my_fopen(const char *pathname, const char *mode) {
                 return NULL;
             }
             
-            // Move to the end of file
+            // Move to the end of file for appending
             const off_t ret = lseek(fd, 0, SEEK_END);
             if (ret == -1) {
                 printf("Error while moving to the end\n");
@@ -200,7 +201,6 @@ int my_fgetc(MY_FILE *stream) {
     }
 
     if (stream->count == 0) {
-        // printf("Read now\n");
         const int bufsize = (stream->flag & FLAG_UNBUF) ? 1 : READ_BUFFER_SIZE;
         if (stream->buf == NULL) {
             if ((stream->buf = (char *)malloc(bufsize)) == NULL) {
@@ -218,10 +218,9 @@ int my_fgetc(MY_FILE *stream) {
     }
 
     if (stream->count == 0) {
-        // printf("Reached EOF\n");
         return EOF;
     }
-    // printf("Use buffer now\n");
+
     int c = *(stream->curr);
     (stream->curr)++;
     (stream->count)--;
@@ -241,14 +240,12 @@ int my_fflush(MY_FILE *stream) {
         return 0;
     }
 
-    // printf("Write now\n");
     ssize_t nwrite = 0;
     if ((nwrite = write(stream->fd, stream->buf, stream->count)) < 0) {
         printf("Error: Failed to write from file fd %d\n", stream->fd);
         return EOF;
     }
 
-    // printf("nwrite = %ld\n", nwrite);
     stream->count = 0;
     stream->curr = stream->buf;
     return 0;
@@ -275,7 +272,6 @@ int my_fputc(int c, MY_FILE *stream) {
     }
 
     if (c != EOF) {
-        // printf("Fill buffer now\n");
         *(stream->curr) = (char)c;
         (stream->curr)++;
         (stream->count)++;
@@ -308,9 +304,7 @@ int my_fclose(MY_FILE *stream) {
         return -1;
     }
 
-    // TODO: Before cleaning the buffer if it is write or append mode then I should flush it.
     if (stream->flag & FLAG_WRITE) {
-        // printf("Write mode so flush before closing\n");
         my_fflush(stream);
     }
 
@@ -322,8 +316,7 @@ int my_fclose(MY_FILE *stream) {
     stream->curr = NULL;
     stream->count = 0;
     stream->flag = 0;
-    
-    // printf("Closing file with fd = %d\n", fd);
+
     return close(fd);
 }
 
@@ -431,8 +424,6 @@ int test_create(int debug) {
         return 1;
     }
 
-    // printf("Created file fd = %d\n", f->fd);
-
     my_fclose(f);
 
     if (check_fd_count(0) != 0) {
@@ -444,7 +435,8 @@ int test_create(int debug) {
 
 
 int test_append(int debug) {
-    const char *file_name = "tests/data/append.txt";
+    // Create a file via append mode
+    const char *file_name = "tests/data/append1.txt";
 
     if (check_fd_count(0) != 0) {
         return 1;
@@ -460,7 +452,6 @@ int test_append(int debug) {
         return 1;
     }
 
-    // printf("Append file fd = %d\n", f->fd);
     my_fclose(f);
 
     if (check_fd_count(0) != 0) {
@@ -487,9 +478,6 @@ int test_fputc(int debug) {
     if (check_fd_count(1) != 0) {
         return 1;
     }
-
-    // printf("Created file fd = %d\n", f->fd);
-
     
     for (int i = 0; data[i] != '\0'; ++i) {
         my_fputc(data[i], f);
@@ -523,8 +511,6 @@ int test_fgetc(int debug) {
     }
     read_data[i] = '\0';
 
-    // printf("Read data = %s\n", read_data);
-
     my_fclose(f);
 
     if (strcmp(read_data, data) != 0) {
@@ -538,6 +524,36 @@ int test_fgetc(int debug) {
 
     return 0;
 }
+
+
+int test_clean_append_file(int debug) {
+    // Create (thus rewrite) the file that is appended next. This clears the append file of data
+    // from the past run
+    const char *new_file_name = "tests/data/append.txt";
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
+    MY_FILE *f = my_fopen(new_file_name, "w");
+    if (f == NULL) {
+        printf("ERROR: Unable to creat the file %s\n", new_file_name);
+        return 1;
+    }
+
+    if (check_fd_count(1) != 0) {
+        return 1;
+    }
+
+    my_fclose(f);
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+    
+    return 0;
+}
+
 
 int test_fputc_append(int debug) {
     const char *new_file_name = "tests/data/append.txt";
@@ -555,9 +571,6 @@ int test_fputc_append(int debug) {
     if (check_fd_count(1) != 0) {
         return 1;
     }
-
-    // printf("Created file fd = %d\n", f->fd);
-
     
     for (int i = 0; data[i] != '\0'; ++i) {
         my_fputc(data[i], f);
@@ -590,8 +603,6 @@ int test_fgetc_append(int debug) {
         ++i;
     }
     read_data[i] = '\0';
-
-    // printf("Read data = %s\n", read_data);
 
     my_fclose(f);
 
@@ -639,6 +650,11 @@ int main(int argc, char *argv[]) {
     if ((failed = test_fgetc(0)) != 0)
     {
         printf("ERROR: test_fgetc\n");
+    }
+
+    if ((failed = test_clean_append_file(0)) != 0)
+    {
+        printf("ERROR: test_clean_append_file\n");
     }
 
     if ((failed = test_fputc_append(0)) != 0)
