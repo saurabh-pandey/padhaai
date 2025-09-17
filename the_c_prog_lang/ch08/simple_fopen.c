@@ -288,8 +288,21 @@ int my_fputc(int c, MY_FILE *stream) {
 int my_fseek(MY_FILE *stream, long offset, int whence) {
     // Update the stream and then do the below syscall. Finally check for errors.
 
-    // off_t lseek(int fd, off_t offset, int whence);
-    return 0;
+    if (stream == NULL) {
+        return -1;
+    }
+
+    off_t res = 0;
+    if ((res = lseek(stream->fd, offset, whence)) < 0) {
+        return -1;
+    }
+
+    // Reset the buffer in case of read
+    // TODO: But what about the write stream? Maybe flush?
+    stream->curr = stream->buf;
+    stream->count = 0;
+
+    return res;
 }
 
 
