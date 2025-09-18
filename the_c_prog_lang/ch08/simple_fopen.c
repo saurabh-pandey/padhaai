@@ -292,13 +292,15 @@ int my_fseek(MY_FILE *stream, long offset, int whence) {
         return -1;
     }
 
+    // Flush all buffered data for writing
+    my_fflush(stream);
+
     off_t res = 0;
     if ((res = lseek(stream->fd, offset, whence)) < 0) {
         return -1;
     }
 
     // Reset the buffer in case of read
-    // TODO: But what about the write stream? Maybe flush?
     stream->curr = stream->buf;
     stream->count = 0;
 
@@ -640,6 +642,53 @@ int test_fgetc_append(int debug) {
 }
 
 
+int test_fseek(int debug) {
+    const char *file_name = "tests/data/input.txt";
+
+    MY_FILE *f = my_fopen(file_name, "r");
+    if (f == NULL) {
+        printf("ERROR: Unable to open the file for reading %s\n", file_name);
+        return 1;
+    }
+
+    // Read full data
+    char full_data[1000];
+    int data_sz = 0;
+    int c;
+    while((c = my_fgetc(f)) != EOF) {
+        full_data[data_sz] = (char)c;
+        ++data_sz;
+    }
+    full_data[data_sz] = '\0';
+
+    // Now read using seek at offset
+    for (int offset = 1; offset < data_sz + 1; ++offset) {
+        my_fseek(f, offset, SEEK_SET);
+        char read_data[1000];
+        int i = 0;
+        int c;
+        while((c = my_fgetc(f)) != EOF) {
+            read_data[i] = (char)c;
+            ++i;
+        }
+        read_data[i] = '\0';
+
+        if (strcmp(read_data, (full_data + offset)) != 0) {
+            printf("ERROR: Seek doesn't match at offset = %d\n", offset);
+            return 1;
+        }
+    }
+
+    my_fclose(f);
+
+    if (check_fd_count(0) != 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Trying file ptr\n");
 
@@ -686,6 +735,11 @@ int main(int argc, char *argv[]) {
     if ((failed = test_fgetc_append(0)) != 0)
     {
         printf("ERROR: test_fgetc_append\n");
+    }
+
+    if ((failed = test_fseek(0)) != 0)
+    {
+        printf("ERROR: test_fseek\n");
     }
 
     if (failed) {
