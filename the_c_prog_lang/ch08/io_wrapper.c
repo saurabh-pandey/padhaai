@@ -690,7 +690,7 @@ int test_fseek(int debug) {
 
 
 int main(int argc, char *argv[]) {
-    printf("Running tests for simple_fopen\n");
+    printf("Running tests for io_wrapper\n");
 
     // Initialize the fd table
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));

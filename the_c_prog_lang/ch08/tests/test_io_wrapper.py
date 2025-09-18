@@ -3,7 +3,7 @@ import unittest
 
 from . import valgrind
 
-class TestSimpleFopen(unittest.TestCase):
+class TestIoWrapper(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         p = pathlib.Path(__file__)
@@ -14,7 +14,7 @@ class TestSimpleFopen(unittest.TestCase):
         stdout, stderr, retcode = valgrind.run(self.exe)
         self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
         self.assertEqual(stdout.splitlines(),
-                         ['Running tests for simple_fopen', 'All tests passed', 'Done'])
+                         ['Running tests for io_wrapper', 'All tests passed', 'Done'])
 
 
 if __name__ == '__main__':
