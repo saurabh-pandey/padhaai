@@ -690,7 +690,7 @@ int test_fseek(int debug) {
 
 
 int main(int argc, char *argv[]) {
-    printf("Trying file ptr\n");
+    printf("Running tests for simple_fopen\n");
 
     // Initialize the fd table
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
@@ -744,7 +744,11 @@ int main(int argc, char *argv[]) {
 
     if (failed) {
         printf("ERROR: Failed with some tests\n");
+    } else {
+        printf("All tests passed\n");
     }
+
+    printf("Done\n");
 
     return 0;
 }
