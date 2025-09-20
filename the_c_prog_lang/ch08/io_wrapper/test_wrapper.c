@@ -367,9 +367,6 @@ int test_fseek(int debug) {
 int main(int argc, char *argv[]) {
     printf("Running tests for io_wrapper\n");
 
-    // TODO: Do this at the time of load of the library
-    FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
-
     int failed = 0;
     // Start all the tests
     if ((failed = test_open_close_within_limits(0)) != 0)

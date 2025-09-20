@@ -337,3 +337,13 @@ int my_fclose(MY_FILE *stream) {
 
     return close(fd);
 }
+
+__attribute__((constructor))
+static void my_init(void) {
+    printf("IO_WRAPPER Library loaded, running my_init()\n");
+
+    printf("Now filling the file table\n");
+    // TODO: Do this at the time of load of the library
+    FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
+    printf("Done!!\n");
+}
