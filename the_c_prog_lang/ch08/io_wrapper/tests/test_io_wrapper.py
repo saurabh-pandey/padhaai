@@ -11,7 +11,7 @@ class TestIoWrapper(unittest.TestCase):
 
     def test_run(self):
         self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
-        stdout, stderr, retcode = valgrind.run(self.exe)
+        stdout, stderr, _ = valgrind.run(self.exe)
         self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
         self.assertEqual(stdout.splitlines(),
                          ['Running tests for io_wrapper', 'All tests passed', 'Done'])
