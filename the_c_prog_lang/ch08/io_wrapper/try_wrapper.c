@@ -49,9 +49,9 @@ int test_open_close_within_limits(int debug) {
             printf("ERROR: Unable to open the file %s\n", inp_file_name);
             return 1;
         } else {
-            if (debug) {
-                printf("Opened file fd = %d\n", f->fd);
-            }
+            // if (debug) {
+            //     printf("Opened file fd = %d\n", f->fd);
+            // }
             
             open_files[i] = f;
             

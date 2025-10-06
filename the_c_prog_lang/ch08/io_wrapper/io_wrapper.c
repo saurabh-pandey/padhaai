@@ -43,7 +43,7 @@ typedef struct MY_FILE {
 MY_FILE file_table[MAX_FILES];
 
 
-void print_my_file(MY_FILE *f) {
+static void print_my_file(MY_FILE *f) {
     if (f == NULL) {
         printf("NULL");
     } else {

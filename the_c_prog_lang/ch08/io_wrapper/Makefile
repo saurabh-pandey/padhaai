@@ -4,14 +4,20 @@ CFLAGS=-Wall -g
 BIN=bin
 $(shell mkdir -p $(BIN))
 
-$(BIN)/io_wrapper : io_wrapper.c
-	$(CC) $(CFLAGS) -o $@ $^
+LIB=lib
+$(shell mkdir -p $(LIB))
+
+all: $(LIB)/libio_wrapper.so $(BIN)/try_wrapper
+
+$(LIB)/libio_wrapper.so : io_wrapper.c
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ $^
+
+$(BIN)/try_wrapper : try_wrapper.c
+	$(CC) $(CFLAGS) -Llib -o $@ $^ -lio_wrapper
 
 .PHONY: clean
 clean:
-	rm -r $(BIN)
-
-all: $(BIN)/io_wrapper
+	rm -r $(BIN) $(LIB)
 
 # Run tests
 test:
