@@ -65,7 +65,7 @@ void print_file_table(const char*prefix) {
 }
 
 
-MY_FILE *fetch_first_free_file_from_table() {
+static MY_FILE *fetch_first_free_file_from_table() {
     for (int i = 0; i < MAX_FILES; ++i) {
         MY_FILE *curr_f = &(file_table[i]);
         if (curr_f->fd == -1) {
@@ -75,7 +75,7 @@ MY_FILE *fetch_first_free_file_from_table() {
     return NULL;
 }
 
-MY_FILE *create_file_from_fd(int fd) {
+static MY_FILE *create_file_from_fd(int fd) {
     MY_FILE *f = fetch_first_free_file_from_table();
     if (f == NULL) {
         printf("ERROR: Seems like file table is full\n");
@@ -89,30 +89,30 @@ MY_FILE *create_file_from_fd(int fd) {
     return f;
 }
 
-size_t fill_used_files(MY_FILE *used_fds[]) {
-    size_t total_used_files = 0;
-    for (int i = 0; i < MAX_FILES; ++i) {
-        MY_FILE *curr_f = &(file_table[i]);
-        if (curr_f->fd != -1) {
-            used_fds[total_used_files] = curr_f;
-            ++total_used_files;
-        }
-    }
-    return total_used_files;
-}
+// static size_t fill_used_files(MY_FILE *used_fds[]) {
+//     size_t total_used_files = 0;
+//     for (int i = 0; i < MAX_FILES; ++i) {
+//         MY_FILE *curr_f = &(file_table[i]);
+//         if (curr_f->fd != -1) {
+//             used_fds[total_used_files] = curr_f;
+//             ++total_used_files;
+//         }
+//     }
+//     return total_used_files;
+// }
 
 
-size_t fill_used_fds(int *used_fds) {
-    size_t total_used_fds = 0;
-    for (int i = 0; i < MAX_FILES; ++i) {
-        MY_FILE *curr_f = &(file_table[i]);
-        if (curr_f->fd != -1) {
-            used_fds[total_used_fds] = curr_f->fd;
-            ++total_used_fds;
-        }
-    }
-    return total_used_fds;
-}
+// static size_t fill_used_fds(int *used_fds) {
+//     size_t total_used_fds = 0;
+//     for (int i = 0; i < MAX_FILES; ++i) {
+//         MY_FILE *curr_f = &(file_table[i]);
+//         if (curr_f->fd != -1) {
+//             used_fds[total_used_fds] = curr_f->fd;
+//             ++total_used_fds;
+//         }
+//     }
+//     return total_used_fds;
+// }
 
 
 int count_open_fds() {
