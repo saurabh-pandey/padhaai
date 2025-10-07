@@ -5,8 +5,6 @@
 
 #include <stdlib.h> // malloc()
 
-// #include <string.h> // strcmp()
-
 
 #define MAX_FILES 5
 #define MAX_CHAR_ARR_SIZE 100
@@ -88,31 +86,6 @@ static MY_FILE *create_file_from_fd(int fd) {
     f->flag = 0;
     return f;
 }
-
-// static size_t fill_used_files(MY_FILE *used_fds[]) {
-//     size_t total_used_files = 0;
-//     for (int i = 0; i < MAX_FILES; ++i) {
-//         MY_FILE *curr_f = &(file_table[i]);
-//         if (curr_f->fd != -1) {
-//             used_fds[total_used_files] = curr_f;
-//             ++total_used_files;
-//         }
-//     }
-//     return total_used_files;
-// }
-
-
-// static size_t fill_used_fds(int *used_fds) {
-//     size_t total_used_fds = 0;
-//     for (int i = 0; i < MAX_FILES; ++i) {
-//         MY_FILE *curr_f = &(file_table[i]);
-//         if (curr_f->fd != -1) {
-//             used_fds[total_used_fds] = curr_f->fd;
-//             ++total_used_fds;
-//         }
-//     }
-//     return total_used_fds;
-// }
 
 
 int count_open_fds() {
@@ -340,10 +313,10 @@ int my_fclose(MY_FILE *stream) {
 
 __attribute__((constructor))
 static void my_init(void) {
-    printf("IO_WRAPPER Library loaded, running my_init()\n");
+    // printf("IO_WRAPPER Library loaded, running my_init()\n");
 
-    printf("Now filling the file table\n");
+    // printf("Now filling the file table\n");
     // TODO: Do this at the time of load of the library
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
-    printf("Done!!\n");
+    // printf("Done!!\n");
 }

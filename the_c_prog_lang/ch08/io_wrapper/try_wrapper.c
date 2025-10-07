@@ -1,10 +1,5 @@
 #include <stdio.h>
 
-#include <fcntl.h> // open(), creat()
-#include <unistd.h> // close(), lseek()
-
-#include <stdlib.h> // malloc()
-
 #include <string.h> // strcmp()
 
 #include "io_wrapper.h"
