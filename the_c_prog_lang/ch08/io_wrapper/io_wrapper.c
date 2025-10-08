@@ -29,6 +29,7 @@
 #define FLAG_UNBUF 0x08 // 1000
 
 
+// Actual definition is hidden inside the source thus making MY_FILE struct opaque
 typedef struct MY_FILE {
     int fd; // File descriptor
     char *buf; // Buffer
@@ -313,10 +314,7 @@ int my_fclose(MY_FILE *stream) {
 
 __attribute__((constructor))
 static void my_init(void) {
-    // printf("IO_WRAPPER Library loaded, running my_init()\n");
-
-    // printf("Now filling the file table\n");
-    // TODO: Do this at the time of load of the library
+    // Initialize the file table
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
-    // printf("Done!!\n");
+    // TODO: Here can I also set stdin, stdout abd stderr fds?
 }
