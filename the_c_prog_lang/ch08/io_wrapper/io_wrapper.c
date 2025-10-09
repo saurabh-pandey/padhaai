@@ -1,3 +1,5 @@
+#include "io_wrapper.h"
+
 #include <stdio.h>
 
 #include <fcntl.h> // open(), creat()
@@ -316,17 +318,14 @@ __attribute__((constructor))
 static void my_init(void) {
     // Initialize the file table
     FILL_ARRAY(file_table, ((MY_FILE){-1, "", NULL, 0, 0}));
-    // TODO: Here can I also set stdin, stdout abd stderr fds?
-    // my_stdin = 0
-    // my_stdout = 1
-    // my_stderr = 2
-    // Right now this lib offers no way to read from stdin, stdout and stderr.
-    // These are pre-created and alloted the first 3 slots in the file table.
-    // User never creates these fds.
-    // Thus my stdin, stdout and stderr are pointers to the first 3 slots in the file table.
-    // Still not sure how to share it via the header:
-    // my_stdin is supposed to be MY_FILE * at index 0
-    // Maybe I can declare these variables in header but define in the lib.
-    // This means once done we might strive to get rid of even printf() calls.
-    // Might also add some tests
+
+    // Initialize std in, out and err fds
+    my_stdin = create_file_from_fd(0);
+    my_stdin->flag |= FLAG_READ;
+
+    my_stdout = create_file_from_fd(1);
+    my_stdout->flag |= FLAG_WRITE;
+
+    my_stderr = create_file_from_fd(2);
+    my_stderr->flag |= FLAG_WRITE;
 }

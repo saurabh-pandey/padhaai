@@ -4,6 +4,11 @@
 // Opaque File Handle
 typedef struct MY_FILE MY_FILE;
 
+// stdin, stdout and stderr
+MY_FILE *my_stdin;
+MY_FILE *my_stdout;
+MY_FILE *my_stderr;
+
 // Probe functions
 void print_file_table(const char*prefix);
 int count_open_fds();
