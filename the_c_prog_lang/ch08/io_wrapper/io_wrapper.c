@@ -8,7 +8,7 @@
 #include <stdlib.h> // malloc()
 
 
-#define MAX_FILES 5
+#define MAX_FILES 10
 #define MAX_CHAR_ARR_SIZE 100
 #define PRINT_BUFFER_SIZE 100
 #define READ_BUFFER_SIZE 100

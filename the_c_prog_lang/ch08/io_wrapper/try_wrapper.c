@@ -19,8 +19,9 @@ const char * data = "This is a small sentence that I am going to write. Now I wi
 
 int check_fd_count(int expected) {
     int actual = -1;
-    if ((actual = count_open_fds()) != expected) {
-        printf("ERROR: Expected open fds to be %d but actual is %d\n", expected, actual);
+    // Added 3 to expected to account for stdin, stdout and stderr
+    if ((actual = count_open_fds()) != (expected + 3)) {
+        printf("ERROR: Expected open fds to be %d but actual is %d\n", expected + 3, actual);
         return 1;
     }
     return 0;
