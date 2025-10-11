@@ -365,48 +365,57 @@ int main(int argc, char *argv[]) {
 
     int failed = 0;
     // Start all the tests
-    if ((failed = test_open_close_within_limits(0)) != 0)
+    if (test_open_close_within_limits(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_open_close_within_limits\n");
     }
 
-    if ((failed = test_create(0)) != 0)
+    if (test_create(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_create\n");
     }
 
-    if ((failed = test_append(0)) != 0)
+    if (test_append(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_append\n");
     }
 
-    if ((failed = test_fputc(0)) != 0)
+    if (test_fputc(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_fputc\n");
     }
 
-    if ((failed = test_fgetc(0)) != 0)
+    if (test_fgetc(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_fgetc\n");
     }
 
-    if ((failed = test_clean_append_file(0)) != 0)
+    if (test_clean_append_file(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_clean_append_file\n");
     }
 
-    if ((failed = test_fputc_append(0)) != 0)
+    if (test_fputc_append(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_fputc_append\n");
     }
 
-    if ((failed = test_fgetc_append(0)) != 0)
+    if (test_fgetc_append(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_fgetc_append\n");
     }
 
-    if ((failed = test_fseek(0)) != 0)
+    if (test_fseek(0) != 0)
     {
+        failed = 1;
         printf("ERROR: test_fseek\n");
     }
 
