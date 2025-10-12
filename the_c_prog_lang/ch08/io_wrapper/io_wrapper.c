@@ -333,6 +333,8 @@ static void my_init(void) {
 
 __attribute__((destructor))
 static void my_fini(void) {
-    my_fflush(my_stdout);
-    my_fflush(my_stderr);
+    // Closing all open std streams
+    my_fclose(my_stdin);
+    my_fclose(my_stdout);
+    my_fclose(my_stderr);
 }
