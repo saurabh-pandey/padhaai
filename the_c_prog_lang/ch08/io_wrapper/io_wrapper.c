@@ -328,4 +328,11 @@ static void my_init(void) {
 
     my_stderr = create_file_from_fd(2);
     my_stderr->flag |= FLAG_WRITE;
+    my_stderr->flag |= FLAG_UNBUF;
+}
+
+__attribute__((destructor))
+static void my_fini(void) {
+    my_fflush(my_stdout);
+    my_fflush(my_stderr);
 }
