@@ -359,6 +359,32 @@ int test_fseek(int debug) {
     return 0;
 }
 
+int test_stdin_out(int debug) {
+    int c;
+    while ((c = my_fgetc(my_stdin)) != EOF) {
+        my_fputc(c, my_stdout);
+    }
+    return 0;
+}
+
+
+int test_stdout(int debug) {
+    const char *msg = "This is a simple output message";
+    for (int i = 0; msg[i] != '\0'; ++i) {
+        my_fputc(msg[i], my_stdout);
+    }
+    return 0;
+}
+
+
+int test_stderr(int debug) {
+    const char *err = "This is an error message";
+    for (int i = 0; err[i] != '\0'; ++i) {
+        my_fputc(err[i], my_stderr);
+    }
+    return 0;
+}
+
 
 int main(int argc, char *argv[]) {
     printf("Running tests for io_wrapper\n");
@@ -417,6 +443,24 @@ int main(int argc, char *argv[]) {
     {
         failed = 1;
         printf("ERROR: test_fseek\n");
+    }
+
+    if (test_stdin_out(0) != 0)
+    {
+        failed = 1;
+        printf("ERROR: test_stdin_out\n");
+    }
+
+    if (test_stdout(0) != 0)
+    {
+        failed = 1;
+        printf("ERROR: test_stdout\n");
+    }
+
+    if (test_stderr(0) != 0)
+    {
+        failed = 1;
+        printf("ERROR: test_stderr\n");
     }
 
     if (failed) {
