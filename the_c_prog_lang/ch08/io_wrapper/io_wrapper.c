@@ -298,6 +298,8 @@ int my_fclose(MY_FILE *stream) {
         return -1;
     }
 
+    // TODO: What if stream fd is set to -1?
+
     if (stream->flag & FLAG_WRITE) {
         my_fflush(stream);
     }
@@ -334,6 +336,7 @@ static void my_init(void) {
 __attribute__((destructor))
 static void my_fini(void) {
     // Closing all open std streams
+    // TODO: Should I close all (open) streams here?
     my_fclose(my_stdin);
     my_fclose(my_stdout);
     my_fclose(my_stderr);
