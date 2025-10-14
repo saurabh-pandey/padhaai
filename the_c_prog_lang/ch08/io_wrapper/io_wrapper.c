@@ -77,6 +77,10 @@ static MY_FILE *fetch_first_free_file_from_table() {
 }
 
 static MY_FILE *create_file_from_fd(int fd) {
+    if (fd < 0) {
+        printf("ERROR: Negative fd value is invalid\n");
+        return NULL;
+    }
     MY_FILE *f = fetch_first_free_file_from_table();
     if (f == NULL) {
         printf("ERROR: Seems like file table is full\n");
@@ -298,7 +302,10 @@ int my_fclose(MY_FILE *stream) {
         return -1;
     }
 
-    // TODO: What if stream fd is set to -1?
+    if (stream->fd < 0) {
+        printf("ERROR: File stream is not valid\n");
+        return -1;
+    }
 
     if (stream->flag & FLAG_WRITE) {
         my_fflush(stream);
@@ -337,7 +344,7 @@ __attribute__((destructor))
 static void my_fini(void) {
     // Closing all open std streams
     // TODO: Should I close all (open) streams here?
-    my_fclose(my_stdin);
-    my_fclose(my_stdout);
-    my_fclose(my_stderr);
+    for (int i = 0; i < sizeof(file_table)/sizeof(file_table[0]); ++i) {
+        my_fclose(&file_table[i]);
+    }
 }

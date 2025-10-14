@@ -17,11 +17,12 @@ class TestTryWrapper(unittest.TestCase):
         ''')
         self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
         stdout, stderr, _ = valgrind.run(self.exe, input=arr_inp)
-        print("STDERR: ", stderr.splitlines())
-        print("STDOUT: ", stdout.splitlines())
-        # self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
-        # self.assertEqual(stdout.splitlines(),
-        #                  ['Running tests for io_wrapper', 'All tests passed', 'Done'])
+        self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        self.assertIn("This is an error message", stderr)
+        self.assertEqual(stdout.splitlines(),
+                         ['This is a line.',
+                          'Another line of input.',
+                          'This is a simple output message'])
 
 
 if __name__ == '__main__':
