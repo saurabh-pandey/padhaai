@@ -14,19 +14,24 @@ $(BIN)/% : $(BIN)/%.o
 $(BIN)/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-all: $(EXECS) iow
+all: $(EXECS) iow fs
 
 iow:
 	cd io_wrapper && $(MAKE) all && cd ..;
+
+fs:
+	cd fsize && $(MAKE) all && cd ..;
 
 
 .PHONY: clean
 clean:
 	rm -r $(BIN)
 	cd io_wrapper && $(MAKE) clean && cd ..;
+	cd fsize && $(MAKE) clean && cd ..;
 
 # Run tests
 test:
 	python3 -m unittest -v
 	cd io_wrapper && $(MAKE) test && cd ..;
+	cd fsize && $(MAKE) test && cd ..;
 
