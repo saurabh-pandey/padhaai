@@ -13,7 +13,7 @@ all: $(BIN)/fsize
 # $(LIB)/libio_wrapper.so : io_wrapper.c
 # 	$(CC) $(CFLAGS) -fPIC -shared -o $@ $^
 
-$(BIN)/fsize : main.c
+$(BIN)/fsize : main.c fsize.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 .PHONY: clean
