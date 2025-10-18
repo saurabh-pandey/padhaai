@@ -1,0 +1,10 @@
+File 2 in new dir where line number is increasing with current line number equal to 1
+File 2 in new dir where line number is increasing with current line number equal to 2
+File 2 in new dir where line number is increasing with current line number equal to 3
+File 2 in new dir where line number is increasing with current line number equal to 4
+File 2 in new dir where line number is increasing with current line number equal to 5
+File 2 in new dir where line number is increasing with current line number equal to 6
+File 2 in new dir where line number is increasing with current line number equal to 7
+File 2 in new dir where line number is increasing with current line number equal to 8
+File 2 in new dir where line number is increasing with current line number equal to 9
+File 2 in new dir where line number is increasing with current line number equal to 10

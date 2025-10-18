@@ -7,10 +7,10 @@ int main(int argc, char * argv[]) {
     printf("Running fsize program\n");
 
     if (argc == 1) {
-        fsize(".");
+        fsize(".", 0);
     } else {
         for (int i = 1; i < argc; ++i) {
-            fsize(argv[i]);
+            fsize(argv[i], 0);
         }
     }
 
