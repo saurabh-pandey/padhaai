@@ -31,7 +31,7 @@ void fsize(const char * name, int depth) {
             char dir_path[PATH_MAX];
 
             sprintf(dir_path, "%s/%s", name, entry->d_name);
-
+            // Don't recurse for . and .. folders as this would lead to infinite recursion
             if ((strcmp(entry->d_name, ".") != 0) && (strcmp(entry->d_name, "..") != 0))
             {
                 fsize(dir_path, depth + 2);
