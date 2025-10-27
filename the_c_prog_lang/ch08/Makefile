@@ -14,13 +14,16 @@ $(BIN)/% : $(BIN)/%.o
 $(BIN)/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-all: $(EXECS) iow fs
+all: $(EXECS) iow fs sto_alo
 
 iow:
 	cd io_wrapper && $(MAKE) all && cd ..;
 
 fs:
 	cd fsize && $(MAKE) all && cd ..;
+
+sto_alo:
+	cd storage_allocator && $(MAKE) all && cd ..;
 
 
 .PHONY: clean
