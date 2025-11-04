@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     printf("After free Program break   : %p\n", brk);
 
     brk = sbrk(1024*100);
-    printf("After calling sbrk(64)     : %p\n", brk);
+    printf("After calling sbrk(64)     : %p\n", sbrk(0));
     
     return 0;
 }
