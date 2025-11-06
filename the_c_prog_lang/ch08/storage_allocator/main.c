@@ -2,6 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <stddef.h>
+
+typedef struct example {
+  char c;
+  int i;
+  double d;
+} example;
+
 
 void pause_for_input(const char * msg) {
     printf("Pausing %s\n", msg);
@@ -15,6 +23,12 @@ void pause_for_input(const char * msg) {
 
 int main(int argc, char *argv[]) {
     printf("Running storage allocator\n");
+
+    printf("sizeof(example) = %zu\n", sizeof(example));
+    printf("alignof(example) = %zu\n", _Alignof(example));
+    printf("offsetof(c) = %zu\n", offsetof(example, c));
+    printf("offsetof(i) = %zu\n", offsetof(example, i));
+    printf("offsetof(d) = %zu\n", offsetof(example, d));
 
     pause_for_input("Before malloc");
 
