@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct example {
   char c;
@@ -64,6 +65,59 @@ int main(int argc, char *argv[]) {
 
     printf("sizeof(example2) = %zu\n", sizeof(example2));
     printf("alignof(example2) = %zu\n", _Alignof(example2));
+
+
+    char c;
+    int i;
+    long l;
+    double d;
+    example s;
+
+    printf("Alignment requirements (bytes):\n");
+    printf("  char     : %zu\n", _Alignof(char));
+    printf("  int      : %zu\n", _Alignof(int));
+    printf("  long     : %zu\n", _Alignof(long));
+    printf("  double   : %zu\n", _Alignof(double));
+    printf("  example  : %zu\n", _Alignof(example));
+    puts("");
+
+    printf("Variable addresses:\n");
+    printf("  &c       = %p\n", (void*)&c);
+    printf("  &i       = %p\n", (void*)&i);
+    printf("  &l       = %p\n", (void*)&l);
+    printf("  &d       = %p\n", (void*)&d);
+    printf("  &s       = %p\n", (void*)&s);
+    puts("");
+
+    printf("Alignment check (addr %% align == 0):\n");
+    printf("  char     : %d\n", ((uintptr_t)&c) % _Alignof(char) == 0);
+    printf("  int      : %d\n", ((uintptr_t)&i) % _Alignof(int) == 0);
+    printf("  long     : %d\n", ((uintptr_t)&l) % _Alignof(long) == 0);
+    printf("  double   : %d\n", ((uintptr_t)&d) % _Alignof(double) == 0);
+    printf("  example  : %d\n", ((uintptr_t)&s) % _Alignof(example) == 0);
+
+
+    char *pc   = malloc(sizeof(char));
+    int *pi    = malloc(sizeof(int));
+    long *pl   = malloc(sizeof(long));
+    double *pd = malloc(sizeof(double));
+
+    printf("Heap pointer addresses:\n");
+    printf("  char*    = %p\n", (void*)pc);
+    printf("  int*     = %p\n", (void*)pi);
+    printf("  long*    = %p\n", (void*)pl);
+    printf("  double*  = %p\n", (void*)pd);
+
+    printf("\nAlignment check:\n");
+    printf("  char     : %d\n", ((uintptr_t)pc) % _Alignof(char) == 0);
+    printf("  int      : %d\n", ((uintptr_t)pi) % _Alignof(int) == 0);
+    printf("  long     : %d\n", ((uintptr_t)pl) % _Alignof(long) == 0);
+    printf("  double   : %d\n", ((uintptr_t)pd) % _Alignof(double) == 0);
+
+    free(pc);
+    free(pi);
+    free(pl);
+    free(pd);
 
     pause_for_input("Before malloc");
 
