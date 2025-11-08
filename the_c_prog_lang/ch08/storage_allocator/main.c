@@ -44,6 +44,47 @@ void pause_for_input(const char * msg) {
 }
 
 
+#include <string.h>
+
+#define MAXLINE 256
+
+
+const char *region_of(void *addr) {
+    static char line[MAXLINE];
+    static char region[MAXLINE];
+    unsigned long start, end;
+    FILE *f = fopen("/proc/self/maps", "r");
+    if (!f) return "unknown";
+
+    while (fgets(line, sizeof(line), f)) {
+        if (sscanf(line, "%lx-%lx", &start, &end) == 2) {
+            if ((unsigned long)addr >= start && (unsigned long)addr < end) {
+                // extract region name (file or [heap]/[stack]/etc.)
+                char *name = strchr(line, '/');
+                if (!name) name = strchr(line, '[');
+                if (name) {
+                    name[strcspn(name, "\n")] = 0; // strip newline
+                    snprintf(region, sizeof(region), "%s", name);
+                } else {
+                    snprintf(region, sizeof(region), "anonymous");
+                }
+                fclose(f);
+                return region;
+            }
+        }
+    }
+    fclose(f);
+    return "not found";
+}
+
+int global_var = 42;
+static int static_global_var = 84;
+
+void show_address(const char *label, void *ptr) {
+    printf("%-10s %p  →  %s\n", label, ptr, region_of(ptr));
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Running storage allocator\n");
 
@@ -118,6 +159,20 @@ int main(int argc, char *argv[]) {
     free(pi);
     free(pl);
     free(pd);
+
+    static int static_local_var = 321;
+    int local_var = 1234;
+    int *heap_var = malloc(sizeof(int));
+    *heap_var = 5678;
+
+    show_address("function", (void *)main);
+    show_address("global", &global_var);
+    show_address("static global", &static_global_var);
+    show_address("static local", &static_local_var);
+    show_address("heap", heap_var);
+    show_address("stack", &local_var);
+
+    free(heap_var);
 
     pause_for_input("Before malloc");
 
