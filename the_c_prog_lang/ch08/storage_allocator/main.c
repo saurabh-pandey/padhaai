@@ -1,3 +1,8 @@
+/*
+While working on storage allocator memory alignment of types came up. This code is some experiments
+to understand the alignment of types.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
