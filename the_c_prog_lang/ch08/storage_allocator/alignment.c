@@ -40,12 +40,12 @@ typedef struct example2 {
 
 
 void pause_for_input(const char * msg) {
-    printf("Pausing %s\n", msg);
+    // printf("Pausing %s\n", msg);
     printf("%s Program break: %p\n", msg, sbrk(0));
-    printf("Now enter a number to continue\n");
-    int num = 0;
-    scanf("%d", &num);
-    printf("Number is %d ... continuing\n", num);
+    // printf("Now enter a number to continue\n");
+    // int num = 0;
+    // scanf("%d", &num);
+    // printf("Number is %d ... continuing\n", num);
 }
 
 
