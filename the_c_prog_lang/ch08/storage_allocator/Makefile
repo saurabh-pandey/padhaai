@@ -8,12 +8,12 @@ $(shell mkdir -p $(BIN))
 # LIB=lib
 # $(shell mkdir -p $(LIB))
 
-all: $(BIN)/storage_allocator
+all: $(BIN)/alignment
 
 # $(LIB)/libio_wrapper.so : io_wrapper.c
 # 	$(CC) $(CFLAGS) -fPIC -shared -o $@ $^
 
-$(BIN)/storage_allocator : main.c
+$(BIN)/alignment : alignment.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 .PHONY: clean

@@ -91,7 +91,7 @@ void show_address(const char *label, void *ptr) {
 
 
 int main(int argc, char *argv[]) {
-    printf("Running storage allocator\n");
+    printf("Running primitive type alignment experiments\n");
 
     printf("Alignment of char        = %zu\n", _Alignof(char));
     printf("Alignment of int         = %zu\n", _Alignof(int));
