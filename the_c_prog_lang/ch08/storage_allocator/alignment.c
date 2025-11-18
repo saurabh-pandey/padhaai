@@ -82,24 +82,24 @@ const char *region_of(void *addr) {
     return "not found";
 }
 
-int global_var = 42;
-static int static_global_var = 84;
-
 void show_address(const char *label, void *ptr) {
     printf("%-10s %p  →  %s\n", label, ptr, region_of(ptr));
 }
+
+int global_var = 42;
+static int static_global_var = 84;
 
 
 int main(int argc, char *argv[]) {
     printf("Running primitive type alignment experiments\n");
 
-    printf("Alignment of char        = %zu\n", _Alignof(char));
-    printf("Alignment of int         = %zu\n", _Alignof(int));
-    printf("Alignment of double      = %zu\n", _Alignof(double));
-    printf("Alignment of example     = %zu\n", _Alignof(example));
-    printf("Alignment of max_align_t = %zu\n", _Alignof(max_align_t));
-
-
+    // Sequence
+    // Start with sizeof and why example, example1 and example2 sizes are unexpected
+    // Next understand alignment of some primitives
+    // Also for stuff on stack, heap and program data
+    // Finally explore malloc and sbrk
+    
+    // TODO: Also make sure the output is clean and reads well
     printf("sizeof(example) = %zu\n", sizeof(example));
     printf("alignof(example) = %zu\n", _Alignof(example));
     printf("offsetof(c) = %zu\n", offsetof(example, c));
@@ -120,11 +120,12 @@ int main(int argc, char *argv[]) {
     example s;
 
     printf("Alignment requirements (bytes):\n");
-    printf("  char     : %zu\n", _Alignof(char));
-    printf("  int      : %zu\n", _Alignof(int));
-    printf("  long     : %zu\n", _Alignof(long));
-    printf("  double   : %zu\n", _Alignof(double));
-    printf("  example  : %zu\n", _Alignof(example));
+    printf("  char        : %zu\n", _Alignof(char));
+    printf("  int         : %zu\n", _Alignof(int));
+    printf("  long        : %zu\n", _Alignof(long));
+    printf("  double      : %zu\n", _Alignof(double));
+    printf("  example     : %zu\n", _Alignof(example));
+    printf("  max_align_t : %zu\n", _Alignof(max_align_t));
     puts("");
 
     printf("Variable addresses:\n");
