@@ -86,18 +86,34 @@ void show_address(const char *label, void *ptr) {
     printf("%-10s %p  →  %s\n", label, ptr, region_of(ptr));
 }
 
+
+void experiment_sizeof(void) {
+    printf("Size of some types (bytes):\n");
+    printf("  char        : %zu\n", sizeof(char));
+    printf("  int         : %zu\n", sizeof(int));
+    printf("  long        : %zu\n", sizeof(long));
+    printf("  double      : %zu\n", sizeof(double));
+    printf("  max_align_t : %zu\n", sizeof(max_align_t));
+    printf("  example     : %zu\n", sizeof(example));
+    printf("  example1    : %zu\n", sizeof(example1));
+    printf("  example2    : %zu\n", sizeof(example2));
+    puts("");
+}
+
 int global_var = 42;
 static int static_global_var = 84;
 
 
 int main(int argc, char *argv[]) {
-    printf("Running primitive type alignment experiments\n");
+    printf("Running primitive type size, alignment and memory location experiments\n");
 
     // Sequence
     // Start with sizeof and why example, example1 and example2 sizes are unexpected
     // Next understand alignment of some primitives
     // Also for stuff on stack, heap and program data
     // Finally explore malloc and sbrk
+
+    experiment_sizeof();
     
     // TODO: Also make sure the output is clean and reads well
     printf("sizeof(example) = %zu\n", sizeof(example));
