@@ -88,7 +88,7 @@ void show_address(const char *label, void *ptr) {
 
 
 void experiment_sizeof(void) {
-    printf("Size of some types (bytes):\n");
+    printf("Size of (bytes):\n");
     printf("  char        : %zu\n", sizeof(char));
     printf("  int         : %zu\n", sizeof(int));
     printf("  long        : %zu\n", sizeof(long));
@@ -100,12 +100,56 @@ void experiment_sizeof(void) {
     puts("");
 }
 
+
+void experiment_alignment(void) {
+    printf("Alignment requirements (bytes):\n");
+    printf("  char        : %zu\n", _Alignof(char));
+    printf("  int         : %zu\n", _Alignof(int));
+    printf("  long        : %zu\n", _Alignof(long));
+    printf("  double      : %zu\n", _Alignof(double));
+    printf("  max_align_t : %zu\n", _Alignof(max_align_t));
+    printf("  example     : %zu\n", _Alignof(example));
+    printf("  example1    : %zu\n", _Alignof(example1));
+    printf("  example2    : %zu\n", _Alignof(example2));
+    puts("");
+}
+
+
+void experiment_offset(void) {
+    printf("Offset of example struct:\n");
+    
+    printf("example struct member offset (bytes):\n");
+    printf("  offsetof(c) : %zu // It starts here\n", offsetof(example, c));
+    printf("  offsetof(i) : %zu // There is a padding of 3 bytes after char\n",
+           offsetof(example, i));
+    printf("  offsetof(d) : %zu // No padding needed here\n", offsetof(example, d));
+    puts("");
+
+    example ex;
+    void *c_p = (void*)&(ex.c);
+    void *i_p = (void*)&(ex.i);
+    void *d_p = (void*)&(ex.d);
+    
+    printf("address of struct members:\n");
+    printf("  &example.c : %p\n", c_p);
+    printf("  &example.i : %p // Note the padding!\n", i_p);
+    printf("  &example.d : %p\n", d_p);
+    puts("");
+
+    printf("calculated offset of struct members:\n");
+    printf("  &offset.c : %zu\n", (c_p - c_p));
+    printf("  &offset.i : %zu\n", (i_p - c_p));
+    printf("  &offset.d : %zu\n", (d_p - c_p));
+    puts("");
+}
+
+
 int global_var = 42;
 static int static_global_var = 84;
 
 
 int main(int argc, char *argv[]) {
-    printf("Running primitive type size, alignment and memory location experiments\n");
+    printf("Running sizeof, alignment and memory location experiments\n");
 
     // Sequence
     // Start with sizeof and why example, example1 and example2 sizes are unexpected
@@ -114,19 +158,13 @@ int main(int argc, char *argv[]) {
     // Finally explore malloc and sbrk
 
     experiment_sizeof();
-    
-    // TODO: Also make sure the output is clean and reads well
-    printf("sizeof(example) = %zu\n", sizeof(example));
-    printf("alignof(example) = %zu\n", _Alignof(example));
-    printf("offsetof(c) = %zu\n", offsetof(example, c));
-    printf("offsetof(i) = %zu\n", offsetof(example, i));
-    printf("offsetof(d) = %zu\n", offsetof(example, d));
+    puts("");
 
-    printf("sizeof(example1) = %zu\n", sizeof(example1));
-    printf("alignof(example1) = %zu\n", _Alignof(example1));
+    experiment_alignment();
+    puts("");
 
-    printf("sizeof(example2) = %zu\n", sizeof(example2));
-    printf("alignof(example2) = %zu\n", _Alignof(example2));
+    experiment_offset();
+    puts("");
 
 
     char c;
@@ -134,15 +172,6 @@ int main(int argc, char *argv[]) {
     long l;
     double d;
     example s;
-
-    printf("Alignment requirements (bytes):\n");
-    printf("  char        : %zu\n", _Alignof(char));
-    printf("  int         : %zu\n", _Alignof(int));
-    printf("  long        : %zu\n", _Alignof(long));
-    printf("  double      : %zu\n", _Alignof(double));
-    printf("  example     : %zu\n", _Alignof(example));
-    printf("  max_align_t : %zu\n", _Alignof(max_align_t));
-    puts("");
 
     printf("Variable addresses:\n");
     printf("  &c       = %p\n", (void*)&c);
