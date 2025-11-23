@@ -96,7 +96,7 @@ void experiment_sizeof(void) {
     printf("  max_align_t : %zu\n", sizeof(max_align_t));
     printf("  example     : %zu\n", sizeof(example));
     printf("  example1    : %zu\n", sizeof(example1));
-    printf("  example2    : %zu\n", sizeof(example2));
+    printf("  example2    : %zu // This has smaller size than example1!!\n", sizeof(example2));
     puts("");
 }
 
