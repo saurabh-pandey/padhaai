@@ -10,6 +10,7 @@ to understand the alignment of types.
 #include <stddef.h>
 #include <stdint.h>
 
+
 typedef struct example {
   char c;
   int i;
@@ -83,7 +84,7 @@ const char *region_of(void *addr) {
 }
 
 void show_address(const char *label, void *ptr) {
-    printf("%-10s %p  →  %s\n", label, ptr, region_of(ptr));
+    printf("%-15s %p   →  %s\n", label, ptr, region_of(ptr));
 }
 
 
@@ -151,7 +152,7 @@ void check_alignment_of_stack_vars(void) {
     double d;
     example s;
 
-    printf("STack Variable addresses:\n");
+    printf("Stack Variable addresses:\n");
     printf("  &c       = %p\n", (void*)&c);
     printf("  &i       = %p\n", (void*)&i);
     printf("  &l       = %p\n", (void*)&l);
@@ -194,8 +195,26 @@ void check_alignment_of_heap_vars(void) {
 }
 
 
+// Some globals for memory experiments
 int global_var = 42;
 static int static_global_var = 84;
+
+void find_var_process_memory(void)
+{
+    static int static_local_var = 321;
+    int local_var = 1234;
+    int *heap_var = malloc(sizeof(int));
+    *heap_var = 5678;
+
+    show_address("function", (void *)find_var_process_memory);
+    show_address("global", &global_var);
+    show_address("static global", &static_global_var);
+    show_address("static local", &static_local_var);
+    show_address("heap", heap_var);
+    show_address("stack", &local_var);
+
+    free(heap_var);
+}
 
 
 int main(int argc, char *argv[]) {
@@ -221,22 +240,11 @@ int main(int argc, char *argv[]) {
 
     check_alignment_of_heap_vars();
     puts("");
+
+    find_var_process_memory();
+    puts("");
+
     
-
-    static int static_local_var = 321;
-    int local_var = 1234;
-    int *heap_var = malloc(sizeof(int));
-    *heap_var = 5678;
-
-    show_address("function", (void *)main);
-    show_address("global", &global_var);
-    show_address("static global", &static_global_var);
-    show_address("static local", &static_local_var);
-    show_address("heap", heap_var);
-    show_address("stack", &local_var);
-
-    free(heap_var);
-
     pause_for_input("Before malloc");
 
     int * data = (int *)malloc(100 * sizeof(int));
