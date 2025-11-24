@@ -144,6 +144,56 @@ void experiment_offset(void) {
 }
 
 
+void check_alignment_of_stack_vars(void) {
+    char c;
+    int i;
+    long l;
+    double d;
+    example s;
+
+    printf("STack Variable addresses:\n");
+    printf("  &c       = %p\n", (void*)&c);
+    printf("  &i       = %p\n", (void*)&i);
+    printf("  &l       = %p\n", (void*)&l);
+    printf("  &d       = %p\n", (void*)&d);
+    printf("  &s       = %p\n", (void*)&s);
+    puts("");
+
+    printf("Stack vars alignment check (addr %% align == 0):\n");
+    printf("  char     : %d\n", ((uintptr_t)&c) % _Alignof(char) == 0);
+    printf("  int      : %d\n", ((uintptr_t)&i) % _Alignof(int) == 0);
+    printf("  long     : %d\n", ((uintptr_t)&l) % _Alignof(long) == 0);
+    printf("  double   : %d\n", ((uintptr_t)&d) % _Alignof(double) == 0);
+    printf("  example  : %d\n", ((uintptr_t)&s) % _Alignof(example) == 0);
+    puts("");
+}
+
+
+void check_alignment_of_heap_vars(void) {
+    char *pc   = malloc(sizeof(char));
+    int *pi    = malloc(sizeof(int));
+    long *pl   = malloc(sizeof(long));
+    double *pd = malloc(sizeof(double));
+
+    printf("Heap pointer addresses:\n");
+    printf("  char*    = %p\n", (void*)pc);
+    printf("  int*     = %p\n", (void*)pi);
+    printf("  long*    = %p\n", (void*)pl);
+    printf("  double*  = %p\n", (void*)pd);
+
+    printf("\nHeap vars alignment check:\n");
+    printf("  char     : %d\n", ((uintptr_t)pc) % _Alignof(char) == 0);
+    printf("  int      : %d\n", ((uintptr_t)pi) % _Alignof(int) == 0);
+    printf("  long     : %d\n", ((uintptr_t)pl) % _Alignof(long) == 0);
+    printf("  double   : %d\n", ((uintptr_t)pd) % _Alignof(double) == 0);
+
+    free(pc);
+    free(pi);
+    free(pl);
+    free(pd);
+}
+
+
 int global_var = 42;
 static int static_global_var = 84;
 
@@ -166,50 +216,12 @@ int main(int argc, char *argv[]) {
     experiment_offset();
     puts("");
 
-
-    char c;
-    int i;
-    long l;
-    double d;
-    example s;
-
-    printf("Variable addresses:\n");
-    printf("  &c       = %p\n", (void*)&c);
-    printf("  &i       = %p\n", (void*)&i);
-    printf("  &l       = %p\n", (void*)&l);
-    printf("  &d       = %p\n", (void*)&d);
-    printf("  &s       = %p\n", (void*)&s);
+    check_alignment_of_stack_vars();
     puts("");
 
-    printf("Alignment check (addr %% align == 0):\n");
-    printf("  char     : %d\n", ((uintptr_t)&c) % _Alignof(char) == 0);
-    printf("  int      : %d\n", ((uintptr_t)&i) % _Alignof(int) == 0);
-    printf("  long     : %d\n", ((uintptr_t)&l) % _Alignof(long) == 0);
-    printf("  double   : %d\n", ((uintptr_t)&d) % _Alignof(double) == 0);
-    printf("  example  : %d\n", ((uintptr_t)&s) % _Alignof(example) == 0);
-
-
-    char *pc   = malloc(sizeof(char));
-    int *pi    = malloc(sizeof(int));
-    long *pl   = malloc(sizeof(long));
-    double *pd = malloc(sizeof(double));
-
-    printf("Heap pointer addresses:\n");
-    printf("  char*    = %p\n", (void*)pc);
-    printf("  int*     = %p\n", (void*)pi);
-    printf("  long*    = %p\n", (void*)pl);
-    printf("  double*  = %p\n", (void*)pd);
-
-    printf("\nAlignment check:\n");
-    printf("  char     : %d\n", ((uintptr_t)pc) % _Alignof(char) == 0);
-    printf("  int      : %d\n", ((uintptr_t)pi) % _Alignof(int) == 0);
-    printf("  long     : %d\n", ((uintptr_t)pl) % _Alignof(long) == 0);
-    printf("  double   : %d\n", ((uintptr_t)pd) % _Alignof(double) == 0);
-
-    free(pc);
-    free(pi);
-    free(pl);
-    free(pd);
+    check_alignment_of_heap_vars();
+    puts("");
+    
 
     static int static_local_var = 321;
     int local_var = 1234;
