@@ -217,6 +217,30 @@ void find_var_process_memory(void)
 }
 
 
+void check_program_break(void) {
+    // pause_for_input("Before malloc");
+    printf("Before malloc Program break        : %p\n", sbrk(0));
+
+    int * data = (int *)malloc(100 * sizeof(int));
+
+    // printf("Data ptr = %p\n", data);
+
+    // pause_for_input("After malloc");
+    
+    printf("After malloc Program break         : %p\n", sbrk(0));
+
+    free(data);
+
+    // pause_for_input("After free");
+    printf("After free Program break           : %p\n", sbrk(0));
+
+    sbrk(1024*100);
+
+    // pause_for_input("After sbrk(64)");
+    printf("After sbrk(1024*100) Program break : %p // It changes here!!!\n", sbrk(0));
+}
+
+
 int main(int argc, char *argv[]) {
     printf("Running sizeof, alignment and memory location experiments\n");
 
@@ -244,23 +268,7 @@ int main(int argc, char *argv[]) {
     find_var_process_memory();
     puts("");
 
-    
-    pause_for_input("Before malloc");
-
-    int * data = (int *)malloc(100 * sizeof(int));
-
-    printf("Data ptr = %p\n", data);
-
-    pause_for_input("After malloc");
-
-    free(data);
-
-    pause_for_input("After free");
-
-    sbrk(1024*100);
-
-    pause_for_input("After sbrk(64)");
-    
+    check_program_break();
     
     return 0;
 }
