@@ -6,9 +6,11 @@ to understand the alignment of types.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
+
+#define MAXLINE 256
 
 
 typedef struct example {
@@ -38,21 +40,6 @@ typedef struct example2 {
   double d1;
   double d2;
 } example2;
-
-
-void pause_for_input(const char * msg) {
-    // printf("Pausing %s\n", msg);
-    printf("%s Program break: %p\n", msg, sbrk(0));
-    // printf("Now enter a number to continue\n");
-    // int num = 0;
-    // scanf("%d", &num);
-    // printf("Number is %d ... continuing\n", num);
-}
-
-
-#include <string.h>
-
-#define MAXLINE 256
 
 
 const char *region_of(void *addr) {
@@ -180,7 +167,7 @@ void check_alignment_of_heap_vars(void) {
     printf("  char*    = %p\n", (void*)pc);
     printf("  int*     = %p\n", (void*)pi);
     printf("  long*    = %p\n", (void*)pl);
-    printf("  double*  = %p\n", (void*)pd);
+    printf("  double*  = %p // Note all are 16 byte aligned\n", (void*)pd);
 
     printf("\nHeap vars alignment check:\n");
     printf("  char     : %d\n", ((uintptr_t)pc) % _Alignof(char) == 0);
@@ -218,41 +205,34 @@ void find_var_process_memory(void)
 
 
 void check_program_break(void) {
-    // pause_for_input("Before malloc");
     printf("Before malloc Program break        : %p\n", sbrk(0));
 
     int * data = (int *)malloc(100 * sizeof(int));
-
-    // printf("Data ptr = %p\n", data);
-
-    // pause_for_input("After malloc");
     
     printf("After malloc Program break         : %p\n", sbrk(0));
 
     free(data);
 
-    // pause_for_input("After free");
     printf("After free Program break           : %p\n", sbrk(0));
 
     sbrk(1024*100);
 
-    // pause_for_input("After sbrk(64)");
     printf("After sbrk(1024*100) Program break : %p // It changes here!!!\n", sbrk(0));
 }
 
 
 int main(int argc, char *argv[]) {
-    printf("Running sizeof, alignment and memory location experiments\n");
+    printf("============================================================\n");
+    printf(" Running sizeof, alignment and memory location experiments\n");
+    printf("============================================================\n");
 
-    // Sequence
-    // Start with sizeof and why example, example1 and example2 sizes are unexpected
-    // Next understand alignment of some primitives
-    // Also for stuff on stack, heap and program data
-    // Finally explore malloc and sbrk
-
+    printf("\n\n  First sizeof\n");
+    printf("==================\n");
     experiment_sizeof();
     puts("");
 
+    printf("\n\n  Next alignment and offset\n");
+    printf("===============================\n");
     experiment_alignment();
     puts("");
 
@@ -265,6 +245,8 @@ int main(int argc, char *argv[]) {
     check_alignment_of_heap_vars();
     puts("");
 
+    printf("\n\n  Finally memory addresses\n");
+    printf("===============================\n");
     find_var_process_memory();
     puts("");
 
