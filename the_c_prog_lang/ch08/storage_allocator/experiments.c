@@ -167,7 +167,7 @@ void check_alignment_of_heap_vars(void) {
     printf("  char*    = %p\n", (void*)pc);
     printf("  int*     = %p\n", (void*)pi);
     printf("  long*    = %p\n", (void*)pl);
-    printf("  double*  = %p // Note all are 16 byte aligned\n", (void*)pd);
+    printf("  double*  = %p // Note all are 16 byte aligned and 32 bytes apart\n", (void*)pd);
 
     printf("\nHeap vars alignment check:\n");
     printf("  char     : %d\n", ((uintptr_t)pc) % _Alignof(char) == 0);
