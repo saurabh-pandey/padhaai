@@ -1,20 +1,19 @@
 CC=gcc
 CFLAGS=-Wall -g
-# LDFLAGS  := -Llib -Wl,-rpath='$$ORIGIN/../lib'
 
 BIN=bin
 $(shell mkdir -p $(BIN))
 
-# LIB=lib
-# $(shell mkdir -p $(LIB))
+JUST_EXECS = experiments vec_object_pool
+EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
-all: $(BIN)/experiments
-
-# $(LIB)/libio_wrapper.so : io_wrapper.c
-# 	$(CC) $(CFLAGS) -fPIC -shared -o $@ $^
-
-$(BIN)/experiments : experiments.c
+$(BIN)/% : $(BIN)/%.o
 	$(CC) $(CFLAGS) -o $@ $^
+
+$(BIN)/%.o : %.c
+	$(CC) $(CFLAGS) -c -o $@ $^
+
+all: $(EXECS)
 
 .PHONY: clean
 clean:
