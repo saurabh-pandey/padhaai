@@ -23,10 +23,18 @@ typedef struct {
     Vector v;
 } PoolItem;
 
-PoolItem pool[MAX_POOL_SIZE] = {{1, {-1, -1, -1}}};
+PoolItem pool[MAX_POOL_SIZE];
+const PoolItem init = {1, {-1, -1, -1}};
+
+void initialize_pool(void) {
+    for (int i = 0; i < sizeof(pool)/sizeof(PoolItem); ++i) {
+        pool[i] = init;
+    }
+}
 
 Vector * borrow(void) {
     for (int i = 0; i < sizeof(pool)/sizeof(PoolItem); ++i) {
+        // printf("borrow i = %d, is_free = %d\n", i, pool[i].is_free);
         if (pool[i].is_free == 1) {
             pool[i].is_free = 0;
             return &(pool[i].v);
@@ -62,23 +70,52 @@ void print_vec(const Vector * v) {
     }
 }
 
-int main(int argc, char * argv[]) {
-    printf("Testing Vector memory pool\n");
+void init_vec(Vector * v, int x, int y, int z) {
+    if (v == NULL) {
+        return;
+    }
+    v->x = x;
+    v->y = y;
+    v->z = z;
+}
 
+void single_action(void) {
     const int max_trials = 10;
 
     for (int i = 0; i < max_trials; ++i) {
         Vector * v = borrow();
-        if (v != NULL) {
-            v->x = i;
-            v->y = i;
-            v->z = i;
-        }
-
+        init_vec(v, i, i, i);
+        
         print_vec(v);
         
         yield(v);
     }
+}
+
+void double_action(void) {
+    const int max_trials = 10;
+
+    for (int i = 0; i < max_trials; ++i) {
+        Vector * v1 = borrow();
+        init_vec(v1, i, i, i);
+        print_vec(v1);
+
+        Vector * v2 = borrow();
+        init_vec(v2, i - max_trials, i - max_trials, i - max_trials);
+        print_vec(v2);
+        
+        yield(v1);
+        yield(v2);
+    }
+}
+
+int main(int argc, char * argv[]) {
+    printf("Testing Vector memory pool\n");
+
+    initialize_pool();
+
+    // single_action();
+    double_action();
 
     return 0;
 }
