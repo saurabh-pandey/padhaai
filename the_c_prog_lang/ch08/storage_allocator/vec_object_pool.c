@@ -109,13 +109,36 @@ void double_action(void) {
     }
 }
 
+void multi_action(int num_borrows) {
+    const int max_trials = 10;
+    Vector * vecs[20] = {NULL};
+
+    for (int i = 0; i < max_trials; ++i) {
+        for (int j = 0; j < num_borrows; ++j) {
+            vecs[j] = borrow();
+            if (vecs[j] == NULL) {
+                printf("Borrow no %d failed\n", j);
+            }
+            init_vec(vecs[j], i, i, i);
+            print_vec(vecs[j]);
+        }
+        for (int j = 0; j < num_borrows; ++j) {
+            yield(vecs[j]);
+            vecs[j] = NULL;
+        }
+    }
+}
+
 int main(int argc, char * argv[]) {
     printf("Testing Vector memory pool\n");
 
     initialize_pool();
 
     // single_action();
-    double_action();
+    // double_action();
+
+    multi_action(5);
+    multi_action(11);
 
     return 0;
 }
