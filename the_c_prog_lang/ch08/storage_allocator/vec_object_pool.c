@@ -149,6 +149,35 @@ void multi_action_inverse_yield(int num_borrows) {
     }
 }
 
+void multi_action_worst(int num_borrows) {
+    const int max_trials = 10;
+    Vector * vecs[20] = {NULL};
+
+    for (int i = 0; i < max_trials; ++i) {
+        Vector * last_borrowed = NULL;
+        for (int j = 0; j < num_borrows; ++j) {
+            vecs[j] = borrow();
+            if (vecs[j] == NULL) {
+                printf("Borrow no %d failed\n", j);
+            } else {
+                last_borrowed = vecs[j];
+            }
+            init_vec(vecs[j], i, i, i);
+            print_vec(vecs[j]);
+        }
+        // yield and borrow this last borrowed object
+        printf("Testing worst case for %p\n", last_borrowed);
+        for (int j = 0; j < 100000; ++j) {
+            yield(last_borrowed);
+            last_borrowed = borrow();
+        }
+        for (int j = num_borrows - 1; j > -1; --j) {
+            yield(vecs[j]);
+            vecs[j] = NULL;
+        }
+    }
+}
+
 int main(int argc, char * argv[]) {
     printf("Testing Vector memory pool\n");
 
@@ -163,6 +192,8 @@ int main(int argc, char * argv[]) {
     multi_action_inverse_yield(5);
 
     multi_action_inverse_yield(12);
+
+    multi_action_worst(12);
 
     return 0;
 }
