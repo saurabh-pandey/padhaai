@@ -9,14 +9,14 @@ Link to the video is: https://www.youtube.com/watch?v=CpgsQLSc7KY
 
 #include <stdio.h>
 
-typedef struct
-{
+typedef struct {
     int x;
     int y;
     int z;
 } Vector;
 
-#define MAX_POOL_SIZE 10
+#define MAX_POOL_SIZE 10000
+#define MAX_BORROWS MAX_POOL_SIZE + 100
 
 typedef struct {
     int is_free;
@@ -27,13 +27,13 @@ PoolItem pool[MAX_POOL_SIZE];
 const PoolItem init = {1, {-1, -1, -1}};
 
 void initialize_pool(void) {
-    for (int i = 0; i < sizeof(pool)/sizeof(PoolItem); ++i) {
+    for (int i = 0; i < sizeof(pool)/sizeof(pool[0]); ++i) {
         pool[i] = init;
     }
 }
 
 Vector * borrow(void) {
-    for (int i = 0; i < sizeof(pool)/sizeof(PoolItem); ++i) {
+    for (int i = 0; i < sizeof(pool)/sizeof(pool[0]); ++i) {
         // printf("borrow i = %d, is_free = %d\n", i, pool[i].is_free);
         if (pool[i].is_free == 1) {
             pool[i].is_free = 0;
@@ -48,7 +48,7 @@ int yield(Vector * v) {
         return -1;
     }
     
-    for (int i = 0; i < sizeof(pool)/sizeof(PoolItem); ++i) {
+    for (int i = 0; i < sizeof(pool)/sizeof(pool[0]); ++i) {
         if (v == &(pool[i].v)) {
             if (pool[i].is_free != 0) {
                 printf("ERROR: Returned object is already marked free\n");
@@ -86,7 +86,7 @@ void single_action(void) {
         Vector * v = borrow();
         init_vec(v, i, i, i);
         
-        print_vec(v);
+        // print_vec(v);
         
         yield(v);
     }
@@ -111,16 +111,16 @@ void double_action(void) {
 
 void multi_action(int num_borrows) {
     const int max_trials = 10;
-    Vector * vecs[20] = {NULL};
+    Vector * vecs[MAX_BORROWS] = {NULL};
 
     for (int i = 0; i < max_trials; ++i) {
         for (int j = 0; j < num_borrows; ++j) {
             vecs[j] = borrow();
-            if (vecs[j] == NULL) {
-                printf("Borrow no %d failed\n", j);
-            }
+            // if (vecs[j] == NULL) {
+            //     printf("Borrow no %d failed\n", j);
+            // }
             init_vec(vecs[j], i, i, i);
-            print_vec(vecs[j]);
+            // print_vec(vecs[j]);
         }
         for (int j = 0; j < num_borrows; ++j) {
             yield(vecs[j]);
@@ -131,16 +131,16 @@ void multi_action(int num_borrows) {
 
 void multi_action_inverse_yield(int num_borrows) {
     const int max_trials = 10;
-    Vector * vecs[20] = {NULL};
+    Vector * vecs[MAX_BORROWS] = {NULL};
 
     for (int i = 0; i < max_trials; ++i) {
         for (int j = 0; j < num_borrows; ++j) {
             vecs[j] = borrow();
-            if (vecs[j] == NULL) {
-                printf("Borrow no %d failed\n", j);
-            }
+            // if (vecs[j] == NULL) {
+            //     printf("Borrow no %d failed\n", j);
+            // }
             init_vec(vecs[j], i, i, i);
-            print_vec(vecs[j]);
+            // print_vec(vecs[j]);
         }
         for (int j = num_borrows - 1; j > -1; --j) {
             yield(vecs[j]);
@@ -151,19 +151,20 @@ void multi_action_inverse_yield(int num_borrows) {
 
 void multi_action_worst(int num_borrows) {
     const int max_trials = 10;
-    Vector * vecs[20] = {NULL};
+    Vector * vecs[MAX_BORROWS] = {NULL};
 
     for (int i = 0; i < max_trials; ++i) {
         Vector * last_borrowed = NULL;
         for (int j = 0; j < num_borrows; ++j) {
             vecs[j] = borrow();
-            if (vecs[j] == NULL) {
-                printf("Borrow no %d failed\n", j);
-            } else {
+            if (vecs[j] != NULL) {
                 last_borrowed = vecs[j];
             }
+            // } else {
+            //     printf("Borrow no %d failed\n", j);
+            // }
             init_vec(vecs[j], i, i, i);
-            print_vec(vecs[j]);
+            // print_vec(vecs[j]);
         }
         // yield and borrow this last borrowed object
         printf("Testing worst case for %p\n", last_borrowed);
@@ -186,14 +187,14 @@ int main(int argc, char * argv[]) {
     // single_action();
     // double_action();
 
-    multi_action(5);
-    multi_action(11);
+    multi_action(MAX_POOL_SIZE / 2);
+    multi_action(MAX_POOL_SIZE + 10);
 
-    multi_action_inverse_yield(5);
+    multi_action_inverse_yield(MAX_POOL_SIZE / 2);
 
-    multi_action_inverse_yield(12);
+    multi_action_inverse_yield(MAX_POOL_SIZE + 10);
 
-    multi_action_worst(12);
+    multi_action_worst(MAX_POOL_SIZE + 10);
 
     return 0;
 }
