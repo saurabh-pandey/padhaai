@@ -8,6 +8,7 @@ Link to the video is: https://www.youtube.com/watch?v=CpgsQLSc7KY
 */
 
 #include <stdio.h>
+#include <time.h>
 
 typedef struct {
     int x;
@@ -194,7 +195,16 @@ int main(int argc, char * argv[]) {
 
     multi_action_inverse_yield(MAX_POOL_SIZE + 10);
 
+    struct timespec start, end;
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
     multi_action_worst(MAX_POOL_SIZE + 10);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    double elapsed = (end.tv_sec - start.tv_sec) +
+                     (end.tv_nsec - start.tv_nsec) / 1e9;
+
+    printf("Elapsed time: %.6f seconds\n", elapsed);
 
     return 0;
 }
