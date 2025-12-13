@@ -35,7 +35,6 @@ void initialize_pool(void) {
 
 Vector * borrow(void) {
     for (int i = 0; i < sizeof(pool)/sizeof(pool[0]); ++i) {
-        // printf("borrow i = %d, is_free = %d\n", i, pool[i].is_free);
         if (pool[i].is_free == 1) {
             pool[i].is_free = 0;
             return &(pool[i].v);
@@ -155,24 +154,30 @@ void multi_action_worst(int num_borrows) {
     Vector * vecs[MAX_BORROWS] = {NULL};
 
     for (int i = 0; i < max_trials; ++i) {
-        Vector * last_borrowed = NULL;
         for (int j = 0; j < num_borrows; ++j) {
             vecs[j] = borrow();
-            if (vecs[j] != NULL) {
-                last_borrowed = vecs[j];
-            }
             // } else {
             //     printf("Borrow no %d failed\n", j);
             // }
             init_vec(vecs[j], i, i, i);
             // print_vec(vecs[j]);
         }
+
+        Vector * last_borrowed = NULL;
+        if (num_borrows > MAX_POOL_SIZE) {
+            last_borrowed = vecs[MAX_POOL_SIZE - 1];
+        } else {
+            last_borrowed = vecs[num_borrows - 1];
+        }
         // yield and borrow this last borrowed object
         printf("Testing worst case for %p\n", last_borrowed);
+        int max_yeild = 0;
         for (int j = 0; j < 100000; ++j) {
-            yield(last_borrowed);
+            int num_yield = yield(last_borrowed);
+            max_yeild = num_yield > max_yeild ? num_yield : max_yeild;
             last_borrowed = borrow();
         }
+        printf("Max yield ret val = %d, max pool %d\n", max_yeild, MAX_POOL_SIZE);
         for (int j = num_borrows - 1; j > -1; --j) {
             yield(vecs[j]);
             vecs[j] = NULL;
