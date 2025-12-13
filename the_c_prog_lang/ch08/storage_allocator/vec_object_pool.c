@@ -180,6 +180,16 @@ void multi_action_worst(int num_borrows) {
     }
 }
 
+#define TIME_FUNC_RET(seconds_var, func_call) do {                                  \
+    struct timespec m_time_func_ret_t1, m_time_func_ret_t2;                         \
+    clock_gettime(CLOCK_MONOTONIC, &m_time_func_ret_t1);                            \
+    func_call;                                                                      \
+    clock_gettime(CLOCK_MONOTONIC, &m_time_func_ret_t2);                            \
+    (seconds_var) = (m_time_func_ret_t2.tv_sec - m_time_func_ret_t1.tv_sec) +       \
+                    (m_time_func_ret_t2.tv_nsec - m_time_func_ret_t1.tv_nsec)/1e9;  \
+} while(0)
+
+
 int main(int argc, char * argv[]) {
     printf("Testing Vector memory pool\n");
 
@@ -195,16 +205,14 @@ int main(int argc, char * argv[]) {
 
     multi_action_inverse_yield(MAX_POOL_SIZE + 10);
 
-    struct timespec start, end;
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    multi_action_worst(MAX_POOL_SIZE + 10);
-    clock_gettime(CLOCK_MONOTONIC, &end);
-
-    double elapsed = (end.tv_sec - start.tv_sec) +
-                     (end.tv_nsec - start.tv_nsec) / 1e9;
-
+    double elapsed = 0.0;
+    TIME_FUNC_RET(elapsed, multi_action_worst(MAX_POOL_SIZE + 10));
     printf("Elapsed time: %.6f seconds\n", elapsed);
+
+    elapsed = 0.0;
+    TIME_FUNC_RET(elapsed, multi_action_inverse_yield(MAX_POOL_SIZE + 10));
+    printf("multi_action_inverse_yield took %.6f seconds\n", elapsed);
+
 
     return 0;
 }
