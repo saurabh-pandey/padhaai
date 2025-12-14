@@ -79,111 +79,69 @@ void init_vec(Vector * v, int x, int y, int z) {
     v->z = z;
 }
 
-void single_action(void) {
-    const int max_trials = 10;
-
+void sequential_borrow_yield(int max_trials) {
     for (int i = 0; i < max_trials; ++i) {
         Vector * v = borrow();
         init_vec(v, i, i, i);
-        
-        // print_vec(v);
-        
         yield(v);
     }
 }
 
-void double_action(void) {
-    const int max_trials = 10;
 
-    for (int i = 0; i < max_trials; ++i) {
-        Vector * v1 = borrow();
-        init_vec(v1, i, i, i);
-        print_vec(v1);
-
-        Vector * v2 = borrow();
-        init_vec(v2, i - max_trials, i - max_trials, i - max_trials);
-        print_vec(v2);
-        
-        yield(v1);
-        yield(v2);
-    }
-}
-
-void multi_action(int num_borrows) {
-    const int max_trials = 10;
+void yield_sequential_after_borrow(int max_trials) {
     Vector * vecs[MAX_BORROWS] = {NULL};
-
     for (int i = 0; i < max_trials; ++i) {
-        for (int j = 0; j < num_borrows; ++j) {
+        for (int j = 0; j < MAX_BORROWS; ++j) {
             vecs[j] = borrow();
-            // if (vecs[j] == NULL) {
-            //     printf("Borrow no %d failed\n", j);
-            // }
             init_vec(vecs[j], i, i, i);
-            // print_vec(vecs[j]);
         }
-        for (int j = 0; j < num_borrows; ++j) {
+        for (int j = 0; j < MAX_BORROWS; ++j) {
             yield(vecs[j]);
             vecs[j] = NULL;
         }
     }
 }
 
-void multi_action_inverse_yield(int num_borrows) {
-    const int max_trials = 10;
+void yield_reverse_after_borrow(int max_trials) {
     Vector * vecs[MAX_BORROWS] = {NULL};
-
     for (int i = 0; i < max_trials; ++i) {
-        for (int j = 0; j < num_borrows; ++j) {
+        for (int j = 0; j < MAX_BORROWS; ++j) {
             vecs[j] = borrow();
-            // if (vecs[j] == NULL) {
-            //     printf("Borrow no %d failed\n", j);
-            // }
             init_vec(vecs[j], i, i, i);
-            // print_vec(vecs[j]);
         }
-        for (int j = num_borrows - 1; j > -1; --j) {
+        // yielding in reverse
+        for (int j = MAX_BORROWS - 1; j > -1; --j) {
             yield(vecs[j]);
             vecs[j] = NULL;
         }
     }
 }
 
-void multi_action_worst(int num_borrows) {
-    const int max_trials = 10;
+void yield_last_borrowed(int max_trials) {
     Vector * vecs[MAX_BORROWS] = {NULL};
-
     for (int i = 0; i < max_trials; ++i) {
-        for (int j = 0; j < num_borrows; ++j) {
+        for (int j = 0; j < MAX_BORROWS; ++j) {
             vecs[j] = borrow();
-            // } else {
-            //     printf("Borrow no %d failed\n", j);
-            // }
             init_vec(vecs[j], i, i, i);
-            // print_vec(vecs[j]);
         }
 
-        Vector * last_borrowed = NULL;
-        if (num_borrows > MAX_POOL_SIZE) {
-            last_borrowed = vecs[MAX_POOL_SIZE - 1];
-        } else {
-            last_borrowed = vecs[num_borrows - 1];
-        }
-        // yield and borrow this last borrowed object
-        printf("Testing worst case for %p\n", last_borrowed);
-        int max_yeild = 0;
-        for (int j = 0; j < 100000; ++j) {
+        Vector * last_borrowed = vecs[MAX_POOL_SIZE - 1];
+        // yield and borrow this last borrowed object for worst case
+        // printf("Testing worst case for %p\n", last_borrowed);
+        int max_yield = 0;
+        for (int j = 0; j < MAX_POOL_SIZE; ++j) {
             int num_yield = yield(last_borrowed);
-            max_yeild = num_yield > max_yeild ? num_yield : max_yeild;
+            max_yield = num_yield > max_yield ? num_yield : max_yield;
             last_borrowed = borrow();
         }
-        printf("Max yield ret val = %d, max pool %d\n", max_yeild, MAX_POOL_SIZE);
-        for (int j = num_borrows - 1; j > -1; --j) {
+        // printf("Max yield ret val = %d, max pool %d\n", max_yield, MAX_POOL_SIZE);
+        for (int j = MAX_BORROWS - 1; j > -1; --j) {
             yield(vecs[j]);
             vecs[j] = NULL;
         }
     }
 }
+
 
 #define TIME_FUNC_RET(seconds_var, func_call) do {                                  \
     struct timespec m_time_func_ret_t1, m_time_func_ret_t2;                         \
@@ -200,24 +158,23 @@ int main(int argc, char * argv[]) {
 
     initialize_pool();
 
-    // single_action();
-    // double_action();
-
-    multi_action(MAX_POOL_SIZE / 2);
-    multi_action(MAX_POOL_SIZE + 10);
-
-    multi_action_inverse_yield(MAX_POOL_SIZE / 2);
-
-    multi_action_inverse_yield(MAX_POOL_SIZE + 10);
-
+    const int max_trials = 10;
     double elapsed = 0.0;
-    TIME_FUNC_RET(elapsed, multi_action_worst(MAX_POOL_SIZE + 10));
-    printf("Elapsed time: %.6f seconds\n", elapsed);
+    
+    TIME_FUNC_RET(elapsed, sequential_borrow_yield(max_trials));
+    printf("sequential_borrow_yield time: %.6f seconds\n", elapsed);
 
     elapsed = 0.0;
-    TIME_FUNC_RET(elapsed, multi_action_inverse_yield(MAX_POOL_SIZE + 10));
-    printf("multi_action_inverse_yield took %.6f seconds\n", elapsed);
+    TIME_FUNC_RET(elapsed, yield_sequential_after_borrow(max_trials));
+    printf("yield_sequential_after_borrow time: %.6f seconds\n", elapsed);
 
+    elapsed = 0.0;
+    TIME_FUNC_RET(elapsed, yield_reverse_after_borrow(max_trials));
+    printf("yield_reverse_after_borrow time: %.6f seconds\n", elapsed);
+
+    elapsed = 0.0;
+    TIME_FUNC_RET(elapsed, yield_last_borrowed(max_trials));
+    printf("yield_last_borrowed time: %.6f seconds\n", elapsed);
 
     return 0;
 }
