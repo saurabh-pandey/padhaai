@@ -95,6 +95,7 @@ void yield_sequential_after_borrow(int max_trials) {
             vecs[j] = borrow();
             init_vec(vecs[j], i, i, i);
         }
+        // yield in the same order as borrowed
         for (int j = 0; j < MAX_BORROWS; ++j) {
             yield(vecs[j]);
             vecs[j] = NULL;
@@ -127,14 +128,12 @@ void yield_last_borrowed(int max_trials) {
 
         Vector * last_borrowed = vecs[MAX_POOL_SIZE - 1];
         // yield and borrow this last borrowed object for worst case
-        // printf("Testing worst case for %p\n", last_borrowed);
         int max_yield = 0;
         for (int j = 0; j < MAX_POOL_SIZE; ++j) {
             int num_yield = yield(last_borrowed);
             max_yield = num_yield > max_yield ? num_yield : max_yield;
             last_borrowed = borrow();
         }
-        // printf("Max yield ret val = %d, max pool %d\n", max_yield, MAX_POOL_SIZE);
         for (int j = MAX_BORROWS - 1; j > -1; --j) {
             yield(vecs[j]);
             vecs[j] = NULL;
