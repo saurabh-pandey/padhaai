@@ -61,7 +61,11 @@ int yield_constant(Vector * v) {
         return -1;
     }
 
-    const int index = ((char *)(v) - (char *)pool)/sizeof(pool[0]);
+    // const int index = ((char *)(v) - (char *)pool)/sizeof(pool[0]);
+
+    PoolItem const * const item = (PoolItem *)((char *)v - offsetof(PoolItem, v));
+    const ptrdiff_t index = item - pool;
+    
     if (v == &(pool[index].v)) {
         if (pool[index].is_free != 0) {
             printf("ERROR: Returned object is already marked free\n");
