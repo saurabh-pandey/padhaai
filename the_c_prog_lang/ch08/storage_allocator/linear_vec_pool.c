@@ -10,6 +10,7 @@ Link to the video is: https://www.youtube.com/watch?v=CpgsQLSc7KY
 #include "linear_vec_pool.h"
 
 #include <stdio.h>
+#include <stddef.h>
 
 
 typedef struct {
@@ -36,7 +37,7 @@ Vector * borrow(void) {
     return NULL;
 }
 
-int yield(Vector * v) {
+int yield_linear(Vector * v) {
     if (v == NULL) {
         return -1;
     }
@@ -54,3 +55,25 @@ int yield(Vector * v) {
     
     return -1;
 }
+
+int yield_constant(Vector * v) {
+    if (v == NULL) {
+        return -1;
+    }
+
+    const int index = ((char *)(v) - (char *)pool)/sizeof(pool[0]);
+    if (v == &(pool[index].v)) {
+        if (pool[index].is_free != 0) {
+            printf("ERROR: Returned object is already marked free\n");
+            return -1;
+        }
+        pool[index].is_free = 1;
+        return index;
+    }
+    printf("ERROR: Object in pool doesn't match at the calculated index\n");
+    return -1;
+}
+
+
+// int yield(Vector * v) { return yield_linear(v); }
+int yield(Vector * v) { return yield_constant(v); }
