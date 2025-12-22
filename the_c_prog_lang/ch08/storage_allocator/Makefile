@@ -13,10 +13,10 @@ $(BIN)/% : $(BIN)/%.o
 $(BIN)/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
+all: $(EXECS)
+
 $(BIN)/test_vec_object_pool : test_vec_object_pool.c linear_vec_pool.c
 	$(CC) $(CFLAGS) -Iinclude -o $@ $^
-
-all: $(EXECS)
 
 .PHONY: clean
 clean:
