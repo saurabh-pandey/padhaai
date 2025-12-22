@@ -4,7 +4,7 @@ CFLAGS=-Wall -g
 BIN=bin
 $(shell mkdir -p $(BIN))
 
-JUST_EXECS = experiments test_vec_object_pool
+JUST_EXECS = experiments try_vec_object_pool
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
@@ -15,7 +15,7 @@ $(BIN)/%.o : %.c
 
 all: $(EXECS)
 
-$(BIN)/test_vec_object_pool : test_vec_object_pool.c linear_vec_pool.c
+$(BIN)/try_vec_object_pool : try_vec_object_pool.c linear_vec_pool.c
 	$(CC) $(CFLAGS) -Iinclude -o $@ $^
 
 .PHONY: clean
