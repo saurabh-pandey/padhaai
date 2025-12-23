@@ -13,12 +13,14 @@ class TestTryVecObjectPool(unittest.TestCase):
     def test_run(self):
         const_output = subprocess.run([self.const_exe], capture_output=True, text=True).stdout
         linear_output = subprocess.run([self.linear_exe], capture_output=True, text=True).stdout
-        print()
-        print(self._parse_output(const_output))
-        print()
-        print(self._parse_output(linear_output))
+        const_result = self._parse_output(const_output)
+        linear_result = self._parse_output(linear_output)
+        for key in const_result:
+            self.assertTrue(key in linear_result, f"{key} not found in linear output result")
+            self.assertGreaterEqual(linear_result[key],
+                                    const_result[key],
+                                    f"{key} result is slower")
     
-
     def _parse_output(self, output):
         result = {}
         for line in output.splitlines():
