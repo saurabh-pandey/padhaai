@@ -79,5 +79,8 @@ int yield_constant(Vector * v) {
 }
 
 
-// int yield(Vector * v) { return yield_linear(v); }
+#ifdef YIELD_LINEAR
+int yield(Vector * v) { return yield_linear(v); }
+#else
 int yield(Vector * v) { return yield_constant(v); }
+#endif
