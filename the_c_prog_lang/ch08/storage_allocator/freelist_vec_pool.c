@@ -1,0 +1,69 @@
+#include "freelist_vec_pool.h"
+
+#include <stdio.h>
+
+
+#define MAX_POOL_SIZE 10000
+#define MAX_BORROWS MAX_POOL_SIZE + 100
+
+
+Vector vector_pool[MAX_POOL_SIZE];
+const Vector init = {-1, -1, -1};
+
+typedef struct FreeList {
+    size_t vec_id;
+    struct FreeList * next;
+} FreeList;
+
+FreeList pool[MAX_POOL_SIZE];
+
+FreeList * head = NULL;
+
+
+void initialize_pool(void) {
+    for (size_t i = 0; i < MAX_POOL_SIZE; ++i) {
+        vector_pool[i] = init;
+        pool[i].vec_id = i;
+        pool[i].next = NULL;
+        if (i > 0) {
+            pool[i - 1].next = &(pool[i]);
+        }
+    }
+    head = pool;
+}
+
+
+Vector * borrow(void) {
+    if (head == NULL) {
+        return NULL;
+    }
+    Vector * v = &(vector_pool[head->vec_id]);
+
+    FreeList * old_head = head;
+
+    head = head->next;
+    old_head->next = NULL;
+    return v;
+}
+
+
+int yield(Vector * v) {
+    if (v == NULL) {
+        return -1;
+    }
+    
+    size_t id = (v - vector_pool) / sizeof(vector_pool[0]);
+
+    if (id > (MAX_POOL_SIZE - 1)) {
+        printf("ERROR: Vector to be yielded is out-of-bounds\n");
+        return -1;
+    }
+    
+    FreeList * fl = &(pool[id]);
+    // printf("New free list next = %p\n", fl->next);
+    fl->next = head;
+    head = fl;
+
+    return id;
+}
+

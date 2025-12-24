@@ -4,7 +4,8 @@ CFLAGS=-Wall -g
 BIN=bin
 $(shell mkdir -p $(BIN))
 
-JUST_EXECS = experiments try_vec_object_pool_constant try_vec_object_pool_linear
+JUST_EXECS = experiments try_vec_linear_pool_constant try_vec_linear_pool_linear \
+try_vec_freelist_pool
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
@@ -15,10 +16,13 @@ $(BIN)/%.o : %.c
 
 all: $(EXECS)
 
-$(BIN)/try_vec_object_pool_constant: CFLAGS +=
-$(BIN)/try_vec_object_pool_linear:   CFLAGS += -DYIELD_LINEAR
+$(BIN)/try_vec_linear_pool_constant: CFLAGS +=
+$(BIN)/try_vec_linear_pool_linear:   CFLAGS += -DYIELD_LINEAR
 
-$(BIN)/try_vec_object_pool_%: try_vec_object_pool.c linear_vec_pool.c
+$(BIN)/try_vec_linear_pool_%: try_vec_linear_pool.c linear_vec_pool.c
+	$(CC) $(CFLAGS) -Iinclude -o $@ $^
+
+$(BIN)/try_vec_freelist_pool: try_vec_freelist_pool.c freelist_vec_pool.c
 	$(CC) $(CFLAGS) -Iinclude -o $@ $^
 
 .PHONY: clean
