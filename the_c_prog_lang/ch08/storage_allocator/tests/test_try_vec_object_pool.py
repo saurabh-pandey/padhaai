@@ -18,8 +18,12 @@ class TestTryVecObjectPool(unittest.TestCase):
         const_result = self._parse_output(const_output)
         linear_result = self._parse_output(linear_output)
         freelist_result = self._parse_output(freelist_output)
-        self.assertEqual(len(const_result), len(linear_result))
-        self.assertEqual(len(const_result), len(freelist_result))
+        self.assertEqual(len(const_result),
+                         len(linear_result),
+                         "Constant and linear results size mismatch")
+        self.assertEqual(len(const_result),
+                         len(freelist_result),
+                         "Constant and Freelist results size mismatch")
         for key in const_result:
             self.assertTrue(key in linear_result, f"{key} not found in linear output result")
             self.assertTrue(key in freelist_result, f"{key} not found in freelist output result")
