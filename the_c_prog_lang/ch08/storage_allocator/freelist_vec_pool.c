@@ -1,3 +1,11 @@
+/* This file contains a fixed size object pool. It serves only a Vector object and can accept it 
+back into the pool.
+This simple fixed size vec object pool serves as a simpler example towards understand a generic
+storage allocator.
+It is based on the following youtube video by Jacob Sorber titled "Making allocators and object pools faster using a free list"
+Link to the video is: https://www.youtube.com/watch?v=MxgnS9Lwv0k
+*/
+
 #include "freelist_vec_pool.h"
 
 #include <stdio.h>
