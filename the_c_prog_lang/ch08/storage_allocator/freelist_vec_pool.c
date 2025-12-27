@@ -29,14 +29,14 @@ FreeList * head = NULL;
 
 
 void initialize_pool(void) {
-    for (size_t i = 0; i < MAX_POOL_SIZE; ++i) {
+    for (size_t i = 0; i < MAX_POOL_SIZE - 1; ++i) {
         vector_pool[i] = init;
         pool[i].vec_id = i;
-        pool[i].next = NULL;
-        if (i > 0) {
-            pool[i - 1].next = &(pool[i]);
-        }
+        pool[i].next = &(pool[i]);
     }
+    pool[MAX_POOL_SIZE - 1].vec_id = MAX_POOL_SIZE - 1;
+    pool[MAX_POOL_SIZE - 1].next = NULL;
+    
     head = pool;
 }
 
