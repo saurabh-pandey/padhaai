@@ -25,9 +25,6 @@ class TestTryVecObjectPool(unittest.TestCase):
         linear_result = self._parse_output(linear_output)
         freelist_result_v1 = self._parse_output(freelist_output_v1)
         freelist_result_v2 = self._parse_output(freelist_output_v2)
-        print()
-        print("FL V1", freelist_result_v1)
-        print("FL V2", freelist_result_v2)
         self.assertEqual(len(const_result),
                          len(linear_result),
                          "Constant and linear results size mismatch")

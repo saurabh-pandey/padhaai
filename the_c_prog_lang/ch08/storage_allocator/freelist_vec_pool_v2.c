@@ -9,17 +9,15 @@ Link to the video is: https://www.youtube.com/watch?v=MxgnS9Lwv0k
 #include "freelist_vec_pool.h"
 
 #include <stdio.h>
+#include <stddef.h>
 
 
 #define MAX_POOL_SIZE 10000
 #define MAX_BORROWS MAX_POOL_SIZE + 100
 
 
-Vector vector_pool[MAX_POOL_SIZE];
-const Vector init = {-1, -1, -1};
-
 typedef struct FreeList {
-    size_t vec_id;
+    Vector vec;
     struct FreeList * next;
 } FreeList;
 
@@ -28,13 +26,14 @@ FreeList pool[MAX_POOL_SIZE];
 FreeList * head = NULL;
 
 
+const Vector init = {-1, -1, -1};
+
 void initialize_pool(void) {
     for (size_t i = 0; i < MAX_POOL_SIZE - 1; ++i) {
-        vector_pool[i] = init;
-        pool[i].vec_id = i;
+        pool[i].vec = init;
         pool[i].next = &(pool[i]);
     }
-    pool[MAX_POOL_SIZE - 1].vec_id = MAX_POOL_SIZE - 1;
+    pool[MAX_POOL_SIZE - 1].vec = init;
     pool[MAX_POOL_SIZE - 1].next = NULL;
     
     head = pool;
@@ -45,7 +44,7 @@ Vector * borrow(void) {
     if (head == NULL) {
         return NULL;
     }
-    Vector * v = &(vector_pool[head->vec_id]);
+    Vector * v = &(head->vec);
 
     FreeList * old_head = head;
 
@@ -60,18 +59,17 @@ int yield(Vector * v) {
         return -1;
     }
     
-    size_t id = (v - vector_pool) / sizeof(vector_pool[0]);
+    FreeList * object_to_add = (FreeList *)((char *)v - offsetof(FreeList, vec));
 
-    if (id > (MAX_POOL_SIZE - 1)) {
-        printf("ERROR: Vector to be yielded is out-of-bounds\n");
+    // Check if the vec is same as computed
+    if (&(object_to_add->vec) != v) {
+        printf("ERROR: Vector to be yielded is not correct\n");
         return -1;
     }
     
-    FreeList * fl = &(pool[id]);
-    // printf("New free list next = %p\n", fl->next);
-    fl->next = head;
-    head = fl;
+    object_to_add->next = head;
+    head = object_to_add;
 
-    return id;
+    return 1;
 }
 
