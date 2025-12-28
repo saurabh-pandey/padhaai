@@ -43,9 +43,9 @@ example struct member offset (bytes):
   offsetof(d) : 8 // No padding needed here
 
 address of struct members:
-  &example.c : 0x1ffefffdc0
-  &example.i : 0x1ffefffdc4 // Note the padding!
-  &example.d : 0x1ffefffdc8
+  &example.c : 0x1ffefffd90
+  &example.i : 0x1ffefffd94 // Note the padding!
+  &example.d : 0x1ffefffd98
 
 calculated offset of struct members:
   &offset.c : 0
@@ -54,11 +54,11 @@ calculated offset of struct members:
 
 
 Stack Variable addresses:
-  &c       = 0x1ffefffdab
-  &i       = 0x1ffefffdac
-  &l       = 0x1ffefffdb0
-  &d       = 0x1ffefffdb8
-  &s       = 0x1ffefffdc0
+  &c       = 0x1ffefffd7b
+  &i       = 0x1ffefffd7c
+  &l       = 0x1ffefffd80
+  &d       = 0x1ffefffd88
+  &s       = 0x1ffefffd90
 
 Stack vars alignment check (addr % align == 0):
   char     : 1
@@ -84,12 +84,12 @@ Heap vars alignment check:
 
   Finally memory addresses
 ===============================
-function        0x109b5a   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/bin/experiments
-global          0x10c010   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/bin/experiments
-static global   0x10c014   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/bin/experiments
-static local    0x10c018   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/bin/experiments
+function        0x109b5a   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/initial_experiments/bin/experiments
+global          0x10c010   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/initial_experiments/bin/experiments
+static global   0x10c014   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/initial_experiments/bin/experiments
+static local    0x10c018   →  /home/saurabh/kaam/github/padhaai/the_c_prog_lang/ch08/storage_allocator/initial_experiments/bin/experiments
 heap            0x4a8e1c0   →  anonymous
-stack           0x1ffefffdcc   →  anonymous
+stack           0x1ffefffd9c   →  anonymous
 
 Before malloc Program break        : 0x403c000
 After malloc Program break         : 0x403c000
@@ -107,13 +107,16 @@ class TestExperiments(unittest.TestCase):
         self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
         stdout, stderr, _ = valgrind.run(self.exe)
         self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
+        # print(stdout)
         print("Len example output = ", len(expected_output.splitlines()))
         print("Len std output = ", len(stdout.splitlines()))
         example_lines = expected_output.splitlines()
         stdout_lines = stdout.splitlines()
         for example_line, stdout_line in zip(example_lines, stdout_lines):
-            print("Example line : ", example_line)
-            print("stdout line  : ", stdout_line)
+            if stdout_line != example_line:
+                print()
+                print("Example line : ", example_line)
+                print("stdout line  : ", stdout_line)
             
         # self.assertEqual(expected_output, stdout)
         # for i range(len(ex))
