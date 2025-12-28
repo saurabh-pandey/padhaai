@@ -107,19 +107,7 @@ class TestExperiments(unittest.TestCase):
         self.assertTrue(valgrind.check_valgrind_installed(), "Valgrind not installed")
         stdout, stderr, _ = valgrind.run(self.exe)
         self.assertEqual(valgrind.parse_valgrind_output(stderr), 0)
-        # print(stdout)
-        print("Len example output = ", len(expected_output.splitlines()))
-        print("Len std output = ", len(stdout.splitlines()))
-        example_lines = expected_output.splitlines()
-        stdout_lines = stdout.splitlines()
-        for example_line, stdout_line in zip(example_lines, stdout_lines):
-            if stdout_line != example_line:
-                print()
-                print("Example line : ", example_line)
-                print("stdout line  : ", stdout_line)
-            
-        # self.assertEqual(expected_output, stdout)
-        # for i range(len(ex))
+        self.assertEqual(expected_output, stdout)
 
 
 if __name__ == '__main__':
