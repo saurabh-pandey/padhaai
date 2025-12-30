@@ -15,7 +15,7 @@ $(BIN)/%.o : %.c
 
 all: $(EXECS)
 
-$(BIN)/try_storage_allocator: try_storage_allocator.c
+$(BIN)/try_storage_allocator: try_storage_allocator.c simple_allocator.c
 	$(CC) $(CFLAGS) -Iinclude -o $@ $^
 
 $(BIN)/initial_experiments:
