@@ -4,7 +4,7 @@ CFLAGS=-Wall -g
 BIN=bin
 $(shell mkdir -p $(BIN))
 
-JUST_EXECS = initial_experiments object_pool
+JUST_EXECS = initial_experiments object_pool try_storage_allocator
 EXECS=$(addprefix $(BIN)/, $(JUST_EXECS))
 
 $(BIN)/% : $(BIN)/%.o
@@ -14,6 +14,9 @@ $(BIN)/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 all: $(EXECS)
+
+$(BIN)/try_storage_allocator: try_storage_allocator.c
+	$(CC) $(CFLAGS) -Iinclude -o $@ $^
 
 $(BIN)/initial_experiments:
 	cd initial_experiments && $(MAKE) all && cd ..;
