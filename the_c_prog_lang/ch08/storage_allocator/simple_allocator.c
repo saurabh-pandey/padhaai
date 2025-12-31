@@ -35,8 +35,13 @@ void my_free(void * p) {
             new_block->s.next = freep;
             freep = new_block;
             return;
-        } else if (new_block->s.next == (curr + curr->s.sz)) {
+        } else if (new_block == (curr + curr->s.sz)) {
             // Merge with curr
+            // This means just increase the size of curr
+            curr->s.sz += new_block->s.sz;
+            // TODO: What if this new block make even curr and curr->next contiguous?
+            // For now treating them as independent block which is slightly not optimal but still
+            // works
             return;
         } else if (curr->s.next == NULL) {
             // Make it next block of curr
@@ -44,9 +49,17 @@ void my_free(void * p) {
             return;
         } else if ((new_block + new_block->s.sz) == curr->s.next) {
             // Merge with curr->next
+            // Make curr->next point to new block
+            // Make new block next point to curr->next->next
+            // Update the size in new block header to be a sum of curr->next as well
+            new_block->s.next = curr->s.next->s.next;
+            new_block->s.sz += curr->s.sz;
+            curr->s.next = new_block;
             return;
         } else if (new_block < curr->s.next) {
             // This is between curr and curr->next
+            new_block->s.next = curr->s.next;
+            curr->s.next = new_block;
             return;
         }
         curr = curr->s.next;
