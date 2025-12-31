@@ -18,6 +18,15 @@ Header * freep = NULL;
 
 void my_free(void * p) {
     // Find the block this memory belongs to and insert
+    // The idea is that we have the current and next block in the existing list
+    // And we have the new block to insert
+    // New block is inserted in the right address
+    // The new block is:
+    // 1. Either supposed to be merged with curr
+    // 2. Or is in between curr and next
+    // 3. Or is merged with next
+    // 4. Or search in the next pair
+    // 5. If the new block address is less than curr that means it is the new head node
 }
 
 void * morecore(size_t nunits) {
