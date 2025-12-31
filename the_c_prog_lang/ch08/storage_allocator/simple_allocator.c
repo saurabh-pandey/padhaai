@@ -27,7 +27,38 @@ void my_free(void * p) {
     // 3. Or is merged with next
     // 4. Or search in the next pair
     // 5. If the new block address is less than curr that means it is the new head node
+    Header * new_block = (Header *)p;
+    Header * curr = freep;
+    while (curr != NULL) {
+        if (new_block < curr) {
+            // This has to be new head node
+            new_block->s.next = freep;
+            freep = new_block;
+            return;
+        } else if (new_block->s.next == (curr + curr->s.sz)) {
+            // Merge with curr
+            return;
+        } else if (curr->s.next == NULL) {
+            // Make it next block of curr
+            curr->s.next = new_block;
+            return;
+        } else if ((new_block + new_block->s.sz) == curr->s.next) {
+            // Merge with curr->next
+            return;
+        } else if (new_block < curr->s.next) {
+            // This is between curr and curr->next
+            return;
+        }
+        curr = curr->s.next;
+    }
+    // If here then must likely head is NULL
+    if (freep != NULL) {
+        printf("Head was supposed to be NULL :(\n");
+    }
+    // In this case this is the new head
+    freep = new_block;
 }
+
 
 void * morecore(size_t nunits) {
     void * new_mem = sbrk(nunits * sizeof(Header));
@@ -44,6 +75,7 @@ void * morecore(size_t nunits) {
     
     return new_mem;
 }
+
 
 void * my_malloc(size_t nbytes) {
     const size_t nunits = (nbytes / sizeof(Header)) + 2;
