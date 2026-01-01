@@ -19,6 +19,7 @@
 
 
 void test_multiple_malloc_free() {
+    printf("\n\nMultiple malloc free\n");
     const char * orig_hello_world = "Hello World";
     char *my_hello_world = (char *)MALLOC(12);
 
@@ -45,6 +46,7 @@ void test_multiple_malloc_free() {
 
 
 void test_single_malloc_free() {
+    printf("\n\nSingle malloc free\n");
     const char * hello_world = "Hello World";
     char *str = (char *)MALLOC(12);
 
@@ -66,7 +68,7 @@ int main() {
 
     test_single_malloc_free();
 
-    // test_multiple_malloc_free();
+    test_multiple_malloc_free();
 
     return 0;
 }

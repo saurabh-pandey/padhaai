@@ -99,7 +99,8 @@ void * my_morecore(size_t nunits) {
     new_block->s.sz = nunits;
     
     // Assign this to the list ordered by memory
-    my_free(new_mem);
+    // We always send the raw memory to free so we skip the header first block
+    my_free(new_block + 1);
     
     return new_mem;
 }
@@ -139,6 +140,7 @@ void * my_malloc(size_t nbytes) {
                         // This was the first block so freep is pointing to the next one 
                         freep = curr->s.next;
                     }
+                    printf("    Returning same size block %p\n", curr);
                     return (curr + 1);
                 } else {
                     // This block is bigger so resize and return the tail end
@@ -147,6 +149,7 @@ void * my_malloc(size_t nbytes) {
                     // TODO: Resize here
                     Header * tail_block = (Header *)curr + curr->s.sz;
                     tail_block->s.sz = nunits;
+                    printf("    Returning tail block %p\n", tail_block);
                     return (tail_block + 1);
                 }
             }
