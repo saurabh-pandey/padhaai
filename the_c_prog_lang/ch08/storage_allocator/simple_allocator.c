@@ -15,6 +15,17 @@ typedef union Header {
 
 Header * freep = NULL;
 
+void print_mem_blocks(void) {
+    Header * curr = freep;
+
+    while (curr != NULL) {
+        printf("{sz = %zu, curr = %p, mem = %p} -> ", curr->s.sz, curr, curr + 1);
+        curr = curr->s.next;
+    }
+    
+    printf("{NULL}\n");
+}
+
 
 void my_free(void * p) {
     // Find the block this memory belongs to and insert

@@ -7,4 +7,6 @@ void * my_malloc(size_t nbytes);
 
 void my_free(void * p);
 
+void print_mem_blocks(void);
+
 #endif

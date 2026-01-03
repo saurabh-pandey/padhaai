@@ -50,6 +50,8 @@ void test_single_malloc_free() {
     const char * hello_world = "Hello World";
     char *str = (char *)MALLOC(12);
 
+    print_mem_blocks();
+
     for (int i = 0; i < 12; ++i) {
         str[i] = hello_world[i];
     }
@@ -66,9 +68,13 @@ int main() {
 
     test_single_malloc_free();
 
+    print_mem_blocks();
+
     test_single_malloc_free();
 
     test_multiple_malloc_free();
+
+    print_mem_blocks();
 
     return 0;
 }
