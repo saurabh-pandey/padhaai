@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define NALLOC 10
+#define NALLOC 100
 
 typedef union Header {
     struct {
@@ -86,7 +86,8 @@ void my_free(void * p) {
 
 void * my_morecore(size_t nunits) {
     printf("\nmy_morecore\n");
-    void * new_mem = sbrk(nunits * sizeof(Header));
+    const size_t nalloc_units = nunits > NALLOC ? nunits : NALLOC;
+    void * new_mem = sbrk(nalloc_units * sizeof(Header));
     if (new_mem == (void *)-1) {
         perror("sbrk failed");
         return NULL;
@@ -96,7 +97,7 @@ void * my_morecore(size_t nunits) {
     printf("New program break      = %p\n", sbrk(0));
 
     Header * new_block = (Header *)new_mem;
-    new_block->s.sz = nunits;
+    new_block->s.sz = nalloc_units;
     
     // Assign this to the list ordered by memory
     // We always send the raw memory to free so we skip the header first block
