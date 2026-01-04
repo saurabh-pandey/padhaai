@@ -2,13 +2,14 @@
 
 #include <stdio.h>
 
+#include <stdlib.h>
+#include <time.h>
+
 // Comment to try the new allocator
 // #define DEBUG
 
 #ifdef DEBUG
 // For testing only
-#include <stdlib.h>
-
 #define MALLOC malloc
 #define FREE free
 
@@ -63,8 +64,32 @@ void test_single_malloc_free() {
 }
 
 
+typedef struct double_vec {
+    double coord[3];
+} double_vec;
+
+
+void fill_coords(double_vec * arr, size_t sz) {
+    for (int i = 0; i < sz; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            const double new_coord = rand() * 1.0 / RAND_MAX;
+            printf("New coord = %f\n", new_coord);
+            arr[i].coord[j] = new_coord;
+        }
+    }
+}
+
+
+
 int main() {
     printf("Running storage allocator\n");
+
+    srand(time(NULL));
+
+    double_vec coords_arr[10];
+    fill_coords(coords_arr, 10);
+
+    return 0;
 
     test_single_malloc_free();
 
@@ -75,6 +100,8 @@ int main() {
     test_multiple_malloc_free();
 
     print_mem_blocks();
+
+    printf("\n\n Sizeof(double_vec) = %zu\n", sizeof(double_vec));
 
     return 0;
 }
