@@ -19,6 +19,48 @@
 #endif
 
 
+typedef struct double_vec {
+    double coord[3];
+} double_vec;
+
+
+void fill_coords(double_vec * arr, size_t sz) {
+    for (int i = 0; i < sz; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            const double new_coord = rand() * 1.0 / RAND_MAX;
+            printf("New coord = %f\n", new_coord);
+            arr[i].coord[j] = new_coord;
+        }
+    }
+}
+
+void test_hole_in_mem(void) {
+    printf("\n\n test_hole_in_mem\n");
+    printf("\n\n Sizeof(double_vec) = %zu\n", sizeof(double_vec));
+    
+    double_vec coords_arr[10];
+    fill_coords(coords_arr, 10);
+
+    double_vec * malloc_coords = MALLOC(10 * sizeof(double_vec));
+
+    for (size_t i = 0; i < 10; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            malloc_coords[i].coord[j] = coords_arr[i].coord[j];
+        }
+    }
+
+    printf("Malloc array\n");
+
+    for (size_t i = 0; i < 10; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            printf("Malloc coord = %f\n", malloc_coords[i].coord[j]);
+        }
+    }
+
+    FREE(malloc_coords);
+}
+
+
 void test_multiple_malloc_free() {
     printf("\n\nMultiple malloc free\n");
     const char * orig_hello_world = "Hello World";
@@ -51,7 +93,7 @@ void test_single_malloc_free() {
     const char * hello_world = "Hello World";
     char *str = (char *)MALLOC(12);
 
-    print_mem_blocks();
+    // print_mem_blocks();
 
     for (int i = 0; i < 12; ++i) {
         str[i] = hello_world[i];
@@ -64,44 +106,22 @@ void test_single_malloc_free() {
 }
 
 
-typedef struct double_vec {
-    double coord[3];
-} double_vec;
-
-
-void fill_coords(double_vec * arr, size_t sz) {
-    for (int i = 0; i < sz; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            const double new_coord = rand() * 1.0 / RAND_MAX;
-            printf("New coord = %f\n", new_coord);
-            arr[i].coord[j] = new_coord;
-        }
-    }
-}
-
-
-
 int main() {
     printf("Running storage allocator\n");
 
     srand(time(NULL));
 
-    double_vec coords_arr[10];
-    fill_coords(coords_arr, 10);
-
-    return 0;
-
     test_single_malloc_free();
 
-    print_mem_blocks();
+    // print_mem_blocks();
 
     test_single_malloc_free();
 
     test_multiple_malloc_free();
 
-    print_mem_blocks();
+    // print_mem_blocks();
 
-    printf("\n\n Sizeof(double_vec) = %zu\n", sizeof(double_vec));
+    test_hole_in_mem();
 
     return 0;
 }
