@@ -41,23 +41,37 @@ void test_hole_in_mem(void) {
     double_vec coords_arr[10];
     fill_coords(coords_arr, 10);
 
-    double_vec * malloc_coords = MALLOC(10 * sizeof(double_vec));
+    double_vec * malloc_coords_arr[10] = {NULL};
 
-    for (size_t i = 0; i < 10; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            malloc_coords[i].coord[j] = coords_arr[i].coord[j];
+    for (int iteration = 0; iteration < 10; ++iteration) {
+        int coords_sz = iteration + 1;
+        double_vec * malloc_coords = MALLOC(coords_sz * sizeof(double_vec));
+
+        for (size_t i = 0; i < coords_sz; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                malloc_coords[i].coord[j] = coords_arr[i].coord[j];
+            }
         }
+
+        // printf("Malloc array\n");
+
+        // for (size_t i = 0; i < coords_sz; ++i) {
+        //     for (int j = 0; j < 3; ++j) {
+        //         printf("Malloc coord = %f\n", malloc_coords[i].coord[j]);
+        //     }
+        // }
+        malloc_coords_arr[iteration] = malloc_coords;
     }
 
-    printf("Malloc array\n");
+    print_mem_blocks();
 
-    for (size_t i = 0; i < 10; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            printf("Malloc coord = %f\n", malloc_coords[i].coord[j]);
+    for (int iteration = 0; iteration < 10; ++iteration) {
+        if (iteration % 3 == 0) {
+            FREE(malloc_coords_arr[iteration]);
         }
+        // FREE(malloc_coords_arr[iteration]);
+        print_mem_blocks();
     }
-
-    FREE(malloc_coords);
 }
 
 
