@@ -66,28 +66,35 @@ void test_hole_in_mem(void) {
         malloc_coords_arr[iteration] = malloc_coords;
     }
 
+    printf("After all mallocs\n");
     print_mem_blocks();
 
     for (int iteration = 0; iteration < NUM_BLOCKS; ++iteration) {
         // Free everything
         // FREE(malloc_coords_arr[iteration]);
+        // printf("\nAfter free iteration %d\n", iteration);
+        // print_mem_blocks();
 
         // Free even blocks
         if (iteration % 2 == 0) {
             FREE(malloc_coords_arr[iteration]);
+            printf("\nAfter free iteration %d\n", iteration);
+            print_mem_blocks();
         }
         
         // Free odd block
         // if (iteration % 2 != 0) {
         //     FREE(malloc_coords_arr[iteration]);
+        //     printf("\nAfter free iteration %d\n", iteration);
+        //     print_mem_blocks();
         // }
         
         // Free every 3rd
         // if (iteration % 3 == 0) {
         //     FREE(malloc_coords_arr[iteration]);
+        //     printf("\nAfter free iteration %d\n", iteration);
+        //     print_mem_blocks();
         // }
-        printf("\nAfter iteration %d\n", iteration);
-        print_mem_blocks();
     }
 }
 
@@ -142,13 +149,13 @@ int main() {
 
     srand(time(NULL));
 
-    test_single_malloc_free();
+    // test_single_malloc_free();
 
     // print_mem_blocks();
 
-    test_single_malloc_free();
+    // test_single_malloc_free();
 
-    test_multiple_malloc_free();
+    // test_multiple_malloc_free();
 
     // print_mem_blocks();
 
