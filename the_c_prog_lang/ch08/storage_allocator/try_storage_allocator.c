@@ -34,16 +34,19 @@ void fill_coords(double_vec * arr, size_t sz) {
     }
 }
 
+
+#define NUM_BLOCKS 4
+
 void test_hole_in_mem(void) {
     printf("\n\n test_hole_in_mem\n");
     printf("\n\n Sizeof(double_vec) = %zu\n", sizeof(double_vec));
     
-    double_vec coords_arr[10];
-    fill_coords(coords_arr, 10);
+    double_vec coords_arr[NUM_BLOCKS];
+    fill_coords(coords_arr, NUM_BLOCKS);
 
-    double_vec * malloc_coords_arr[10] = {NULL};
+    double_vec * malloc_coords_arr[NUM_BLOCKS] = {NULL};
 
-    for (int iteration = 0; iteration < 10; ++iteration) {
+    for (int iteration = 0; iteration < NUM_BLOCKS; ++iteration) {
         int coords_sz = iteration + 1;
         double_vec * malloc_coords = MALLOC(coords_sz * sizeof(double_vec));
 
@@ -65,11 +68,25 @@ void test_hole_in_mem(void) {
 
     print_mem_blocks();
 
-    for (int iteration = 0; iteration < 10; ++iteration) {
-        if (iteration % 3 == 0) {
+    for (int iteration = 0; iteration < NUM_BLOCKS; ++iteration) {
+        // Free everything
+        // FREE(malloc_coords_arr[iteration]);
+
+        // Free even blocks
+        if (iteration % 2 == 0) {
             FREE(malloc_coords_arr[iteration]);
         }
-        // FREE(malloc_coords_arr[iteration]);
+        
+        // Free odd block
+        // if (iteration % 2 != 0) {
+        //     FREE(malloc_coords_arr[iteration]);
+        // }
+        
+        // Free every 3rd
+        // if (iteration % 3 == 0) {
+        //     FREE(malloc_coords_arr[iteration]);
+        // }
+        printf("\nAfter iteration %d\n", iteration);
         print_mem_blocks();
     }
 }
