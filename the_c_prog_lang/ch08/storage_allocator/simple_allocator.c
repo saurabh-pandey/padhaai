@@ -84,7 +84,7 @@ void my_free(void * p) {
         }
         curr = curr->s.next;
     }
-    // If here then must likely head is NULL
+    // If here then most likely head is NULL
     if (freep != NULL) {
         printf("Head was supposed to be NULL :(\n");
     } else {
