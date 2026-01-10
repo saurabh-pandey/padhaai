@@ -60,6 +60,9 @@ typedef struct {
     mem_val val;
 } test_data;
 
+#define TD_ALLOC(sz) ((test_data){ .op = ALOC, .val.size = (sz) })
+#define TD_FREE(idx) ((test_data){ .op = FR, .val.index = (idx) })
+
 void copy_coords(const pure_coords * src, pure_coords * dst, size_t size_to_cpy) {
     for (size_t i = 0; i < size_to_cpy; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -77,10 +80,10 @@ void test_hole_in_mem(void) {
     fill_coords(coords_arr, MAX_NUM_BLOCKS);
 
     test_data test_arr[] = {
-        {.op = ALOC, .val.size = 1},
-        {.op = ALOC, .val.size = 2},
-        {.op = FR, .val.index = 0},
-        {.op = ALOC, .val.size = 3}
+        TD_ALLOC(1),
+        TD_ALLOC(2),
+        TD_FREE(0),
+        TD_ALLOC(3)
     };
 
     pure_coords * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
