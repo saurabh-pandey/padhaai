@@ -19,19 +19,19 @@
 #endif
 
 
-typedef struct double_vec {
+typedef struct {
     double coord[3];
-} double_vec;
+} pure_coords;
 
 // Another struct with 32 bytes that matches Header
 // Might use this one for some other tests
 typedef struct {
     double time;
     double coord[3];
-} time_coord;
+} time_coords;
 
 
-void fill_coords(double_vec * arr, size_t sz) {
+void fill_coords(pure_coords * arr, size_t sz) {
     for (int i = 0; i < sz; ++i) {
         for (int j = 0; j < 3; ++j) {
             const double new_coord = rand() * 1.0 / RAND_MAX;
@@ -50,77 +50,122 @@ typedef enum {
     FR
 } mem_op;
 
+typedef union {
+    size_t size; // Used for alloc
+    size_t index; // Used for free
+} mem_val;
 
 typedef struct {
     mem_op op;
-    size_t num_vecs; // Used for alloc
-    size_t index; // Used for free
+    mem_val val;
 } test_data;
+
+void copy_coords(const pure_coords * src, pure_coords * dst, size_t size_to_cpy) {
+    for (size_t i = 0; i < size_to_cpy; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            dst[i].coord[j] = src[i].coord[j];
+        }
+    }
+}
 
 void test_hole_in_mem(void) {
     printf("\n\n test_hole_in_mem\n");
-    printf("\n\n Sizeof(double_vec) = %zu\n", sizeof(double_vec));
-    printf("\n\n Sizeof(time_coord) = %zu\n", sizeof(time_coord));
+    printf("\n\n Sizeof(pure_coords) = %zu\n", sizeof(pure_coords));
+    printf("\n\n Sizeof(time_coords) = %zu\n", sizeof(time_coords));
     
-    double_vec coords_arr[MAX_NUM_BLOCKS];
+    pure_coords coords_arr[MAX_NUM_BLOCKS];
     fill_coords(coords_arr, MAX_NUM_BLOCKS);
 
-    test_data test_arr[] = {{ALOC, 1}, {ALOC, 2}, {FR, 1}, {ALOC, 2}};
+    test_data test_arr[] = {
+        {.op = ALOC, .val.size = 1},
+        {.op = ALOC, .val.size = 2},
+        {.op = FR, .val.index = 0},
+        {.op = ALOC, .val.size = 3}
+    };
 
-    double_vec * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
+    pure_coords * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
 
-    for (int iteration = 0; iteration < MAX_NUM_BLOCKS; ++iteration) {
-        // int coords_sz = iteration + 1;
-        int coords_sz = MAX_NUM_BLOCKS - iteration;
-        double_vec * malloc_coords = MALLOC(coords_sz * sizeof(double_vec));
-
-        for (size_t i = 0; i < coords_sz; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                malloc_coords[i].coord[j] = coords_arr[i].coord[j];
+    size_t index = 0;
+    for (int i = 0; i < sizeof(test_arr)/sizeof(test_arr[0]); ++i) {
+        switch (test_arr[i].op) {
+            case ALOC:
+            {
+                pure_coords * malloc_coords = MALLOC(test_arr[i].val.size * sizeof(pure_coords));
+                malloc_coords_arr[index] = malloc_coords;
+                index++;
+                copy_coords(coords_arr, malloc_coords, test_arr[i].val.size);
+                break;
+            }
+            case FR:
+            {
+                if (test_arr[i].val.index < MAX_NUM_BLOCKS) {
+                    FREE(malloc_coords_arr[test_arr[i].val.index]);
+                    malloc_coords_arr[test_arr[i].val.index] = NULL;
+                } else {
+                    printf("ERROR: Free index = %zu is out of bounds\n", test_arr[i].val.index);
+                }
+                break;
+            }
+            default:
+            {
+                printf("ERROR: Allocation test case not known. Case value = %d\n", test_arr[i].op);
+                break;
             }
         }
-
-        // printf("Malloc array\n");
-
-        // for (size_t i = 0; i < coords_sz; ++i) {
-        //     for (int j = 0; j < 3; ++j) {
-        //         printf("Malloc coord = %f\n", malloc_coords[i].coord[j]);
-        //     }
-        // }
-        malloc_coords_arr[iteration] = malloc_coords;
     }
-
-    printf("After all mallocs\n");
-    print_mem_blocks();
 
     // for (int iteration = 0; iteration < MAX_NUM_BLOCKS; ++iteration) {
-    for (int iteration = MAX_NUM_BLOCKS - 1; iteration >= 0; --iteration) {
-        // Free everything
-        // FREE(malloc_coords_arr[iteration]);
-        // printf("\nAfter free iteration %d\n", iteration);
-        // print_mem_blocks();
+    //     // int coords_sz = iteration + 1;
+    //     int coords_sz = MAX_NUM_BLOCKS - iteration;
+    //     pure_coords * malloc_coords = MALLOC(coords_sz * sizeof(pure_coords));
 
-        // Free even blocks
-        // if (iteration % 2 == 0) {
-        //     FREE(malloc_coords_arr[iteration]);
-        //     printf("\nAfter free iteration %d\n", iteration);
-        //     print_mem_blocks();
-        // }
+    //     for (size_t i = 0; i < coords_sz; ++i) {
+    //         for (int j = 0; j < 3; ++j) {
+    //             malloc_coords[i].coord[j] = coords_arr[i].coord[j];
+    //         }
+    //     }
+
+    //     // printf("Malloc array\n");
+
+    //     // for (size_t i = 0; i < coords_sz; ++i) {
+    //     //     for (int j = 0; j < 3; ++j) {
+    //     //         printf("Malloc coord = %f\n", malloc_coords[i].coord[j]);
+    //     //     }
+    //     // }
+    //     malloc_coords_arr[iteration] = malloc_coords;
+    // }
+
+    // printf("After all mallocs\n");
+    // print_mem_blocks();
+
+    // for (int iteration = 0; iteration < MAX_NUM_BLOCKS; ++iteration) {
+    // for (int iteration = MAX_NUM_BLOCKS - 1; iteration >= 0; --iteration) {
+    //     // Free everything
+    //     // FREE(malloc_coords_arr[iteration]);
+    //     // printf("\nAfter free iteration %d\n", iteration);
+    //     // print_mem_blocks();
+
+    //     // Free even blocks
+    //     // if (iteration % 2 == 0) {
+    //     //     FREE(malloc_coords_arr[iteration]);
+    //     //     printf("\nAfter free iteration %d\n", iteration);
+    //     //     print_mem_blocks();
+    //     // }
         
-        // Free odd block
-        if (iteration % 2 != 0) {
-            FREE(malloc_coords_arr[iteration]);
-            printf("\nAfter free iteration %d\n", iteration);
-            print_mem_blocks();
-        }
+    //     // Free odd block
+    //     if (iteration % 2 != 0) {
+    //         FREE(malloc_coords_arr[iteration]);
+    //         printf("\nAfter free iteration %d\n", iteration);
+    //         print_mem_blocks();
+    //     }
         
-        // Free every 3rd
-        // if (iteration % 3 == 0) {
-        //     FREE(malloc_coords_arr[iteration]);
-        //     printf("\nAfter free iteration %d\n", iteration);
-        //     print_mem_blocks();
-        // }
-    }
+    //     // Free every 3rd
+    //     // if (iteration % 3 == 0) {
+    //     //     FREE(malloc_coords_arr[iteration]);
+    //     //     printf("\nAfter free iteration %d\n", iteration);
+    //     //     print_mem_blocks();
+    //     // }
+    // }
 }
 
 
