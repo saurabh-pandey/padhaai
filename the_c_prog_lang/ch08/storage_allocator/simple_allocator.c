@@ -30,30 +30,38 @@ void print_mem_blocks(void) {
 
 #define MALLOC_CASES 6
 #define FREE_CASES 6
+#define MAX_CASE_MSG_SZ 256
 
 typedef struct {
-    unsigned malloc_cases[MALLOC_CASES]; // Malloc has 6 cases
-    unsigned free_cases[FREE_CASES]; // Free has 6 cases
-} cases;
+    unsigned case_num;
+    char msg[MAX_CASE_MSG_SZ];
+} alloc_case;
 
-cases result;
+typedef struct {
+    alloc_case malloc_cases[MALLOC_CASES]; // Malloc has 6 cases
+    alloc_case free_cases[FREE_CASES]; // Free has 6 cases
+} all_alloc_cases;
+
+all_alloc_cases result;
 
 void reset_cases(void) {
     for (int i = 0; i < MALLOC_CASES; ++i) {
-        result.malloc_cases[i] = 0;
+        result.malloc_cases[i].case_num = 0;
+        result.malloc_cases[i].msg[0] = '\0';
     }
     for (int i = 0; i < FREE_CASES; ++i) {
-        result.free_cases[i] = 0;
+        result.free_cases[i].case_num = 0;
+        result.free_cases[i].msg[0] = '\0';
     }
 }
 
 void print_cases(void) {
-    for (int i = 0; i < MALLOC_CASES; ++i) {
-        result.malloc_cases[i] = 0;
-    }
-    for (int i = 0; i < FREE_CASES; ++i) {
-        result.free_cases[i] = 0;
-    }
+    // for (int i = 0; i < MALLOC_CASES; ++i) {
+    //     result.malloc_cases[i] = 0;
+    // }
+    // for (int i = 0; i < FREE_CASES; ++i) {
+    //     result.free_cases[i] = 0;
+    // }
 }
 
 
