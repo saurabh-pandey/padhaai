@@ -27,6 +27,36 @@ void print_mem_blocks(void) {
 }
 
 
+
+#define MALLOC_CASES 6
+#define FREE_CASES 6
+
+typedef struct {
+    unsigned malloc_cases[MALLOC_CASES]; // Malloc has 6 cases
+    unsigned free_cases[FREE_CASES]; // Free has 6 cases
+} cases;
+
+cases result;
+
+void reset_cases(void) {
+    for (int i = 0; i < MALLOC_CASES; ++i) {
+        result.malloc_cases[i] = 0;
+    }
+    for (int i = 0; i < FREE_CASES; ++i) {
+        result.free_cases[i] = 0;
+    }
+}
+
+void print_cases(void) {
+    for (int i = 0; i < MALLOC_CASES; ++i) {
+        result.malloc_cases[i] = 0;
+    }
+    for (int i = 0; i < FREE_CASES; ++i) {
+        result.free_cases[i] = 0;
+    }
+}
+
+
 void my_free(void * p) {
     // Find the block this memory belongs to and insert
     // The idea is that we have the current and next block in the existing list
