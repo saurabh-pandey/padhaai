@@ -51,13 +51,14 @@ void my_free(void * p) {
     while (curr != NULL) {
         if (new_block < curr) {
             // This has to be new head node
-            printf("New head added\n");
+            printf("  Free Case 1: New head added\n");
             new_block->s.next = freep;
             freep = new_block;
             return;
         } else if (new_block == (curr + curr->s.sz)) {
             // Merge with curr
             // This means just increase the size of curr
+            printf("  Free Case 2: Merge with current\n");
             curr->s.sz += new_block->s.sz;
             // TODO: What if this new block make even curr and curr->next contiguous?
             // For now treating them as independent block which is slightly not optimal but still
@@ -65,6 +66,7 @@ void my_free(void * p) {
             return;
         } else if (curr->s.next == NULL) {
             // Make it next block of curr
+            printf("  Free Case 3: After current as next is null\n");
             curr->s.next = new_block;
             return;
         } else if ((new_block + new_block->s.sz) == curr->s.next) {
@@ -72,12 +74,14 @@ void my_free(void * p) {
             // Make curr->next point to new block
             // Make new block next point to curr->next->next
             // Update the size in new block header to be a sum of curr->next as well
+            printf("  Free Case 4: Merge with next block\n");
             new_block->s.next = curr->s.next->s.next;
             new_block->s.sz += curr->s.sz;
             curr->s.next = new_block;
             return;
         } else if (new_block < curr->s.next) {
             // This is between curr and curr->next
+            printf("  Free Case 5: Between current and next block\n");
             new_block->s.next = curr->s.next;
             curr->s.next = new_block;
             return;
@@ -88,7 +92,7 @@ void my_free(void * p) {
     if (freep != NULL) {
         printf("Head was supposed to be NULL :(\n");
     } else {
-        printf("Head is NULL as expected so adding the freed head block\n");
+        printf("  Free Case 6: Head is NULL as expected so adding the freed head block\n");
     }
     // In this case this is the new head
     freep = new_block;
@@ -128,7 +132,7 @@ void * my_malloc(size_t nbytes) {
     
     if (freep == NULL) {
         // This is the first call or everything was allocated
-        printf("First call or no memory left\n");
+        printf("  Malloc Case 1: First call or no memory left\n");
         freep = my_morecore(nunits);
     }
     
@@ -144,35 +148,36 @@ void * my_malloc(size_t nbytes) {
                 // Found the first fit block
                 if (curr->s.sz == nunits) {
                     // Size matches perfectly just plug out the block and return
-                    printf("    Found exact matching block\n");
+                    printf("  Malloc Case 2: Found exact matching block\n");
                     if (prev != NULL) {
                         // Remove the block from the list
+                        printf("    Malloc Case 2.1: Remove block as prev is not NULL\n");
                         prev->s.next = curr->s.next;
                     } else {
-                        // This was the first block so freep is pointing to the next one 
+                        // This was the first block so freep is pointing to the next one
+                        printf("    Malloc Case 2.2: Remove 1st block as prev is NULL\n");
                         freep = curr->s.next;
                     }
                     printf("    Returning same size block %p\n", curr);
                     return (curr + 1);
                 } else {
                     // This block is bigger so resize and return the tail end
-                    printf("  Found bigger block\n");
+                    printf("  Malloc Case 3: Found bigger block\n");
                     curr->s.sz -= nunits;
-                    // TODO: Resize here
                     Header * tail_block = (Header *)curr + curr->s.sz;
                     tail_block->s.sz = nunits;
                     printf("    Returning tail block %p\n", tail_block);
                     return (tail_block + 1);
                 }
             }
-            printf("  Searching in next\n");
+            printf("  Malloc Case 4: Searching in next\n");
             curr = curr->s.next;
             prev = curr;
         }
 
         // If here then nothing of the right size was found
         // Add a block to the list
-        printf("No block fit for this request found so adding more memory\n");
+        printf("  Malloc Case 5: No block fit for this request found so adding more memory\n");
         my_morecore(nunits);
         // And search again
         // TODO: This is an overkill. I know this is the block to be returned so why search?
