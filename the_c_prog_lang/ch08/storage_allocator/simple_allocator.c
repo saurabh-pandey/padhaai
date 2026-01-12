@@ -1,6 +1,7 @@
 #include "simple_allocator.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #define NALLOC 100
@@ -55,6 +56,22 @@ void reset_cases(void) {
     }
 }
 
+void fill_free_case(size_t index, const char * msg) {
+    if (strlen(result.free_cases[index].msg)) {
+        strcpy(result.free_cases[index].msg, msg);
+    }
+
+    result.free_cases[index].case_num += 1;
+}
+
+void fill_malloc_case(size_t index, const char * msg) {
+    if (strlen(result.malloc_cases[index].msg)) {
+        strcpy(result.malloc_cases[index].msg, msg);
+    }
+
+    result.malloc_cases[index].case_num += 1;
+}
+
 void print_cases(void) {
     // for (int i = 0; i < MALLOC_CASES; ++i) {
     //     result.malloc_cases[i] = 0;
@@ -90,6 +107,7 @@ void my_free(void * p) {
         if (new_block < curr) {
             // This has to be new head node
             printf("  Free Case 1: New head added\n");
+            fill_free_case(0, "New head added");
             new_block->s.next = freep;
             freep = new_block;
             return;
@@ -97,6 +115,7 @@ void my_free(void * p) {
             // Merge with curr
             // This means just increase the size of curr
             printf("  Free Case 2: Merge with current\n");
+            fill_free_case(1, "Merge with current");
             curr->s.sz += new_block->s.sz;
             // TODO: What if this new block make even curr and curr->next contiguous?
             // For now treating them as independent block which is slightly not optimal but still
@@ -105,6 +124,7 @@ void my_free(void * p) {
         } else if (curr->s.next == NULL) {
             // Make it next block of curr
             printf("  Free Case 3: After current as next is null\n");
+            fill_free_case(2, "After current as next is null");
             curr->s.next = new_block;
             return;
         } else if ((new_block + new_block->s.sz) == curr->s.next) {
@@ -113,6 +133,7 @@ void my_free(void * p) {
             // Make new block next point to curr->next->next
             // Update the size in new block header to be a sum of curr->next as well
             printf("  Free Case 4: Merge with next block\n");
+            fill_free_case(3, "Merge with next block");
             new_block->s.next = curr->s.next->s.next;
             new_block->s.sz += curr->s.sz;
             curr->s.next = new_block;
@@ -120,6 +141,7 @@ void my_free(void * p) {
         } else if (new_block < curr->s.next) {
             // This is between curr and curr->next
             printf("  Free Case 5: Between current and next block\n");
+            fill_free_case(4, "Between current and next block");
             new_block->s.next = curr->s.next;
             curr->s.next = new_block;
             return;
@@ -131,6 +153,7 @@ void my_free(void * p) {
         printf("Head was supposed to be NULL :(\n");
     } else {
         printf("  Free Case 6: Head is NULL as expected so adding the freed head block\n");
+        fill_free_case(5, "Head is NULL as expected so adding new head");
     }
     // In this case this is the new head
     freep = new_block;
@@ -171,6 +194,7 @@ void * my_malloc(size_t nbytes) {
     if (freep == NULL) {
         // This is the first call or everything was allocated
         printf("  Malloc Case 1: First call or no memory left\n");
+        fill_malloc_case(0, "First call or no memory left");
         freep = my_morecore(nunits);
     }
     
@@ -190,10 +214,12 @@ void * my_malloc(size_t nbytes) {
                     if (prev != NULL) {
                         // Remove the block from the list
                         printf("    Malloc Case 2.1: Remove block as prev is not NULL\n");
+                        fill_malloc_case(1, "Exact match with prev not NULL");
                         prev->s.next = curr->s.next;
                     } else {
                         // This was the first block so freep is pointing to the next one
                         printf("    Malloc Case 2.2: Remove 1st block as prev is NULL\n");
+                        fill_malloc_case(2, "Exact match at head");
                         freep = curr->s.next;
                     }
                     printf("    Returning same size block %p\n", curr);
@@ -201,6 +227,7 @@ void * my_malloc(size_t nbytes) {
                 } else {
                     // This block is bigger so resize and return the tail end
                     printf("  Malloc Case 3: Found bigger block\n");
+                    fill_malloc_case(3, "Bigger block");
                     curr->s.sz -= nunits;
                     Header * tail_block = (Header *)curr + curr->s.sz;
                     tail_block->s.sz = nunits;
@@ -209,6 +236,7 @@ void * my_malloc(size_t nbytes) {
                 }
             }
             printf("  Malloc Case 4: Searching in next\n");
+            fill_malloc_case(4, "Searching in next");
             curr = curr->s.next;
             prev = curr;
         }
@@ -216,6 +244,7 @@ void * my_malloc(size_t nbytes) {
         // If here then nothing of the right size was found
         // Add a block to the list
         printf("  Malloc Case 5: No block fit for this request found so adding more memory\n");
+        fill_malloc_case(5, "No block found adding more mem");
         my_morecore(nunits);
         // And search again
         // TODO: This is an overkill. I know this is the block to be returned so why search?
