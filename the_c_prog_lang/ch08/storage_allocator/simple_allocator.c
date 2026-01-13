@@ -57,7 +57,7 @@ void reset_cases(void) {
 }
 
 void fill_free_case(size_t index, const char * msg) {
-    if (strlen(result.free_cases[index].msg)) {
+    if (strlen(result.free_cases[index].msg) == 0) {
         strcpy(result.free_cases[index].msg, msg);
     }
 
@@ -65,7 +65,7 @@ void fill_free_case(size_t index, const char * msg) {
 }
 
 void fill_malloc_case(size_t index, const char * msg) {
-    if (strlen(result.malloc_cases[index].msg)) {
+    if (strlen(result.malloc_cases[index].msg) == 0) {
         strcpy(result.malloc_cases[index].msg, msg);
     }
 
@@ -73,12 +73,18 @@ void fill_malloc_case(size_t index, const char * msg) {
 }
 
 void print_cases(void) {
-    // for (int i = 0; i < MALLOC_CASES; ++i) {
-    //     result.malloc_cases[i] = 0;
-    // }
-    // for (int i = 0; i < FREE_CASES; ++i) {
-    //     result.free_cases[i] = 0;
-    // }
+    for (int i = 0; i < MALLOC_CASES; ++i) {
+        printf("Malloc Case %d: hits = %u, msg = %s\n",
+               i + i,
+               result.malloc_cases[i].case_num,
+               result.malloc_cases[i].msg);
+    }
+    for (int i = 0; i < FREE_CASES; ++i) {
+        printf("Free Case %d: hits = %u, msg = %s\n",
+               i + i,
+               result.free_cases[i].case_num,
+               result.free_cases[i].msg);
+    }
 }
 
 
