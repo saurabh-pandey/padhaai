@@ -82,7 +82,7 @@ void test_hole_in_mem(void) {
     test_data test_arr[] = {
         TD_ALLOC(1),
         TD_ALLOC(2),
-        TD_FREE(0),
+        TD_FREE(2),
         TD_ALLOC(3)
     };
 
@@ -93,17 +93,26 @@ void test_hole_in_mem(void) {
         switch (test_arr[i].op) {
             case ALOC:
             {
-                pure_coords * malloc_coords = MALLOC(test_arr[i].val.size * sizeof(pure_coords));
-                malloc_coords_arr[index] = malloc_coords;
-                index++;
-                copy_coords(coords_arr, malloc_coords, test_arr[i].val.size);
+                if (test_arr[i].val.index < MAX_NUM_BLOCKS) {
+                    pure_coords * malloc_coords =
+                        MALLOC(test_arr[i].val.size * sizeof(pure_coords));
+                    malloc_coords_arr[index] = malloc_coords;
+                    index++;
+                    copy_coords(coords_arr, malloc_coords, test_arr[i].val.size);
+                } else {
+                    printf("ERROR: Malloc index = %zu is out of bounds\n", test_arr[i].val.index);
+                }
                 break;
             }
             case FR:
             {
                 if (test_arr[i].val.index < MAX_NUM_BLOCKS) {
-                    FREE(malloc_coords_arr[test_arr[i].val.index]);
-                    malloc_coords_arr[test_arr[i].val.index] = NULL;
+                    if (malloc_coords_arr[test_arr[i].val.index] != NULL) {
+                        FREE(malloc_coords_arr[test_arr[i].val.index]);
+                        malloc_coords_arr[test_arr[i].val.index] = NULL;
+                    } else {
+                        printf("ERROR: Free index = %zu is NULL\n", test_arr[i].val.index);
+                    }
                 } else {
                     printf("ERROR: Free index = %zu is out of bounds\n", test_arr[i].val.index);
                 }

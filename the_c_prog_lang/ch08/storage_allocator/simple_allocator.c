@@ -75,7 +75,7 @@ void fill_malloc_case(size_t index, const char * msg) {
 void print_cases(void) {
     for (int i = 0; i < MALLOC_CASES; ++i) {
         printf("Malloc Case %d: hits = %u, msg = %s\n",
-               i + i,
+               i + 1,
                result.malloc_cases[i].case_num,
                result.malloc_cases[i].msg);
     }
