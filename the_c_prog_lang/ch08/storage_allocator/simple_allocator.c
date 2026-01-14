@@ -81,7 +81,7 @@ void print_cases(void) {
     }
     for (int i = 0; i < FREE_CASES; ++i) {
         printf("Free Case %d: hits = %u, msg = %s\n",
-               i + i,
+               i + 1,
                result.free_cases[i].case_num,
                result.free_cases[i].msg);
     }
