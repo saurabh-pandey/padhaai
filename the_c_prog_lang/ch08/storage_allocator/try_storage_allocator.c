@@ -81,9 +81,14 @@ void test_hole_in_mem(void) {
 
     test_data test_arr[] = {
         TD_ALLOC(1),
+        TD_ALLOC(1),
         TD_ALLOC(2),
-        TD_FREE(1),
+        TD_ALLOC(2),
         TD_ALLOC(3),
+        TD_ALLOC(3),
+        TD_FREE(0),
+        TD_FREE(2),
+        TD_FREE(4),
         TD_ALLOC(2)
     };
 
