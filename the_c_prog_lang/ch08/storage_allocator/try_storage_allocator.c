@@ -133,6 +133,7 @@ void test_hole_in_mem(void) {
     }
 
     print_cases();
+    print_stats();
 
     // for (int iteration = 0; iteration < MAX_NUM_BLOCKS; ++iteration) {
     //     // int coords_sz = iteration + 1;

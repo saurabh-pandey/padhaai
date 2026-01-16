@@ -15,4 +15,6 @@ void print_mem_blocks(void);
 void reset_cases(void);
 void print_cases(void);
 
+void print_stats(void);
+
 #endif

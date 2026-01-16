@@ -88,6 +88,17 @@ void print_cases(void) {
 }
 
 
+static size_t total_alloc_units = 0;
+static size_t requested_alloc_units = 0;
+static size_t requested_free_units = 0;
+
+void print_stats(void) {
+    printf("Total allocated units: %zu\n", total_alloc_units);
+    printf("Requested allocated units: %zu\n", requested_alloc_units);
+    printf("Requested free units: %zu\n", requested_free_units);
+}
+
+
 void my_free(void * p) {
     // Find the block this memory belongs to and insert
     // The idea is that we have the current and next block in the existing list
@@ -107,6 +118,8 @@ void my_free(void * p) {
     Header * new_block = (Header *)p - 1;
     printf("New block ptr = %p\n", new_block);
     printf("Free block sz = %zu\n", new_block->s.sz);
+
+    requested_free_units += new_block->s.sz;
 
     Header * curr = freep;
     while (curr != NULL) {
@@ -169,6 +182,7 @@ void my_free(void * p) {
 void * my_morecore(size_t nunits) {
     printf("\nmy_morecore\n");
     const size_t nalloc_units = nunits > NALLOC ? nunits : NALLOC;
+    total_alloc_units += nalloc_units;
     void * new_mem = sbrk(nalloc_units * sizeof(Header));
     if (new_mem == (void *)-1) {
         perror("sbrk failed");
@@ -184,6 +198,8 @@ void * my_morecore(size_t nunits) {
     // Assign this to the list ordered by memory
     // We always send the raw memory to free so we skip the header first block
     my_free(new_block + 1);
+    // Adjust this size
+    requested_free_units -= new_block->s.sz;
     
     return new_mem;
 }
@@ -196,6 +212,7 @@ void * my_malloc(size_t nbytes) {
     
     const size_t nunits = (nbytes / sizeof(Header)) + 2;
     printf("nunits = %zu\n", nunits);
+    requested_alloc_units += nunits;
     
     if (freep == NULL) {
         // This is the first call or everything was allocated
