@@ -4,7 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define NALLOC 100
+// #define NALLOC 100
+static size_t NALLOC = 100;
 
 typedef union Header {
     struct {
@@ -96,6 +97,16 @@ void print_stats(void) {
     printf("Total allocated units: %zu\n", total_alloc_units);
     printf("Requested allocated units: %zu\n", requested_alloc_units);
     printf("Requested free units: %zu\n", requested_free_units);
+}
+
+
+void set_nalloc(size_t new_size) {
+    NALLOC = new_size;
+}
+
+
+size_t get_nalloc(void) {
+    return NALLOC;
 }
 
 

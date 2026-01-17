@@ -79,20 +79,34 @@ void test_hole_in_mem(void) {
     pure_coords coords_arr[MAX_NUM_BLOCKS];
     fill_coords(coords_arr, MAX_NUM_BLOCKS);
 
+    // test_data test_arr[] = {
+    //     TD_ALLOC(1),
+    //     TD_ALLOC(1),
+    //     TD_ALLOC(2),
+    //     TD_ALLOC(2),
+    //     TD_ALLOC(3),
+    //     TD_ALLOC(3),
+    //     TD_FREE(0),
+    //     TD_FREE(2),
+    //     TD_FREE(4),
+    //     TD_ALLOC(2)
+    // };
     test_data test_arr[] = {
-        TD_ALLOC(1),
-        TD_ALLOC(1),
-        TD_ALLOC(2),
-        TD_ALLOC(2),
+        TD_ALLOC(4),
         TD_ALLOC(3),
-        TD_ALLOC(3),
-        TD_FREE(0),
-        TD_FREE(2),
-        TD_FREE(4),
-        TD_ALLOC(2)
+        TD_ALLOC(2),
+        TD_ALLOC(1),
+        // TD_ALLOC(3),
+        // TD_ALLOC(3),
+        TD_FREE(3),
+        TD_FREE(1),
+        // TD_FREE(4),
+        // TD_ALLOC(2)
     };
 
     pure_coords * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
+
+    set_nalloc(14);
 
     size_t index = 0;
     for (int i = 0; i < sizeof(test_arr)/sizeof(test_arr[0]); ++i) {
@@ -132,7 +146,8 @@ void test_hole_in_mem(void) {
         }
     }
 
-    print_cases();
+    print_mem_blocks();
+    // print_cases();
     print_stats();
 
     // for (int iteration = 0; iteration < MAX_NUM_BLOCKS; ++iteration) {
