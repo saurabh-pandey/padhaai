@@ -42,7 +42,7 @@ void fill_coords(pure_coords * arr, size_t sz) {
 }
 
 
-#define MAX_NUM_BLOCKS 6
+#define MAX_NUM_BLOCKS 20
 
 
 typedef enum {
@@ -92,28 +92,35 @@ void test_hole_in_mem(void) {
     //     TD_ALLOC(2)
     // };
     test_data test_arr[] = {
+        TD_ALLOC(8),
+        TD_ALLOC(7),
+        TD_ALLOC(6),
+        TD_ALLOC(5),
         TD_ALLOC(4),
         TD_ALLOC(3),
         TD_ALLOC(2),
         TD_ALLOC(1),
         // TD_ALLOC(3),
         // TD_ALLOC(3),
+        TD_FREE(7),
+        TD_FREE(5),
         TD_FREE(3),
         TD_FREE(1),
         // TD_FREE(4),
-        // TD_ALLOC(2)
+        TD_ALLOC(7),
+        TD_ALLOC(20),
     };
 
     pure_coords * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
 
-    set_nalloc(14);
+    set_nalloc(40);
 
     size_t index = 0;
     for (int i = 0; i < sizeof(test_arr)/sizeof(test_arr[0]); ++i) {
         switch (test_arr[i].op) {
             case ALOC:
             {
-                if (test_arr[i].val.index < MAX_NUM_BLOCKS) {
+                if (index < MAX_NUM_BLOCKS) {
                     pure_coords * malloc_coords =
                         MALLOC(test_arr[i].val.size * sizeof(pure_coords));
                     malloc_coords_arr[index] = malloc_coords;
@@ -147,7 +154,7 @@ void test_hole_in_mem(void) {
     }
 
     print_mem_blocks();
-    // print_cases();
+    print_cases();
     print_stats();
 
     // for (int iteration = 0; iteration < MAX_NUM_BLOCKS; ++iteration) {
