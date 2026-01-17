@@ -108,7 +108,9 @@ void test_hole_in_mem(void) {
         TD_FREE(1),
         // TD_FREE(4),
         TD_ALLOC(7),
-        TD_ALLOC(20),
+        TD_ALLOC(10),
+        // Try free case
+        // TD_FREE(0),
     };
 
     pure_coords * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
