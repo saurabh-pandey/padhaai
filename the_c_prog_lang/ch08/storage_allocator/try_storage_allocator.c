@@ -92,30 +92,32 @@ void test_hole_in_mem(void) {
     //     TD_ALLOC(2)
     // };
     test_data test_arr[] = {
-        TD_ALLOC(8),
-        TD_ALLOC(7),
+        TD_ALLOC(6),
         TD_ALLOC(6),
         TD_ALLOC(5),
+        TD_ALLOC(5),
+        TD_ALLOC(4),
         TD_ALLOC(4),
         TD_ALLOC(3),
+        TD_ALLOC(3),
+        TD_ALLOC(2),
         TD_ALLOC(2),
         TD_ALLOC(1),
-        // TD_ALLOC(3),
-        // TD_ALLOC(3),
-        TD_FREE(7),
+        TD_ALLOC(1),
         TD_FREE(5),
-        TD_FREE(3),
-        TD_FREE(1),
-        // TD_FREE(4),
+        TD_FREE(6),
+        TD_ALLOC(4),
         TD_ALLOC(7),
-        TD_ALLOC(10),
+        TD_FREE(7),
+        TD_FREE(2),
+        TD_FREE(3),
         // Try free case
         // TD_FREE(0),
     };
 
     pure_coords * malloc_coords_arr[MAX_NUM_BLOCKS] = {NULL};
 
-    set_nalloc(40);
+    set_nalloc(50);
 
     size_t index = 0;
     for (int i = 0; i < sizeof(test_arr)/sizeof(test_arr[0]); ++i) {
