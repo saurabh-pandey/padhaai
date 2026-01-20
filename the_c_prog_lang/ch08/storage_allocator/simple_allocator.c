@@ -284,6 +284,8 @@ void * my_malloc(size_t nbytes) {
         // TODO: This is an overkill. I know this is the block to be returned so why search?
         // If we know curr and prev ptr then above loop can be used directly. Just reset curr and
         // prev to this new block and continue the loop
+
+        // TODO: Another idea is to make the block list circular!!!
     }
 
     // Not enough memory so error case
